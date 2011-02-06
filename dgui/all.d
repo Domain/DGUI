@@ -1,33 +1,19 @@
-﻿module dgui.all;
+﻿/*
+	Copyright (c) 2011 Trogu Antonio Davide
 
-/* Bug List:
- * Usare un flag 'Creating' per impedire il lancio degli eventi prima che il componente sia stato creato e sia visibile
- *
- * ToDo List:
- * 2) Oggetti (ToolButton, ListviewItem, etc...), convertirli in strutture per performance maggiori.
- * 3) Ridurre l'uso dei template (codice duplicato a compile time).
- *    - 4.1) Rimossi Template: OwnerDrawControl, ContainerControl.
- * 7) Permettere cambio parent di un componente.
- * 8) Gestire caso "Rimozione Colonna 0" nel ListView.
- * 9) ListViewItem: Aggiungere la possibilita' di cambiare i colori.
- *
- * Difetti List:
- * 1) Funzioni statiche:
- *	  - 1.1) TabControl: Rimosse le funzioni statiche.
-	  - 1.2) ComboBox: Rimosse le funzioni statiche.
- * 2) Spostate funzioni in 'Control' (ma dovrebbero stare in 'SubclassedControl').
- *    - 2.1) Spostato campo '_docking'.
- *	  - 2.2) Spostato campo '_childControls'.
- *	  - 2.3) Spostato metodo 'docking()' (get e set).
- *	  - 2.4) Spostato metodo 'doDock()'.
- * 3) 'Menu' ha una funzione performClick() per chiamare l'evento 'click'.
- * 4) ListView: InsertItem() è dichiarata come package.
- * 6) Splitter: Usa le GDI per disegnare la XOR Bar (invece delle GDI+).
- * 7) Menu: createItem(), doMenu() funzioni duplicate?
- * 8) Migliorare velocita' Docks.
- * 9) Controllare Codice Creazione componenti.
- */
+	This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /*
  * From: http://msdn.microsoft.com/en-us/library/bb776779%28VS.85%29.aspx
@@ -86,6 +72,8 @@
  * you must add an application manifest that indicates that version 6 should be used if it is available.
  *
  */
+
+module dgui.all;
 
 public import dgui.application;
 public import dgui.messagebox/*, dgui.imagelist*/;
