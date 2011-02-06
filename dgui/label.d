@@ -28,23 +28,10 @@ enum LabelDrawMode: ubyte
 	OWNER_DRAW = 1,
 }
 
-enum ContentAlignment: ubyte
-{
-	TOP_CENTER 	   = 0,
-	TOP_LEFT       = 1,
-	TOP_RIGHT	   = 2,
-	BOTTOM_CENTER  = 4,
-	BOTTOM_LEFT    = 8,
-	BOTTOM_RIGHT   = 16,
-	MIDDLE_CENTER  = 32,
-	MIDDLE_LEFT    = 64,
-	MIDDLE_RIGHT   = 128,
-}
-
 class Label: SubclassedControl
 {
 	private LabelDrawMode _drawMode = LabelDrawMode.NORMAL;
-	private ContentAlignment _ca = ContentAlignment.MIDDLE_LEFT;
+	private TextAlignment _textAlign = TextAlignment.MIDDLE | TextAlignment.LEFT;
 
 	public final LabelDrawMode drawMode()
 	{
@@ -56,14 +43,14 @@ class Label: SubclassedControl
 		this._drawMode = ldm;
 	}
 
-	public final ContentAlignment alignment()
+	public final TextAlignment alignment()
 	{
-		return this._ca;
+		return this._textAlign;
 	}
 
-	public final void alignment(ContentAlignment ca)
+	public final void alignment(TextAlignment ta)
 	{
-		this._ca = ca;
+		this._textAlign = ta;
 	}
 
 	protected override void preCreateWindow(inout PreCreateWindow pcw)
@@ -71,7 +58,6 @@ class Label: SubclassedControl
 		pcw.ClassName = WC_DLABEL;
 		pcw.OldClassName = WC_STATIC;
 
-		this.setStyle(ControlStyle.USER_PAINT | ControlStyle.NO_ERASE, true);
 		super.preCreateWindow(pcw);
 	}
 
@@ -81,68 +67,18 @@ class Label: SubclassedControl
 
 		if(this._drawMode is LabelDrawMode.NORMAL)
 		{
-			Canvas c = e.canvas;
 			Rect r = void; //Inizializzata da GetClientRect()
+			Canvas c = e.canvas;
+
 			GetClientRect(this._handle, &r.rect);
 
-			scope StringFormat sf = new StringFormat();
+			//scope TextFormat tf = new TextFormat(TextFormatFlags.SINGLE_LINE);
+			scope TextFormat tf = new TextFormat(TextFormatFlags.WORD_BREAK);
+			tf.alignment = this._textAlign;
 
-			switch(this._ca)
-			{
-				case ContentAlignment.TOP_CENTER:
-					sf.horizontalAlignment = StringAlignment.CENTER;
-					sf.verticalAlignment = StringAlignment.NEAR;
-					break;
-
-				case ContentAlignment.TOP_LEFT:
-					sf.horizontalAlignment = StringAlignment.NEAR;
-					sf.verticalAlignment = StringAlignment.NEAR;
-					break;
-
-				case ContentAlignment.TOP_RIGHT:
-					sf.horizontalAlignment = StringAlignment.FAR;
-					sf.verticalAlignment = StringAlignment.NEAR;
-					break;
-
-				case ContentAlignment.BOTTOM_CENTER:
-					sf.horizontalAlignment = StringAlignment.CENTER;
-					sf.verticalAlignment = StringAlignment.FAR;
-					break;
-
-				case ContentAlignment.BOTTOM_LEFT:
-					sf.horizontalAlignment = StringAlignment.NEAR;
-					sf.verticalAlignment = StringAlignment.FAR;
-					break;
-
-				case ContentAlignment.BOTTOM_RIGHT:
-					sf.horizontalAlignment = StringAlignment.FAR;
-					sf.verticalAlignment = StringAlignment.FAR;
-					break;
-
-				case ContentAlignment.MIDDLE_CENTER:
-					sf.horizontalAlignment = StringAlignment.CENTER;
-					sf.verticalAlignment = StringAlignment.CENTER;
-					break;
-
-				case ContentAlignment.MIDDLE_LEFT:
-					sf.horizontalAlignment = StringAlignment.NEAR;
-					sf.verticalAlignment = StringAlignment.CENTER;
-					break;
-
-				case ContentAlignment.MIDDLE_RIGHT:
-					sf.horizontalAlignment = StringAlignment.FAR;
-					sf.verticalAlignment = StringAlignment.CENTER;
-					break;
-
-				default:
-					break;
-			}
-
-			scope SolidBrush bc = new SolidBrush(this._controlInfo.BackColor);
-			scope SolidBrush fc = new SolidBrush(this._controlInfo.ForeColor);
-
-			c.fillRectangle(bc, r);
-			c.drawString(this.text, r, fc, this.font, sf);
+			scope SolidBrush sb = new SolidBrush(this._controlInfo.BackColor);
+			c.fillRectangle(sb, r);
+			c.drawText(this.text, r, this._controlInfo.ForeColor, this.font, tf);
 		}
 	}
 }

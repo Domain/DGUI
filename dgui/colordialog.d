@@ -30,7 +30,7 @@ class ColorDialog: CommonDialog!(CHOOSECOLORA, Color)
 
 		if(ChooseColorA(&this._dlgStruct))
 		{
-			this._dlgRes = COLORREFtoARGB(this._dlgStruct.rgbResult);
+			this._dlgRes = Color.fromCOLORREF(this._dlgStruct.rgbResult);
 			return true;
 		}
 

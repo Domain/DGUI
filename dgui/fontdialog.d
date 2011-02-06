@@ -18,8 +18,6 @@
 module dgui.fontdialog;
 
 public import dgui.core.winapi;
-public import std.string;
-
 public import dgui.core.commondialog;
 
 class FontDialog: CommonDialog!(CHOOSEFONTA, Font)

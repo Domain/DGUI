@@ -45,8 +45,8 @@ struct PreCreateWindow
 {
 	string ClassName;
 	string OldClassName; //Per fare SuperClassing
-	ARGB DefaultBackColor;
-	ARGB DefaultForeColor;
+	Color DefaultBackColor;
+	Color DefaultForeColor;
 	Cursor DefaultCursor;
 	ClassStyles ClassStyle;
 	uint ExtendedStyle = 0;
@@ -132,6 +132,8 @@ abstract class Control: Handle!(HWND), IDisposable
 		{
 			DestroyWindow(this._handle);
 		}
+
+		this._handle = null;
 	}
 
 	public final Collection!(Control) controls()
@@ -142,7 +144,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	public final Rect bounds()
 	{
 		return this._controlInfo.Bounds;
-	}
+ 	}
 
 	public void bounds(Rect rect)
 	{
@@ -227,7 +229,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	public final Canvas createCanvas()
 	{
-		return Canvas.fromHWND(this._handle);
+		return Canvas.fromHDC(GetDC(this._handle));
 	}
 
 	public final void focus()
@@ -251,7 +253,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 
 		this._controlInfo.BackColor = c;
-		this._controlInfo.BackBrush = CreateSolidBrush(ARGBtoCOLORREF(c));
+		this._controlInfo.BackBrush = CreateSolidBrush(c.colorref);
 
 		if(this.created)
 		{
@@ -272,7 +274,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 
 		this._controlInfo.ForeColor = c;
-		this._controlInfo.ForeBrush = CreateSolidBrush(ARGBtoCOLORREF(c));
+		this._controlInfo.ForeBrush = CreateSolidBrush(c.colorref);
 
 		if(this.created)
 		{
@@ -298,7 +300,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			char[] buffer = new char[len];
 			this.sendMessage(WM_GETTEXT, len, cast(LPARAM)buffer.ptr);
-			return std.string.toString(buffer.ptr);
+			return recalcString(buffer);
 		}
 
 		return this._controlInfo.Text;
@@ -345,7 +347,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			SetWindowPos(this._handle, null, pt.x, pt.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOREDRAW);
+			this.setWindowPos(pt.x, pt.y, 0, 0, PositionSpecified.POSITION);
 		}
 	}
 
@@ -360,7 +362,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			SetWindowPos(this._handle, null, 0, 0, sz.width, sz.height, SWP_NOMOVE | SWP_NOZORDER | SWP_NOREDRAW);
+			this.setWindowPos(0, 0, sz.width, sz.height, PositionSpecified.SIZE);
 		}
 	}
 
@@ -393,7 +395,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			SetWindowPos(this._handle, null, 0, 0, w, this._controlInfo.Bounds.height, SWP_NOMOVE | SWP_NOZORDER);
+			this.setWindowPos(0, 0, w, 0, PositionSpecified.WIDTH);
 		}
 	}
 
@@ -408,7 +410,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			SetWindowPos(this._handle, null, 0, 0, this._controlInfo.Bounds.width, h, SWP_NOMOVE | SWP_NOZORDER);
+			this.setWindowPos(0, 0, 0, h, PositionSpecified.HEIGHT);
 		}
 	}
 
@@ -562,12 +564,12 @@ abstract class Control: Handle!(HWND), IDisposable
 					break;
 
 				case DockStyle.RIGHT:
-					t.setWindowPos(da.right - t.width, da.top, t.width, da.height, PositionSpecified.POSITION | PositionSpecified.HEIGHT);
+					t.setWindowPos(da.right - t.width, da.top, t.width, da.height, PositionSpecified.ALL);
 					da.right -= t.width;
 					break;
 
 				case DockStyle.BOTTOM:
-					t.setWindowPos(da.left, da.bottom - t.height, da.width, t.height, PositionSpecified.POSITION | PositionSpecified.WIDTH);
+					t.setWindowPos(da.left, da.bottom - t.height, da.width, t.height, PositionSpecified.ALL);
 					da.bottom -= t.height;
 					break;
 
@@ -718,8 +720,8 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		this.preCreateWindow(pcw);
 
-		this._controlInfo.BackBrush = CreateSolidBrush(pcw.DefaultBackColor);
-		this._controlInfo.ForeBrush = CreateSolidBrush(pcw.DefaultForeColor);
+		this._controlInfo.BackBrush = CreateSolidBrush(pcw.DefaultBackColor.colorref);
+		this._controlInfo.ForeBrush = CreateSolidBrush(pcw.DefaultForeColor.colorref);
 
 		if(pcw.DefaultCursor)
 		{
@@ -731,12 +733,12 @@ abstract class Control: Handle!(HWND), IDisposable
 			this._controlInfo.DefaultFont = SystemFonts.windowsFont;
 		}
 
-		if(!this._controlInfo.BackColor) // Invalid Color
+		if(!this._controlInfo.BackColor.valid) // Invalid Color
 		{
 			this.backColor = pcw.DefaultBackColor;
 		}
 
-		if(!this._controlInfo.ForeColor) // Invalid Color
+		if(!this._controlInfo.ForeColor.valid) // Invalid Color
 		{
 			this.foreColor = pcw.DefaultForeColor;
 		}
@@ -754,7 +756,6 @@ abstract class Control: Handle!(HWND), IDisposable
 		if(this._controlInfo.Parent)
 		{
 			hParent = this._controlInfo.Parent.handle;
-			//style |= WS_CLIPCHILDREN;
 		}
 
 		if(modal) //E' una finestra modale?
@@ -879,8 +880,8 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected final void initDC(HDC hdc)
 	{
-		SetBkColor(hdc, ARGBtoCOLORREF(this.backColor));
-		SetTextColor(hdc, ARGBtoCOLORREF(this.foreColor));
+		SetBkColor(hdc, this.backColor.colorref);
+		SetTextColor(hdc, this.foreColor.colorref);
 	}
 
 	protected final uint getStyle()
@@ -944,7 +945,14 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected void preCreateWindow(inout PreCreateWindow pcw)
 	{
-		registerWindowClass(pcw.ClassName, pcw.ClassStyle | ClassStyles.PARENTDC | ClassStyles.DBLCLKS, pcw.DefaultCursor, &Control.msgRouter);
+		ClassStyles cstyle = pcw.ClassStyle | ClassStyles.PARENTDC | ClassStyles.DBLCLKS;
+
+		if(this._controlInfo.CStyle & ControlStyle.RESIZE_REDRAW)
+		{
+			cstyle |= ClassStyles.HREDRAW | ClassStyles.VREDRAW;
+		}
+
+		registerWindowClass(pcw.ClassName, cstyle, pcw.DefaultCursor, &Control.msgRouter);
 	}
 
 	protected int originalWndProc(uint msg, WPARAM wParam, LPARAM lParam)
@@ -1130,10 +1138,14 @@ abstract class Control: Handle!(HWND), IDisposable
 
 				if(!(pWndPos.flags & SWP_NOMOVE) || !(pWndPos.flags & SWP_NOSIZE))
 				{
+					/*
 					this._controlInfo.Bounds.x = pWndPos.x;
 					this._controlInfo.Bounds.y = pWndPos.y;
 					this._controlInfo.Bounds.width = pWndPos.cx;
 					this._controlInfo.Bounds.height = pWndPos.cy;
+					*/
+
+					GetWindowRect(this._handle, &this._controlInfo.Bounds.rect);
 
 					if(this._controlInfo.Parent)
 					{

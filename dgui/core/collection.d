@@ -17,8 +17,6 @@
 
 module dgui.core.collection;
 
-import std.stdio;
-
 class Collection(T)
 {
 	private T[] _t;

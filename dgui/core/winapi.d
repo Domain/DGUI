@@ -40,6 +40,42 @@ extern(Windows)
 		SWP_ASYNCWINDOWPOS = 0x4000,
 	}
 
+	enum
+	{
+		DIB_PAL_COLORS = 1,
+		DIB_RGB_COLORS = 0,
+	}
+
+    enum: int
+	{
+		MM_ANISOTROPIC    = 8,
+		MM_HIENGLISH      = 5,
+		MM_HIMETRIC       = 3,
+		MM_ISOTROPIC      = 7,
+		MM_LOENGLISH      = 4,
+		MM_LOMETRIC       = 2,
+		MM_TEXT           = 1,
+		MM_TWIPS          = 6,
+		MM_MAX_FIXEDSCALE = MM_TWIPS,
+	}
+
+	enum: uint
+	{
+		OBJ_BRUSH       = 2,
+		OBJ_PEN         = 1,
+		OBJ_PAL         = 5,
+		OBJ_FONT        = 6,
+		OBJ_BITMAP      = 7,
+		OBJ_EXTPEN      = 11,
+		OBJ_REGION      = 8,
+		OBJ_DC          = 3,
+		OBJ_MEMDC       = 10,
+		OBJ_METAFILE    = 9,
+		OBJ_METADC      = 4,
+		OBJ_ENHMETAFILE = 13,
+		OBJ_ENHMETADC   = 12,
+	}
+
 	enum: uint
 	{
 		RBIM_IMAGELIST = 1,
@@ -257,6 +293,7 @@ extern(Windows)
 	{
 		NM_FIRST = 0,
 		NM_CLICK = NM_FIRST - 2,
+		NM_RCLICK = NM_FIRST - 5,
 		NM_CUSTOMDRAW = NM_FIRST - 12,
 	}
 
@@ -2496,6 +2533,7 @@ extern(Windows)
 	DWORD SizeofResource(HMODULE hModule, HRSRC hResInfo);
 	BOOL TerminateProcess(HANDLE, UINT);
 	VOID ExitProcess(UINT uExitCode);
+	int MulDiv(int nNumber, int nNumerator, int nDenominator);
 
 	/* *** User32.dll *** */
 	HDWP DeferWindowPos(HDWP hWinPosInfo, HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT uFlags);
@@ -2544,6 +2582,7 @@ extern(Windows)
 	DWORD GetSysColor(int nIndex);
 	HBRUSH GetSysColorBrush(int nIndex);
 	BOOL DestroyWindow(HWND hwnd);
+	BOOL CloseWindow(HWND hWnd);
 	BOOL DestroyMenu(HMENU hMenu);
 	BOOL DrawMenuBar(HWND hWnd);
 	HWND SetCapture(HWND hWnd);
@@ -2574,14 +2613,22 @@ extern(Windows)
 	BOOL ImageList_Destroy(HIMAGELIST himl);
 
 	/* *** Gdi32.dll *** */
+	COLORREF GetTextColor(HDC hdc);
+	int GetDIBits(HDC hdc, HBITMAP hbmp, UINT uStartScan, UINT cScanLines, void* lpvBits, BITMAPINFO* lpbi, UINT uUsage);
+	BOOL DrawIconEx(HDC hdc, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, UINT diFlags);
+	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+	int DrawTextExA(HDC hdc, LPTSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
 	BOOL ExtTextOutA(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, uint cbCount, int* lpDx);
 	BOOL BitBlt(HDC hdcDest, int nXDest,int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+	BOOL PlgBlt(HDC hdcDest, POINT *lpPoint, HDC hdcSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HBITMAP hbmMask, int xMask, int yMask);
 	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, VOID *lpvBits);
 	BOOL PatBlt(HDC hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, DWORD dwRop);
 	HBITMAP CreateCompatibleBitmap(HDC hdc, int nWidth, int nHeight);
 	BOOL SetBrushOrgEx(HDC hdc, int nXOrg, int nYOrg, LPPOINT lppt);
-	BOOL GetIconInfo(HICON hIcon, ICONINFO ICONINFO);
+	BOOL GetIconInfo(HICON hIcon, ICONINFO* iconinfo);
 	HBRUSH CreateSolidBrush(COLORREF crColor);
+	HBRUSH CreateHatchBrush(int ht, COLORREF crColor);
 	BOOL DrawEdge(HDC, LPRECT, UINT, UINT);
 	BOOL DestroyCursor(HCURSOR hCursor);
 	BOOL DestroyIcon(HICON hIcon);

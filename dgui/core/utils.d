@@ -17,39 +17,11 @@
 
 module dgui.core.utils;
 
-public import dgui.core.winapi;
-public import dgui.canvas;
 import std.string;
 import std.stdio;
 import std.path;
-
-public bool compareGUID(GUID* g1, GUID* g2)
-{
-	if(g1.Data1 != g2.Data1)
-	{
-		return false;
-	}
-
-	if(g1.Data2 != g2.Data2)
-	{
-		return false;
-	}
-
-	if(g1.Data3 != g2.Data3)
-	{
-		return false;
-	}
-
-	for(int i = 0; i < g1.Data4.length; i++)
-	{
-		if(g1.Data4[i] != g2.Data4[i])
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
+public import dgui.core.winapi;
+public import dgui.canvas;
 
 T winCast(T)(Object o)
 {
@@ -59,27 +31,6 @@ T winCast(T)(Object o)
 T winCast(T)(size_t st)
 {
 	return cast(T)(cast(void*)st);
-}
-
-void copyBitmap(Canvas dest, Canvas src, Bitmap bmp, Size sz)
-{
-	HDC destDc = dest.getHDC();
-	HDC srcDc = src.getHDC();
-
-	HBITMAP hOldBmp = SelectObject(srcDc, bmp.handle);
-	BitBlt(destDc, 0, 0, sz.width, sz.height, srcDc, 0, 0, SRCCOPY);
-	SelectObject(srcDc, hOldBmp);
-
-	src.releaseDC();
-	dest.releaseDC();
-}
-
-void fastFillBlack(Canvas c, Size sz)
-{
-	HDC hdc = c.getHDC();
-
-	BitBlt(hdc, 0, 0, sz.width, sz.height, null, 0, 0, BLACKNESS);
-	c.releaseDC();
 }
 
 HINSTANCE getHInstance()

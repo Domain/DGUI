@@ -498,6 +498,10 @@ class TreeView: SubclassedControl
 				}
 				break;
 
+				case NM_RCLICK: //Trigger a WM_CONTEXMENU Message (Fixes the double click/context menu bug, probably it's a windows bug).
+					this.wndProc(WM_CONTEXTMENU, 0, 0);
+					break;
+
 				default:
 					break;
 			}

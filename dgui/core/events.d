@@ -132,9 +132,7 @@ class DrawItemEventArgs: EventArgs
 	{
 		if(this._state & DrawItemState.FOCUSED)
 		{
-			HDC hdc = this._canvas.getHDC();
-			DrawFocusRect(hdc, &this._itemRect.rect);
-			this._canvas.releaseDC(); //Rilascia 'hdc' (salvato internamente)
+			DrawFocusRect(this._canvas.handle, &this._itemRect.rect);
 		}
 	}
 

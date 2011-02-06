@@ -30,15 +30,25 @@ enum ColorDepth: uint
 	DEPTH_32BIT = ILC_COLOR32,
 }
 
+/*
+ * Dynamic Binding (Uses The Latest Version Available)
+ */
+
 alias extern(Windows) HIMAGELIST function(int, int, uint, int, int) ImageList_CreateProc;
+alias extern(Windows) HIMAGELIST function(HIMAGELIST) ImageList_DestroyProc;
 alias extern(Windows) BOOL function(HIMAGELIST, int) ImageList_RemoveProc;
 alias extern(Windows) int function(HIMAGELIST, HICON) ImageList_AddIconProc;
+alias extern(Windows) int function(HIMAGELIST, int, HDC, int, int, UINT) ImageList_DrawProc;
+alias extern(Windows) int function(HIMAGELIST, COLORREF) ImageList_SetBkColorProc;
 
 class ImageList: Handle!(HIMAGELIST), IDisposable
 {
 	private static ImageList_CreateProc imageList_Create;
 	private static ImageList_RemoveProc imageList_Remove;
 	private static ImageList_AddIconProc imageList_AddIcon;
+	private static ImageList_DestroyProc imageList_Destroy;
+	private static ImageList_DrawProc imageList_Draw;
+	private static ImageList_SetBkColorProc imageList_SetBkColor;
 
 	private ColorDepth _depth = ColorDepth.DEPTH_32BIT;
 	private Size _size;
@@ -48,7 +58,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 	{
 		if(!imageList_Create)
 		{
-			HMODULE hModule = LoadLibraryA(toStringz("comctl32.dll")); //FIXME: Perche' non GetModuleHandle ?
+			HMODULE hModule = GetModuleHandleA("comctl32.dll");
 
 			/*
 			 * Problema Librerie Statiche, si risolve col binding dinamico: Abilita i Visual Styles, se supportati.
@@ -58,6 +68,9 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 			imageList_Create = cast(ImageList_CreateProc)GetProcAddress(hModule, "ImageList_Create");
 			imageList_Remove = cast(ImageList_RemoveProc)GetProcAddress(hModule, "ImageList_Remove");
 			imageList_AddIcon = cast(ImageList_AddIconProc)GetProcAddress(hModule, "ImageList_AddIcon");
+			imageList_Destroy = cast(ImageList_DestroyProc)GetProcAddress(hModule, "ImageList_Destroy");
+			imageList_Draw = cast(ImageList_DrawProc)GetProcAddress(hModule, "ImageList_Draw");
+			imageList_SetBkColor = cast(ImageList_SetBkColorProc)GetProcAddress(hModule, "ImageList_SetBkColor");
 		}
 	}
 
@@ -71,14 +84,12 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 
 	public void dispose()
 	{
-		ImageList_Destroy(this._handle);
+		imageList_Destroy(this._handle);
 	}
 
 	public final void drawIcon(int i, Canvas dest, Point pos)
 	{
-		HDC hdc = dest.getHDC();
-		ImageList_Draw(this._handle, i, hdc, pos.x, pos.y, ILD_NORMAL);
-		dest.releaseDC();
+		imageList_Draw(this._handle, i, dest.handle, pos.x, pos.y, ILD_NORMAL);
 	}
 
 	public final int addImage(Icon ico)
@@ -99,7 +110,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 			}
 
 			this._handle = imageList_Create(this._size.width, this._size.height, this._depth | ILC_MASK, 0, 0);
-			ImageList_SetBkColor(this._handle, CLR_NONE);
+			imageList_SetBkColor(this._handle, CLR_NONE);
 		}
 
 		return imageList_AddIcon(this._handle, ico.handle);

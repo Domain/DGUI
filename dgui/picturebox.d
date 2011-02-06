@@ -100,9 +100,9 @@ class PictureBox: Control
 	{
 		pcw.ClassName  = WC_DPICTUREBOX;
 		pcw.DefaultCursor = SystemCursors.arrow;
+		pcw.ClassStyle = ClassStyles.HREDRAW | ClassStyles.VREDRAW;
 
-		this._controlInfo.CStyle |= ControlStyle.NO_ERASE;
-
+		this.setStyle(ControlStyle.NO_ERASE, true);
 		super.preCreateWindow(pcw);
 	}
 
@@ -115,11 +115,11 @@ class PictureBox: Control
 			switch(this._sm)
 			{
 				case SizeMode.AUTO_SIZE:
-					c.drawImage(this._img, this.bounds);
+					c.drawImage(this._img, Rect(NullPoint, this.size));
 					break;
 
 				default:
-					c.drawImage(this._img, NullPoint);
+					c.drawImage(this._img, 0, 0);
 					break;
 			}
 		}

@@ -20,7 +20,7 @@ module dgui.splitter;
 public import dgui.control;
 
 private const string WC_DSPLITTER = "DSplitter";
-private const int SPLITTER_SIZE = 4;
+private const int SPLITTER_SIZE = 6;
 private const ubyte[] BITMAP_BITS = [ 0xAA, 0, 0x55, 0, 0xAA, 0, 0x55, 0,
 									  0xAA, 0, 0x55, 0, 0xAA, 0, 0x55, 0, ];
 
@@ -62,11 +62,11 @@ class Splitter: Control
 					break;
 
 				case DockStyle.RIGHT:
-					splitCtrl.width = splitCtrl.width - (pt.x - splitCtrl.location.x);
+					splitCtrl.width = splitCtrl.width - ((pt.x + SPLITTER_SIZE) - splitCtrl.location.x);
 					break;
 
 				case DockStyle.BOTTOM:
-					splitCtrl.height = splitCtrl.height - (pt.y - splitCtrl.location.y);
+					splitCtrl.height = splitCtrl.height - ((pt.y + SPLITTER_SIZE) - splitCtrl.location.y);
 					break;
 
 				default:
@@ -166,12 +166,11 @@ class Splitter: Control
 		return null;
 	}
 
-	/*
 	private static void drawBullets(Canvas c, DockStyle dock, Rect paintRect)
 	{
-		const int SPACE = 6;
-		const int WIDTH = 1;
-		const int HEIGHT = 1;
+		const int SPACE = 5;
+		const int WIDTH = 3;
+		const int HEIGHT = 3;
 
 		void drawSingleBullet(int x, int y)
 		{
@@ -192,7 +191,7 @@ class Splitter: Control
 		{
 			case DockStyle.LEFT, DockStyle.RIGHT:
 			{
-				int x = (paintRect.width / 2) - WIDTH;
+				int x = (paintRect.width / 2) - (WIDTH / 2);
 				int y = (paintRect.height / 2) - 15;
 
 				for(int i = 0; i < 5; i++, y += HEIGHT + SPACE)
@@ -218,7 +217,6 @@ class Splitter: Control
 				break;
 		}
 	}
-	*/
 
 	private static void drawXorBar(HDC hdc, Rect r)
 	{
@@ -383,7 +381,7 @@ class Splitter: Control
 		Rect r = void; //Inizializzati sotto
 
 		GetClientRect(this._handle, &r.rect);
-		//drawBullets(c, this.dock, r);
+		drawBullets(c, this.dock, r);
 		super.onPaint(e);
 	}
 }

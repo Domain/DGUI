@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 module dgui.core.geometry;
 
 public import dgui.core.winapi;

@@ -52,10 +52,11 @@ enum PositionSpecified
 
 enum ControlStyle: ubyte
 {
-	NONE       = 0,
-	NO_ERASE   = 1,
-	USER_PAINT = 2,
-	DOCKING    = 4,
+	NONE          = 0,
+	NO_ERASE      = 1,
+	USER_PAINT    = 2,
+	DOCKING       = 4,
+	RESIZE_REDRAW = 8,
 }
 
 enum BorderStyle: ubyte

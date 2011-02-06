@@ -40,9 +40,9 @@ public void registerWindowClass(string className, ClassStyles classStyle, Cursor
 	{
 		wc.cbSize = WNDCLASSEXA.sizeof;
 		wc.lpszClassName = toStringz(className);
-		wc.hCursor = cursor ? cursor.handle : null;
+		wc.hCursor = cursor ? cursor.handle : SystemCursors.arrow.handle;
 		wc.hInstance = hInst;
-		wc.hbrBackground = GetSysColorBrush(COLOR_BTNFACE);
+		wc.hbrBackground = SystemBrushes.brushBtnFace.handle;
 		wc.lpfnWndProc = wndProc;
 		wc.style = classStyle;
 
@@ -86,7 +86,7 @@ public WNDPROC superClassWindowClass(string oldClassName, string newClassName, W
 		classMap[oldClassName] = oldWc.lpfnWndProc;
 
 		newWc = oldWc;
-		newWc.style &= ClassStyles.PARENTDC | (~ClassStyles.GLOBALCLASS /*| ClassStyles.HREDRAW | ClassStyles.VREDRAW*/);
+		newWc.style &= ClassStyles.PARENTDC | (~ClassStyles.GLOBALCLASS);
 		newWc.lpfnWndProc = newWndProc;
 		newWc.lpszClassName = pNewClassName;
 		newWc.hInstance = hInst;

@@ -17,339 +17,32 @@
 
 module dgui.canvas;
 
+import std.gc;
+import std.c.string;
 public import std.string;
-public import std.utf;
-public import std.gc;
-
 public import dgui.core.winapi;
+public import dgui.core.idisposable;
 public import dgui.core.exception;
-public import dgui.core.gdiplus;
+public import dgui.core.geometry;
 public import dgui.core.handle;
 public import dgui.core.utils;
 
-debug
+enum FontStyle: ubyte
 {
-	public import std.stdio;
+	NORMAL = 0,
+	BOLD = 1,
+	ITALIC = 2,
+	UNDERLINE = 4,
+	STRIKEOUT = 8,
 }
 
-alias string EncoderFormat;
-
-struct EncoderType
+enum ImageType
 {
-	public static EncoderFormat bmp()
-	{
-		return "{B96B3CAB-0728-11D3-9D7B-0000F81EF32E}";
-	}
-
-	public static EncoderFormat jpeg()
-	{
-		return "{B96B3CAE-0728-11D3-9D7B-0000F81EF32E}";
-	}
-
-	public static EncoderFormat gif()
-	{
-		return "{B96B3CB0-0728-11D3-9D7B-0000F81EF32E}";
-	}
-
-	public static EncoderFormat tiff()
-	{
-		return "{B96B3CB1-0728-11D3-9D7B-0000F81EF32E}";
-	}
-
-	public static EncoderFormat png()
-	{
-		return "{B96B3CAF-0728-11D3-9D7B-0000F81EF32E}";
-	}
+	BITMAP 		   = 0,
+	ICON_OR_CURSOR = 1,
 }
 
-public ARGB makeARGB(ubyte a, ubyte r, ubyte g, ubyte b)
-{
-	return ((cast(ARGB)(b) << BLUE_SHIFT) | (cast(ARGB)(g) << GREEN_SHIFT) | (cast(ARGB)(r) << RED_SHIFT) | (cast(ARGB)(a) << ALPHA_SHIFT));
-}
-
-public COLORREF ARGBtoCOLORREF(ARGB argb)
-{
-	ubyte r = cast(ubyte)(argb >> RED_SHIFT);
-	ubyte g = cast(ubyte)(argb >> GREEN_SHIFT);
-	ubyte b = cast(ubyte)(argb >> BLUE_SHIFT);
-
-	return RGB(r, g, b);
-}
-
-public ARGB COLORREFtoARGB(COLORREF cref)
-{
-	return makeARGB(0xFF, GetRValue(cref), GetGValue(cref), GetBValue(cref));
-}
-
-alias ARGB Color;
-
-enum Colors: Color
-{
-	ALICE_BLUE              = 0xFFF0F8FF,
-	ANTIQUE_WHITE           = 0xFFFAEBD7,
-	AQUA                    = 0xFF00FFFF,
-	AQUAMARINE              = 0xFF7FFFD4,
-	AZURE                   = 0xFFF0FFFF,
-	BEIGE                   = 0xFFF5F5DC,
-	BISQUE                  = 0xFFFFE4C4,
-	BLACK                   = 0xFF000000,
-	BLANCHED_ALMOND         = 0xFFFFEBCD,
-	BLUE                    = 0xFF0000FF,
-	BLUE_VIOLET             = 0xFF8A2BE2,
-	BROWN                   = 0xFFA52A2A,
-	BURLY_WOOD              = 0xFFDEB887,
-	CADET_BLUE              = 0xFF5F9EA0,
-	CHART_REUSE             = 0xFF7FFF00,
-    CHOCOLATE               = 0xFFD2691E,
-    CORAL                   = 0xFFFF7F50,
-    CORN_FLOWER_BLUE        = 0xFF6495ED,
-    CORNSILK                = 0xFFFFF8DC,
-    CRIMSON                 = 0xFFDC143C,
-    CYAN                    = 0xFF00FFFF,
-    DARK_BLUE               = 0xFF00008B,
-    DARK_CYAN               = 0xFF008B8B,
-    DARK_GOLDENROD          = 0xFFB8860B,
-    DARK_GRAY               = 0xFFA9A9A9,
-    DARK_GREEN              = 0xFF006400,
-    DARK_KHAKI              = 0xFFBDB76B,
-    DARK_MAGENTA            = 0xFF8B008B,
-    DARK_OLIVE_GREEN        = 0xFF556B2F,
-	DARK_ORANGE             = 0xFFFF8C00,
-	DARK_ORCHID             = 0xFF9932CC,
-	DARK_RED                = 0xFF8B0000,
-	DARK_SALMON             = 0xFFE9967A,
-	DARK_SEA_GREEN          = 0xFF8FBC8B,
-	DARK_SLATE_BLUE         = 0xFF483D8B,
-	DARK_SLATE_GRAY         = 0xFF2F4F4F,
-	DARK_TURQUOISE          = 0xFF00CED1,
-	DARK_VIOLET             = 0xFF9400D3,
-	DEEP_PINK               = 0xFFFF1493,
-	DEEP_SKY_BLUE           = 0xFF00BFFF,
-	DIM_GRAY                = 0xFF696969,
-	DODGER_BLUE             = 0xFF1E90FF,
-	FIRE_BRICK              = 0xFFB22222,
-    FLORAL_WHITE            = 0xFFFFFAF0,
-	FOREST_GREEN            = 0xFF228B22,
-    FUCHSIA                 = 0xFFFF00FF,
-	GAINSBORO               = 0xFFDCDCDC,
-	GHOST_WHITE             = 0xFFF8F8FF,
-    GOLD                    = 0xFFFFD700,
-	GOLDEN_ROD              = 0xFFDAA520,
-	GRAY                    = 0xFF808080,
-	GREEN                   = 0xFF008000,
-	GREEN_YELLOW            = 0xFFADFF2F,
-	HONEY_DEW               = 0xFFF0FFF0,
-    HOT_PINK                = 0xFFFF69B4,
-    INDIAN_RED              = 0xFFCD5C5C,
-    INDIGO                  = 0xFF4B0082,
-	INVALID					= 0x00000000,
-	IVORY                   = 0xFFFFFFF0,
-	KHAKI                   = 0xFFF0E68C,
-    LAVENDER                = 0xFFE6E6FA,
-    LAVENDER_BLUSH          = 0xFFFFF0F5,
-    LAWN_GREEN              = 0xFF7CFC00,
-    LEMON_CHIFFON           = 0xFFFFFACD,
-    LIGHT_BLUE              = 0xFFADD8E6,
-    LIGHT_CORAL             = 0xFFF08080,
-    LIGHTCYAN               = 0xFFE0FFFF,
-    LIGHT_GOLDEN_ROD_YELLOW = 0xFFFAFAD2,
-    LIGHT_GRAY              = 0xFFD3D3D3,
-    LIGHT_GREEN             = 0xFF90EE90,
-    LIGHT_PINK              = 0xFFFFB6C1,
-    LIGHT_SALMON            = 0xFFFFA07A,
-    LIGHT_SEA_GREEN         = 0xFF20B2AA,
-    LIGHT_SKY_BLUE          = 0xFF87CEFA,
-	LIGHT_SLATE_GRAY        = 0xFF778899,
-    LIGHT_STEEL_BLUE        = 0xFFB0C4DE,
-    LIGHT_YELLOW            = 0xFFFFFFE0,
-    LIME                    = 0xFF00FF00,
-	LIME_GREEN              = 0xFF32CD32,
-    LINEN                   = 0xFFFAF0E6,
-    MAGENTA                 = 0xFFFF00FF,
-    MAROON                  = 0xFF800000,
-    MEDIUM_AQUAMARINE       = 0xFF66CDAA,
-    MEDIUM_BLUE             = 0xFF0000CD,
-    MEDIUM_ORCHID           = 0xFFBA55D3,
-    MEDIUM_PURPLE           = 0xFF9370DB,
-    MEDIUM_SEA_GREEN        = 0xFF3CB371,
-    MEDIUM_SLATE_BLUE       = 0xFF7B68EE,
-    MEDIUM_SPRING_GREEN     = 0xFF00FA9A,
-    MEDIUM_TURQUOISE        = 0xFF48D1CC,
-    MEDIUM_VIOLET_RED       = 0xFFC71585,
-	MIDNIGHT_BLUE           = 0xFF191970,
-	MINT_CREAM              = 0xFFF5FFFA,
-    MISTY_ROSE              = 0xFFFFE4E1,
-    MOCCASIN                = 0xFFFFE4B5,
-    NAVAJO_WHITE            = 0xFFFFDEAD,
-    NAVY                    = 0xFF000080,
-    OLD_LACE                = 0xFFFDF5E6,
-    OLIVE                   = 0xFF808000,
-    OLIVE_DRAB              = 0xFF6B8E23,
-    ORANGE                  = 0xFFFFA500,
-    ORANGE_RED              = 0xFFFF4500,
-    ORCHID                  = 0xFFDA70D6,
-    PALE_GOLDENROD          = 0xFFEEE8AA,
-    PALE_GREEN              = 0xFF98FB98,
-    PALE_TURQUOISE          = 0xFFAFEEEE,
-    PALE_VIOLET_RED         = 0xFFDB7093,
-    PAPAYA_WHIP             = 0xFFFFEFD5,
-    PEACH_PUFF              = 0xFFFFDAB9,
-    PERU                    = 0xFFCD853F,
-    PINK                    = 0xFFFFC0CB,
-	PLUM                    = 0xFFDDA0DD,
-	POWDER_BLUE             = 0xFFB0E0E6,
-	PURPLE                  = 0xFF800080,
-	RED                     = 0xFFFF0000,
-	ROSY_BROWN              = 0xFFBC8F8F,
-	ROYAL_BLUE              = 0xFF4169E1,
-	SADDLEBROWN             = 0xFF8B4513,
-	SALMON                  = 0xFFFA8072,
-	SANDY_BROWN             = 0xFFF4A460,
-	SEA_GREEN               = 0xFF2E8B57,
-	SEA_SHELL               = 0xFFFFF5EE,
-	SIENNA                  = 0xFFA0522D,
-	SILVER                  = 0xFFC0C0C0,
-	SKY_BLUE                = 0xFF87CEEB,
-	SLATE_BLUE              = 0xFF6A5ACD,
-	SLATE_GRAY              = 0xFF708090,
-	SNOW                    = 0xFFFFFAFA,
-	SPRING_GREEN            = 0xFF00FF7F,
-	STEEL_BLUE              = 0xFF4682B4,
-	TAN                     = 0xFFD2B48C,
-	TEAL                    = 0xFF008080,
-	THISTLE                 = 0xFFD8BFD8,
-	TOMATO                  = 0xFFFF6347,
-	TRANSPARENT             = 0x00FFFFFF,
-	TURQUOISE               = 0xFF40E0D0,
-	VIOLET                  = 0xFFEE82EE,
-	WHEAT                   = 0xFFF5DEB3,
-	WHITE                   = 0xFFFFFFFF,
-	WHITE_SMOKE             = 0xFFF5F5F5,
-	YELLOW                  = 0xFFFFFF00,
-	YELLOW_GREEN            = 0xFF9ACD32,
-}
-
-
-enum PixelUnit: int
-{
-    WORLD,      // 0 -- World coordinate (non-physical unit)
-    DISPLAY,    // 1 -- Variable -- for PageTransform only
-    PIXEL,      // 2 -- Each unit is one device pixel.
-    POINT,      // 3 -- Each unit is a printer's point, or 1/72 inch.
-    INCH,       // 4 -- Each unit is 1 inch.
-    DOCUMENT,   // 5 -- Each unit is 1/300 inch.
-    MILLIMETER, // 6 -- Each unit is 1 millimeter.
-}
-
-enum PenStyle: int
-{
-    SOLID,          // 0
-    DASH,           // 1
-    DOT,            // 2
-    DASH_DOT,       // 3
-    DASH_DOT_DOT,   // 4
-    CUSTOM,         // 5
-}
-
-enum HatchStyle
-{
-    HORIZONTAL,                    // 0
-    VERTICAL,                      // 1
-    FORWARD_DIAGONAL,              // 2
-    BACKWARD_DIAGONAL,             // 3
-    CROSS,                         // 4
-    DIAGONAL_CROSS,                // 5
-    PERCENT_05,                    // 6
-    PERCENT_10,                    // 7
-    PERCENT_20,                    // 8
-    PERCENT_25,                    // 9
-    PERCENT_30,                    // 10
-    PERCENT_40,                    // 11
-    PERCENT_50,                    // 12
-    PERCENT_60,                    // 13
-    PERCENT_70,                    // 14
-    PERCENT_75,                    // 15
-    PERCENT_80,                    // 16
-    PERCENT_90,                    // 17
-    LIGHT_DOWNWARD_DIAGONAL,       // 18
-    LIGHT_UPWARD_DIAGONAL,         // 19
-    DARK_DOWNWARD_DIAGONAL,        // 20
-    DARK_UPWARD_DIAGONAL,          // 21
-    WIDE_DOWNWARD_DIAGONAL,        // 22
-    WIDE_UPWARD_DIAGONAL,          // 23
-    LIGHT_VERTICAL,                // 24
-    LIGHT_HORIZONTAL,              // 25
-    NARROW_VERTICAL,               // 26
-    NARROW_HORIZONTAL,             // 27
-    DARK_VERTICAL,                 // 28
-    DARK_HORIZONTAL,               // 29
-    DASHED_DOWNWARD_DIAGONAL,      // 30
-    DASHED_UPWARD_DIAGONAL,        // 31
-    DASHED_HORIZONTAL,             // 32
-    DASHED_VERTICAL,               // 33
-    SMALL_CONFETTI,                // 34
-    LARGE_CONFETTI,                // 35
-    ZIGZAG,                        // 36
-    WAVE,                          // 37
-    DIAGONAL_BRICK,                // 38
-    HORIZONTAL_BRICK,              // 39
-    WEAVE,                         // 40
-    PLAID,                         // 41
-    DIVOT,                         // 42
-    DOTTED_GRID,                   // 43
-    DOTTED_DIAMOND,                // 44
-    SHINGLE,                       // 45
-    TRELLIS,                       // 46
-    SPHERE,                        // 47
-    SMALL_GRID,                    // 48
-    SMALL_CHECKER_BOARD,           // 49
-    LARGE_CHECKER_BOARD,           // 50
-    OUTLINED_DIAMOND,              // 51
-    SOLID_DIAMOND,                 // 52
-}
-
-enum StringFormatFlags
-{
-	NONE 						   = 0x00000000,
-    DIRECTION_RIGHT_TO_LEFT        = 0x00000001,
-    DIRECTION_VERTICAL             = 0x00000002,
-    NO_FIT_BLACK_BOX               = 0x00000004,
-    DISPLAY_FORMAT_CONTROL         = 0x00000020,
-    NO_FONT_FALLBACK               = 0x00000400,
-    MEASURE_TRAILING_SPACES        = 0x00000800,
-    NO_WRAP                        = 0x00001000,
-    LINE_LIMIT                     = 0x00002000,
-    NO_CLIP                        = 0x00004000,
-}
-
-enum StringAlignment: int
-{
-    NEAR   = 0,
-    CENTER = 1,
-    FAR    = 2,
-}
-
-enum StringTrimming: int
-{
-    NONE               = 0,
-    CHARACTER          = 1,
-    WORD               = 2,
-    ELLIPSIS_CHARACTER = 3,
-    ELLIPSIS_WORD      = 4,
-    ELLIPSIS_PATH      = 5,
-}
-
-enum FontStyle
-{
-    REGULAR     = 0,
-    BOLD        = 1,
-    ITALIC      = 2,
-    BOLD_ITALIC = 3,
-    UNDERLINE   = 4,
-    STRIKEOUT   = 8,
-}
-
-enum BorderType: uint
+enum EdgeType: uint
 {
 	RAISED_OUTER = BDR_RAISEDOUTER,
 	RAISED_INNER = BDR_RAISEDINNER,
@@ -363,7 +56,7 @@ enum BorderType: uint
 	SUNKEN = EDGE_SUNKEN,
 }
 
-enum BorderMode: uint
+enum EdgeMode: uint
 {
 	ADJUST = BF_ADJUST,
 	DIAGONAL = BF_DIAGONAL,
@@ -378,147 +71,1112 @@ enum BorderMode: uint
 	SOFT = BF_SOFT,
 }
 
-enum: ubyte
+enum HatchStyle: int
 {
-	ALPHA_SHIFT = 24,
-	RED_SHIFT   = 16,
-	GREEN_SHIFT = 8,
-	BLUE_SHIFT  = 0,
+	HORIZONTAL = HS_HORIZONTAL,
+	VERTICAL = HS_VERTICAL,
+	BACKWARD_DIAGONAL = HS_BDIAGONAL,
+	FORWARD_DIAGONAL = HS_FDIAGONAL,
+	CROSS = HS_CROSS,
+	DIAGONAL_CROSS = HS_DIAGCROSS,
 }
 
-enum
+enum PenStyle: uint
 {
-	ALPHA_MASK = 0xFF000000,
-	RED_MASK   = 0x00FF0000,
-	GREEN_MASK = 0x0000FF00,
-	BLUE_MASK  = 0x000000FF,
+	SOLID = PS_SOLID,
+	DASH = PS_DASH,
+	DOT = PS_DOT,
+	DASH_DOT = PS_DASHDOT,
+	DASH_DOT_DOT = PS_DASHDOTDOT,
+	NULL = PS_NULL,
+	INSIDE_FRAME = PS_INSIDEFRAME,
 }
 
-final class SystemColors
+enum TextFormatFlags: uint
 {
-	public static Color color3DdarkShadow()
+	NO_PREFIX = DT_NOPREFIX,
+	DIRECTION_RIGHT_TO_LEFT = DT_RTLREADING,
+	WORD_BREAK = DT_WORDBREAK,
+	SINGLE_LINE = DT_SINGLELINE,
+	NO_CLIP = DT_NOCLIP,
+	LINE_LIMIT = DT_EDITCONTROL,
+}
+
+enum TextAlignment: uint
+{
+	LEFT = DT_LEFT,
+	RIGHT = DT_RIGHT,
+	CENTER = DT_CENTER,
+
+	TOP = DT_TOP,
+	BOTTOM = DT_BOTTOM,
+	MIDDLE = DT_VCENTER,
+}
+
+enum TextTrimming: uint
+{
+	NONE = 0,
+	ELLIPSIS = DT_END_ELLIPSIS,
+	ELLIPSIS_PATH = DT_PATH_ELLIPSIS,
+}
+
+struct BitmapData
+{
+	BITMAPINFO* Info;
+	uint ImageSize;
+	uint BitsCount;
+	RGBQUAD* Bits;
+}
+
+struct Color
+{
+	private bool _valid = false; //Controlla se e' stato assegnato un colore
+
+	public union
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_3DDKSHADOW));
+		align(1) struct
+		{
+			ubyte red   = 0xFF;
+			ubyte green = 0xFF;
+			ubyte blue  = 0xFF;
+			ubyte alpha = 0x00; //0x00: Transparent, 0xFF: Opaque (?)
+		}
+
+		COLORREF colorref;
 	}
 
-	public static Color color3Dface()
+	public final bool valid()
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_3DFACE));
+		return this._valid;
 	}
 
-	public static Color colorBtnFace()
+	public static Color opCall(ubyte r, ubyte g, ubyte b)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_BTNFACE));
+		return Color(0x00, r, g, b);
 	}
 
-	public static Color color3DLight()
+	public static Color opCall(ubyte a, ubyte r, ubyte g, ubyte b)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_3DLIGHT));
+		Color color = void; //Inializzata sotto;
+
+		color._valid = true;
+
+		color.alpha = a;
+		color.red = r;
+		color.green = g;
+		color.blue = b;
+
+		return color;
 	}
 
-	public static Color color3DShadow()
+	public static Color fromCOLORREF(COLORREF cref)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_3DSHADOW));
+		Color color = void; //Inializzata sotto;
+
+		color._valid = true;
+		color.colorref = cref;
+		return color;
+	}
+}
+
+class Canvas: Handle!(HDC), IDisposable
+{
+	private enum CanvasType: ubyte
+	{
+		NORMAL = 0,
+		FROM_CONTROL = 1,
+		IN_MEMORY = 2,
 	}
 
-	public static Color colorActiveBorder()
+	private CanvasType _canvasType = CanvasType.NORMAL;
+	private HBITMAP _hBitmap;
+	private bool _owned;
+
+	protected this(HDC hdc, bool owned, CanvasType type)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_ACTIVEBORDER));
+		this._handle = hdc;
+		this._owned = owned;
+		this._canvasType = type;
 	}
 
-	public static Color colorActiveCaption()
+	public ~this()
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_3DLIGHT));
+		if(this._handle && this._owned)
+		{
+			this.dispose();
+			this._handle = null;
+		}
 	}
 
-	public static Color colorAppWorkspace()
+	public void copyTo(Canvas c)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_APPWORKSPACE));
+		BITMAP bmp;
+		GetObjectA(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
+
+		BitBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, SRCCOPY);
 	}
 
-	public static Color colorBackground()
+	public void dispose()
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_BACKGROUND));
+		switch(this._canvasType)
+		{
+			case CanvasType.FROM_CONTROL:
+				ReleaseDC(WindowFromDC(this._handle), this._handle);
+				break;
+
+			case CanvasType.IN_MEMORY:
+				DeleteObject(this._hBitmap);
+				DeleteDC(this._handle);
+				break;
+
+			default:
+				break;
+		}
 	}
 
-	public static Color colorBtnText()
+	public final void drawImage(Image img, Point upLeft, Point upRight, Point lowLeft)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_BTNTEXT));
+		this.drawImage(img, 0, 0, upLeft, upRight, lowLeft);
+	}
+	public final void drawImage(Image img, int x, int y, Point upLeft, Point upRight, Point lowLeft)
+	{
+		POINT[3] pts;
+
+		pts[0] = upLeft.point;
+		pts[1] = upRight.point;
+		pts[2] = lowLeft.point;
+
+		Size sz = img.size;
+		HDC hdc = CreateCompatibleDC(this._handle);
+		HBITMAP hOldBitmap = SelectObject(hdc, img.handle);
+
+		PlgBlt(this._handle, pts.ptr, hdc, x, y, sz.width, sz.height, null, 0, 0);
+
+		SelectObject(hdc, hOldBitmap);
+		DeleteDC(hdc);
 	}
 
-	public static Color colorCaptionText()
+	public final void drawImage(Image img, int x, int y)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_CAPTIONTEXT));
+		Size sz = img.size;
+
+		switch(img.type)
+		{
+			case ImageType.BITMAP:
+				HDC hdc = CreateCompatibleDC(this._handle);
+				HBITMAP hOldBitmap = SelectObject(hdc, img.handle);
+				BitBlt(this._handle, x, y, sz.width, sz.height, hdc, 0, 0, SRCCOPY);
+				SelectObject(hdc, hOldBitmap);
+				DeleteDC(hdc);
+				break;
+
+			case ImageType.ICON_OR_CURSOR:
+				DrawIconEx(this._handle, x, y, img.handle, sz.width, sz.height, 0, null, DI_NORMAL);
+				break;
+
+			default:
+				break;
+		}
 	}
 
-	public static Color colorGrayText()
+	public final void drawImage(Image img, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_GRAYTEXT));
+		Size sz = img.size;
+
+		switch(img.type)
+		{
+			case ImageType.BITMAP:
+				HDC hdc = CreateCompatibleDC(this._handle);
+				HBITMAP hOldBitmap = SelectObject(hdc, img.handle);
+				StretchBlt(this._handle, r.x, r.y, r.width, r.height, hdc, 0, 0, sz.width, sz.height, SRCCOPY);
+				SelectObject(hdc, hOldBitmap);
+				DeleteDC(hdc);
+				break;
+
+			case ImageType.ICON_OR_CURSOR:
+				DrawIconEx(this._handle, r.x, r.y, img.handle, r.width, r.height, 0, null, DI_NORMAL);
+				break;
+
+			default:
+				break;
+		}
 	}
 
-	public static Color colorHighLight()
+	public final void drawEdge(Rect r, EdgeType edgeType, EdgeMode edgeMode)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_HIGHLIGHT));
+		DrawEdge(this._handle, &r.rect, edgeType, edgeMode);
 	}
 
-	public static Color colorHighLightText()
+	public final void drawText(string text, Rect r, Color foreColor, Font font, TextFormat textFormat)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_HIGHLIGHTTEXT));
+		DRAWTEXTPARAMS dtp;
+
+		dtp.cbSize = DRAWTEXTPARAMS.sizeof;
+		dtp.iLeftMargin = textFormat.leftMargin;
+		dtp.iRightMargin = textFormat.rightMargin;
+		dtp.iTabLength = textFormat.tabLength;
+
+		HFONT hOldFont = SelectObject(this._handle, font.handle);
+		COLORREF oldColorRef = SetTextColor(this._handle, foreColor.colorref);
+		int oldBkMode = SetBkMode(this._handle, TRANSPARENT);
+
+		DrawTextExA(this._handle, text.ptr, text.length, &r.rect,
+				    DT_EXPANDTABS | DT_TABSTOP | textFormat.formatFlags | textFormat.alignment | textFormat.trimming,
+				    &dtp);
+
+		SetBkMode(this._handle, oldBkMode);
+		SetTextColor(this._handle, oldColorRef);
+		SelectObject(this._handle, hOldFont);
 	}
 
-	public static Color colorInactiveBorder()
+	public final void drawText(string text, Rect r, Color foreColor, Font font)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_INACTIVEBORDER));
+		scope TextFormat tf = new TextFormat(TextFormatFlags.NO_PREFIX | TextFormatFlags.WORD_BREAK |
+											 TextFormatFlags.NO_CLIP | TextFormatFlags.LINE_LIMIT);
+
+		tf.trimming = TextTrimming.NONE;
+
+		this.drawText(text, r, foreColor, font, tf);
 	}
 
-	public static Color colorInactiveCaption()
+	public final void drawText(string text, Rect r, Color foreColor)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_INACTIVECAPTION));
+		this.drawText(text, r, foreColor, Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false));
 	}
 
-	public static Color colorInactiveCaptionText()
+	public final void drawText(string text, Rect r, Font f, TextFormat tf)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_INACTIVECAPTIONTEXT));
+		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)), f, tf);
 	}
 
-	public static Color colorInfoBk()
+	public final void drawText(string text, Rect r, TextFormat tf)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_INFOBK));
+		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)),
+					  Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false), tf);
 	}
 
-	public static Color colorInfoText()
+	public final void drawText(string text, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_INFOTEXT));
+		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)),
+					  Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false));
 	}
 
-	public static Color colorMenu()
+	public final void drawLine(Pen p, int x1, int y1, int x2, int y2)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_MENU));
+		HPEN hOldPen = SelectObject(this._handle, p.handle);
+
+		MoveToEx(this._handle, x1, y1, null);
+		LineTo(this._handle, x2, y2);
+
+		SelectObject(this._handle, hOldPen);
 	}
 
-	public static Color colorMenuText()
+	public final void drawEllipse(Pen pen, Brush fill, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_MENUTEXT));
+		HPEN hOldPen;
+		HBRUSH hOldBrush;
+
+		if(pen)
+		{
+			hOldPen = SelectObject(this._handle, pen.handle);
+		}
+
+		if(fill)
+		{
+			hOldBrush = SelectObject(this._handle, fill.handle);
+		}
+
+		Ellipse(this._handle, r.left, r.top, r.right, r.bottom);
+
+		if(hOldBrush)
+		{
+			SelectObject(this._handle, hOldBrush);
+		}
+
+		if(hOldPen)
+		{
+			SelectObject(this._handle, hOldPen);
+		}
 	}
 
-	public static Color colorScrollBar()
+	public final void drawEllipse(Pen pen, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_SCROLLBAR));
+		this.drawEllipse(pen, SystemBrushes.nullBrush, r);
 	}
 
-	public static Color colorWindow()
+	public final void drawRectangle(Pen pen, Brush fill, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_WINDOW));
+		HPEN hOldPen;
+		HBRUSH hOldBrush;
+
+		if(pen)
+		{
+			hOldPen = SelectObject(this._handle, pen.handle);
+		}
+
+		if(fill)
+		{
+			hOldBrush = SelectObject(this._handle, fill.handle);
+		}
+
+		Rectangle(this._handle, r.left, r.top, r.right, r.bottom);
+
+		if(hOldBrush)
+		{
+			SelectObject(this._handle, hOldBrush);
+		}
+
+		if(hOldPen)
+		{
+			SelectObject(this._handle, hOldPen);
+		}
 	}
 
-	public static Color colorWindowFrame()
+	public final void drawRectangle(Pen pen, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_WINDOW));
+		this.drawRectangle(pen, SystemBrushes.nullBrush, r);
 	}
 
-	public static Color colorWindowText()
+	public final void fillRectangle(Brush b, Rect r)
 	{
-		return COLORREFtoARGB(GetSysColor(COLOR_WINDOWTEXT));
+		FillRect(this._handle, &r.rect, b.handle);
+	}
+
+	public final void fillEllipse(Brush b, Rect r)
+	{
+		this.drawEllipse(SystemPens.nullPen, b, r);
+	}
+
+	public final Canvas createInMemory(Bitmap b)
+	{
+		HBITMAP hBitmap;
+		HDC hdc = CreateCompatibleDC(this._handle);
+		Canvas c = new Canvas(hdc, true, CanvasType.IN_MEMORY);
+
+		if(!b)
+		{
+			BITMAP bmp;
+
+			GetObjectA(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
+			hBitmap = CreateCompatibleBitmap(this._handle, bmp.bmWidth, bmp.bmHeight);
+			c._hBitmap = hBitmap;
+			SelectObject(hdc, hBitmap);  // La seleziona e la distrugge quando ha finito.
+		}
+		else
+		{
+			SelectObject(hdc, b.handle); // La prende 'in prestito', ma non la distrugge.
+		}
+
+
+		return c;
+	}
+
+	public final Canvas createInMemory()
+	{
+		return this.createInMemory(null);
+	}
+
+	public static Canvas fromHDC(HDC hdc, bool owned = true)
+	{
+		return new Canvas(hdc, owned, CanvasType.FROM_CONTROL);
+	}
+}
+
+abstract class GraphicObject: Handle!(HGDIOBJ), IDisposable
+{
+	protected bool _owned;
+
+	protected this()
+	{
+
+	}
+
+	protected this(HGDIOBJ hGdiObj, bool owned)
+	{
+		this._handle = hGdiObj;
+		this._owned = owned;
+	}
+
+	public ~this()
+	{
+		if(this._owned && this._handle)
+		{
+			this.dispose();
+			this._handle = null;
+		}
+	}
+
+	public void dispose()
+	{
+		DeleteObject(this._handle);
+	}
+}
+
+abstract class Image: GraphicObject
+{
+	protected this()
+	{
+
+	}
+
+	public abstract Size size();
+	public abstract ImageType type();
+
+	protected static int getInfo(T)(HGDIOBJ hGdiObj, inout T t)
+	{
+		return GetObjectW(hGdiObj, T.sizeof, &t);
+	}
+
+	protected this(HGDIOBJ hGdiObj, bool owned)
+	{
+		super(hGdiObj, owned);
+	}
+}
+
+class Bitmap: Image
+{
+	public this(Size sz)
+	{
+		HBITMAP hBitmap = this.createBitmap(sz.width, sz.height, RGB(0xFF, 0xFF, 0xFF));
+		super(hBitmap, true);
+	}
+
+	public this(Size sz, Color bc)
+	{
+		HBITMAP hBitmap = this.createBitmap(sz.width, sz.height, bc.colorref);
+		super(hBitmap, true);
+	}
+
+	public this(int w, int h)
+	{
+		HBITMAP hBitmap = this.createBitmap(w, h, RGB(0xFF, 0xFF, 0xFF));
+		super(hBitmap, true);
+	}
+
+	public this(int w, int h, Color bc)
+	{
+		HBITMAP hBitmap = this.createBitmap(w, h, bc.colorref);
+		super(hBitmap, true);
+	}
+
+	protected this(HBITMAP hBitmap, bool owned)
+	{
+		super(hBitmap, owned);
+	}
+
+	protected this(string fileName)
+	{
+		HBITMAP hBitmap = LoadImageA(getHInstance(), toStringz(fileName), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+
+		if(!hBitmap)
+		{
+			debug
+			{
+				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName), __FILE__, __LINE__);
+			}
+			else
+			{
+				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName));
+			}
+		}
+
+		super(hBitmap, true);
+	}
+
+	private static HBITMAP createBitmap(int w, int h, COLORREF backColor)
+	{
+		Rect r = Rect(0, 0, w, h);
+
+		HDC hdc = GetDC(null);
+		HDC hcdc = CreateCompatibleDC(hdc);
+		HBITMAP hBitmap = CreateCompatibleBitmap(hdc, w, h);
+		HBITMAP hOldBitmap = SelectObject(hcdc, hBitmap);
+
+		COLORREF oldColor = SetBkColor(hcdc, backColor);
+		ExtTextOutA(hcdc, 0, 0, ETO_OPAQUE, &r.rect, "", 0, null);
+		SetBkColor(hcdc, oldColor);
+
+		SelectObject(hcdc, hOldBitmap);
+		DeleteDC(hcdc);
+		ReleaseDC(null, hdc);
+
+		return hBitmap;
+	}
+
+	public void getData(ref BitmapData bd)
+	{
+		BITMAPINFO bi;
+		bi.bmiHeader.biSize = BITMAPINFOHEADER.sizeof;
+		bi.bmiHeader.biBitCount = 0; //Don't get the color table.
+
+		HDC hdc = GetDC(null);
+		GetDIBits(hdc, this._handle, 0, 0, null, &bi, DIB_RGB_COLORS);
+
+		bd.ImageSize = bi.bmiHeader.biSizeImage;
+		bd.BitsCount = bi.bmiHeader.biSizeImage / RGBQUAD.sizeof;
+		bd.Bits = cast(RGBQUAD*)malloc(bi.bmiHeader.biSizeImage);
+
+		switch(bi.bmiHeader.biBitCount) // Calculate color table size (if needed)
+		{
+			case 24:
+				bd.Info = cast(BITMAPINFO*)malloc(BITMAPINFOHEADER.sizeof);
+				break;
+
+			case 16, 32:
+				bd.Info = cast(BITMAPINFO*)malloc(BITMAPINFOHEADER.sizeof + uint.sizeof * 3); // Needs Investigation
+				break;
+
+			default:
+				bd.Info = cast(BITMAPINFO*)malloc(BITMAPINFOHEADER.sizeof + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
+				break;
+		}
+
+		bd.Info.bmiHeader = bi.bmiHeader;
+		GetDIBits(hdc, this._handle, 0, bd.Info.bmiHeader.biHeight, bd.Bits, bd.Info, DIB_RGB_COLORS);
+		ReleaseDC(null, hdc);
+	}
+
+	public void setData(ref BitmapData bd)
+	{
+		HDC hdc = GetDC(null);
+		SetDIBits(hdc, this._handle, 0, bd.Info.bmiHeader.biHeight, bd.Bits, bd.Info, DIB_RGB_COLORS);
+		ReleaseDC(null, hdc);
+	}
+
+	public final Size size()
+	{
+		BITMAP bmp = void; //Inizializzata da getInfo()
+
+		getInfo!(BITMAP)(this._handle, bmp);
+		return Size(bmp.bmWidth, bmp.bmHeight);
+	}
+
+	public final ImageType type()
+	{
+		return ImageType.BITMAP;
+	}
+
+	public static Bitmap fromHBITMAP(HBITMAP hBitmap, bool owned = true)
+	{
+		return new Bitmap(hBitmap, owned);
+	}
+
+	public static Bitmap fromFile(string fileName)
+	{
+		return new Bitmap(fileName);
+	}
+}
+
+class Icon: Image
+{
+	protected this(HICON hIcon, bool owned)
+	{
+		super(hIcon, owned);
+	}
+
+	protected this(string fileName)
+	{
+		HICON hIcon = LoadImageA(getHInstance(), toStringz(fileName), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+
+		if(!hIcon)
+		{
+			debug
+			{
+				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName), __FILE__, __LINE__);
+			}
+			else
+			{
+				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName));
+			}
+		}
+
+		super(hIcon, true);
+	}
+
+	public override void dispose()
+	{
+		DestroyIcon(this._handle);
+	}
+
+	public final Size size()
+	{
+		ICONINFO ii = void; //Inizializzata da GetIconInfo()
+		BITMAP bmp = void; //Inizializzata da getInfo()
+		Size sz = void; //Inizializzata sotto.
+
+		if(!GetIconInfo(this._handle, &ii))
+		{
+			debug
+			{
+				throw new Win32Exception("Unable to get information from Icon", __FILE__, __LINE__);
+			}
+			else
+			{
+				throw new Win32Exception("Unable to get information from Icon");
+			}
+		}
+
+		if(ii.hbmColor) //Exists: Icon Color Bitmap
+		{
+			if(!getInfo!(BITMAP)(ii.hbmColor, bmp))
+			{
+				debug
+				{
+					throw new Win32Exception("Unable to get Icon Color Bitmap", __FILE__, __LINE__);
+				}
+				else
+				{
+					throw new Win32Exception("Unable to get Icon Color Bitmap");
+				}
+			}
+
+			sz.width = bmp.bmWidth;
+			sz.height = bmp.bmHeight;
+			DeleteObject(ii.hbmColor);
+		}
+		else
+		{
+			if(!getInfo!(BITMAP)(ii.hbmMask, bmp))
+			{
+				debug
+				{
+					throw new Win32Exception("Unable to get Icon Mask", __FILE__, __LINE__);
+				}
+				else
+				{
+					throw new Win32Exception("Unable to get Icon Mask");
+				}
+			}
+
+			sz.width = bmp.bmWidth;
+			sz.height = bmp.bmHeight / 2;
+		}
+
+		DeleteObject(ii.hbmMask);
+		return sz;
+	}
+
+	public final ImageType type()
+	{
+		return ImageType.ICON_OR_CURSOR;
+	}
+
+	public static Icon fromHICON(HICON hIcon, bool owned = true)
+	{
+		return new Icon(hIcon, owned);
+	}
+
+	public static Icon fromFile(string fileName)
+	{
+		return new Icon(fileName);
+	}
+}
+
+final class Cursor: Icon
+{
+	protected this(HCURSOR hCursor, bool owned)
+	{
+		super(hCursor, owned);
+	}
+
+	public override void dispose()
+	{
+		DestroyCursor(this._handle);
+	}
+
+	public static Point location()
+	{
+		Point pt;
+
+		GetCursorPos(&pt.point);
+		return pt;
+	}
+
+	public static Cursor fromHCURSOR(HCURSOR hCursor, bool owned = true)
+	{
+		return new Cursor(hCursor, owned);
+	}
+}
+
+final class Font: GraphicObject
+{
+	private FontStyle _style;
+	private int _height;
+	private string _name;
+
+	private this(HFONT hFont, bool owned)
+	{
+		super(hFont, owned);
+	}
+
+	public this(string name, int h, FontStyle style = FontStyle.NORMAL)
+	in
+	{
+		assert(h > 0, "Font height must be > 0");
+	}
+	body
+	{
+		HDC hdc = GetWindowDC(null);
+
+		this._name = name;
+		this._height = MulDiv(cast(int)(h * 100), GetDeviceCaps(hdc, LOGPIXELSY), 72 * 100);
+		this._style = style;
+
+		LOGFONTA lf;
+		lf.lfHeight = this._height;
+
+		doStyle(style, lf);
+		strcpy(lf.lfFaceName.ptr, toStringz(name));
+		this._handle = CreateFontIndirectA(&lf);
+
+		ReleaseDC(null, hdc);
+	}
+
+	private static void doStyle(FontStyle style, inout LOGFONTA lf)
+	{
+		lf.lfCharSet = DEFAULT_CHARSET;
+		lf.lfWeight = FW_NORMAL;
+		//lf.lfItalic = FALSE;    Inizializzata dal compilatore
+		//lf.lfStrikeOut = FALSE; Inizializzata dal compilatore
+		//lf.lfUnderline = FALSE; Inizializzata dal compilatore
+
+		if(style & FontStyle.BOLD)
+		{
+			lf.lfWeight = FW_BOLD;
+		}
+
+		if(style & FontStyle.ITALIC)
+		{
+			lf.lfItalic = 1;
+		}
+
+		if(style & FontStyle.STRIKEOUT)
+		{
+			lf.lfStrikeOut = 1;
+		}
+
+		if(style & FontStyle.UNDERLINE)
+		{
+			lf.lfUnderline = 1;
+		}
+	}
+
+	public static Font fromHFONT(HFONT hFont, bool owned = true)
+	{
+		return new Font(hFont, owned);
+	}
+}
+
+abstract class Brush: GraphicObject
+{
+	protected this(HBRUSH hBrush, bool owned)
+	{
+		super(hBrush, owned);
+	}
+}
+
+class SolidBrush: Brush
+{
+	private Color _color;
+
+	protected this(HBRUSH hBrush, bool owned)
+	{
+		super(hBrush, owned);
+	}
+
+	public this(Color color)
+	{
+		this._color = color;
+		super(CreateSolidBrush(color.colorref), true);
+	}
+
+	public final Color color()
+	{
+		return this._color;
+	}
+
+	public static SolidBrush fromHBRUSH(HBRUSH hBrush, bool owned = true)
+	{
+		return new SolidBrush(hBrush, owned);
+	}
+}
+
+class HatchBrush: Brush
+{
+	private Color _color;
+	private HatchStyle _style;
+
+	protected this(HBRUSH hBrush, bool owned)
+	{
+		super(hBrush, owned);
+	}
+
+	public this(Color color, HatchStyle style)
+	{
+		this._color = color;
+		this._style = style;
+
+		super(CreateHatchBrush(style, color.colorref), true);
+	}
+
+	public final Color color()
+	{
+		return this._color;
+	}
+
+	public final HatchStyle style()
+	{
+		return this._style;
+	}
+
+	public static HatchBrush fromHBRUSH(HBRUSH hBrush, bool owned = true)
+	{
+		return new HatchBrush(hBrush, owned);
+	}
+}
+
+class PatternBrush: Brush
+{
+	private Bitmap _bmp;
+
+	protected this(HBRUSH hBrush, bool owned)
+	{
+		super(hBrush, owned);
+	}
+
+	public this(Bitmap bmp)
+	{
+		this._bmp = bmp;
+		super(CreatePatternBrush(bmp.handle), true);
+	}
+
+	public final Bitmap bitmap()
+	{
+		return this._bmp;
+	}
+
+	public static PatternBrush fromHBRUSH(HBRUSH hBrush, bool owned = true)
+	{
+		return new PatternBrush(hBrush, owned);
+	}
+}
+
+final class Pen: GraphicObject
+{
+	private PenStyle _style;
+	private Color _color;
+	private int _width;
+
+	protected this(HPEN hPen, bool owned)
+	{
+		super(hPen, owned);
+	}
+
+	public this(Color color, int width = 1, PenStyle style = PenStyle.SOLID)
+	{
+		this._color = color;
+		this._width = width;
+		this._style = style;
+
+		this._handle = CreatePen(style, width, color.colorref);
+
+		super(this._handle, true);
+	}
+
+	public PenStyle style()
+	{
+		return this._style;
+	}
+
+	public int width()
+	{
+		return this._width;
+	}
+
+	public Color color()
+	{
+		return this._color;
+	}
+
+	public static Pen fromHPEN(HPEN hPen, bool owned = true)
+	{
+		return new Pen(hPen, owned);
+	}
+}
+
+final class SystemPens
+{
+	public static Pen nullPen()
+	{
+		return Pen.fromHPEN(GetStockObject(NULL_PEN), false);
+	}
+
+	public static Pen blackPen()
+	{
+		return Pen.fromHPEN(GetStockObject(BLACK_PEN), false);
+	}
+
+	public static Pen whitePen()
+	{
+		return Pen.fromHPEN(GetStockObject(WHITE_PEN), false);
+	}
+}
+
+final class SystemBrushes
+{
+	public static SolidBrush blackBrush()
+	{
+		return SolidBrush.fromHBRUSH(GetStockObject(BLACK_BRUSH), false);
+	}
+
+	public static SolidBrush darkGrayBrush()
+	{
+		return SolidBrush.fromHBRUSH(GetStockObject(DKGRAY_BRUSH), false);
+	}
+
+	public static SolidBrush grayBrush()
+	{
+		return SolidBrush.fromHBRUSH(GetStockObject(GRAY_BRUSH), false);
+	}
+
+	public static SolidBrush lightGrayBrush()
+	{
+		return SolidBrush.fromHBRUSH(GetStockObject(LTGRAY_BRUSH), false);
+	}
+
+	public static SolidBrush nullBrush()
+	{
+		return SolidBrush.fromHBRUSH(GetStockObject(NULL_BRUSH), false);
+	}
+
+	public static SolidBrush whiteBrush()
+	{
+		return SolidBrush.fromHBRUSH(GetStockObject(WHITE_BRUSH), false);
+	}
+
+		public static SolidBrush brush3DdarkShadow()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DDKSHADOW), false);
+	}
+
+	public static SolidBrush brush3Dface()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DFACE), false);
+	}
+
+	public static SolidBrush brushBtnFace()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BTNFACE), false);
+	}
+
+	public static SolidBrush brush3DLight()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DLIGHT), false);
+	}
+
+	public static SolidBrush brush3DShadow()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DSHADOW), false);
+	}
+
+	public static SolidBrush brushActiveBorder()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_ACTIVEBORDER), false);
+	}
+
+	public static SolidBrush brushActiveCaption()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DLIGHT), false);
+	}
+
+	public static SolidBrush brushAppWorkspace()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_APPWORKSPACE), false);
+	}
+
+	public static SolidBrush brushBackground()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BACKGROUND), false);
+	}
+
+	public static SolidBrush brushBtnText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BTNTEXT), false);
+	}
+
+	public static SolidBrush brushCaptionText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_CAPTIONTEXT), false);
+	}
+
+	public static SolidBrush brushGrayText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_GRAYTEXT), false);
+	}
+
+	public static SolidBrush brushHighLight()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_HIGHLIGHT), false);
+	}
+
+	public static SolidBrush brushHighLightText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_HIGHLIGHTTEXT), false);
+	}
+
+	public static SolidBrush brushInactiveBorder()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVEBORDER), false);
+	}
+
+	public static SolidBrush brushInactiveCaption()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVECAPTION), false);
+	}
+
+	public static SolidBrush brushInactiveCaptionText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVECAPTIONTEXT), false);
+	}
+
+	public static SolidBrush brushInfoBk()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INFOBK), false);
+	}
+
+	public static SolidBrush brushInfoText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INFOTEXT), false);
+	}
+
+	public static SolidBrush brushMenu()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_MENU), false);
+	}
+
+	public static SolidBrush brushMenuText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_MENUTEXT), false);
+	}
+
+	public static SolidBrush brushScrollBar()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_SCROLLBAR), false);
+	}
+
+	public static SolidBrush brushWindow()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_WINDOW), false);
+	}
+
+	public static SolidBrush brushWindowFrame()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_WINDOW), false);
+	}
+
+	public static SolidBrush brushWindowText()
+	{
+		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_WINDOWTEXT), false);
 	}
 }
 
@@ -535,7 +1193,7 @@ final class SystemFonts
 
 			if(SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, NONCLIENTMETRICSA.sizeof, &ncm, 0))
 			{
-				f = Font.fromLOGFONT(&ncm.lfMessageFont);
+				f = Font.fromHFONT(CreateFontIndirectA(&ncm.lfMessageFont));
 			}
 			else
 			{
@@ -778,991 +1436,302 @@ final class SystemCursors
 	}
 }
 
-abstract class GraphicObject: IDisposable
+final class SystemColors
 {
-	protected GpObject _native;
-
-	public ~this()
+	public static Color red()
 	{
-		if(this._native)
-		{
-			this.dispose();
-			this._native = null;
-		}
+		return Color(0xFF, 0x00, 0x00);
 	}
 
-	new(size_t sz)
+	public static Color green()
 	{
-		void* ptr = GdipAlloc(sz);
-
-		if(!ptr)
-		{
-			debug
-			{
-				throw new GdiException("Cannot allocate GDI+ Object", __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new GdiException("Cannot allocate GDI+ Object");
-			}
-		}
-
-		addRoot(ptr);
-		return ptr;
+		return Color(0x00, 0xFF, 0x00);
 	}
 
-	delete(void* p)
+	public static Color blue()
 	{
-		removeRoot(p);
-		GdipFree(p);
+		return Color(0x00, 0x00, 0xFF);
 	}
 
-	protected static void checkException(Status s)
+	public static Color black()
 	{
-		if(!s)
-		{
-			return;
-		}
-
-		switch(s)
-		{
-			case Status.GENERIC_ERROR:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Generic Error", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Generic Error");
-				}
-			}
-
-			case Status.INVALID_PARAMETER:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Invalid Parameter", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Invalid Parameter");
-				}
-			}
-
-			case Status.OUT_OF_MEMORY:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Out Of Memory", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Out Of Memory");
-				}
-			}
-
-			case Status.OBJECT_BUSY:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Object Busy", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Object Busy");
-				}
-			}
-
-			case Status.INSUFFICIENT_BUFFER:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Insufficient Buffer", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Insufficient Buffer");
-				}
-			}
-
-			case Status.NOT_IMPLEMENTED:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Not Implemented", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Not Implemented");
-				}
-			}
-
-			case Status.WIN32_ERROR:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Win32 Error", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Win32 Error");
-				}
-			}
-
-			case Status.WRONG_STATE:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Wrong State", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Wrong State");
-				}
-			}
-
-			case Status.ABORTED:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Aborted", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Aborted");
-				}
-			}
-
-			case Status.FILE_NOT_FOUND:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ File Not Found", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ File Not Found");
-				}
-			}
-
-			case Status.VALUE_OVERFLOW:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Value Overflow", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Value Overflow");
-				}
-			}
-
-			case Status.ACCESS_DENIED:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Access Denied", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Access Denied");
-				}
-			}
-
-			case Status.UNKNOWN_IMAGE_FORMAT:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Unknown Image Format", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Unknown Image Format");
-				}
-			}
-
-			case Status.FONT_FAMILY_NOT_FOUND:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Font Family Not Found", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Font Family Not Found");
-				}
-			}
-
-			case Status.FONT_STYLE_NOT_FOUND:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Font Style Not Found", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Font Style Not Found");
-				}
-			}
-
-			case Status.NOT_TRUETYPE_FONT:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Not TrueType Font", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Not TrueType Font");
-				}
-			}
-
-			case Status.UNSUPPORTED_GDIPLUS_VERSION:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Unsupported Version", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Unsupported Version");
-				}
-			}
-
-			case Status.GDI_PLUS_NOT_INITIALIZED:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Not Initialized", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Not Initialized");
-				}
-			}
-
-			case Status.PROPERTY_NOT_FOUND:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Property Not Found", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Property Not Found");
-				}
-			}
-
-			case Status.PROPERTY_NOT_SUPPORTED:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Property Not Supported", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Property Not Supported");
-				}
-			}
-
-			default:
-			{
-				debug
-				{
-					throw new GdiException("GDI+ Unknown Error", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("GDI+ Unknown Error");
-				}
-			}
-		}
+		return Color(0x00, 0x00, 0x00);
 	}
 
-	public abstract void dispose();
-
-	public final bool created()
+	public static Color white()
 	{
-		return this._native !is null;
+		return Color(0xFF, 0xFF, 0xFF);
 	}
 
-	public final GpObject native()
+	public static Color yellow()
 	{
-		return this._native;
+		return Color(0xFF, 0xFF, 0x00);
+	}
+
+	public static Color magenta()
+	{
+		return Color(0xFF, 0x00, 0xFF);
+	}
+
+	public static Color cyan()
+	{
+		return Color(0x00, 0xFF, 0xFF);
+	}
+
+	public static Color darkGray()
+	{
+		return Color(0xA9, 0xA9, 0xA9);
+	}
+
+	public static Color lightGray()
+	{
+		return Color(0xD3, 0xD3, 0xD3);
+	}
+
+	public static Color darkRed()
+	{
+		return Color(0x8B, 0x00, 0x00);
+	}
+
+	public static Color darkGreen()
+	{
+		return Color(0x00, 0x64, 0x00);
+	}
+
+	public static Color darkBlue()
+	{
+		return Color(0x00, 0x00, 0x8B);
+	}
+
+	public static Color darkYellow()
+	{
+		return Color(0x00, 0x80, 0x80);
+	}
+
+	public static Color darkMagenta()
+	{
+		return Color(0x80, 0x00, 0x80);
+	}
+
+	public static Color darkCyan()
+	{
+		return Color(0x80, 0x80, 0x00);
+	}
+
+	public static Color transparent()
+	{
+		return Color(0x00, 0x00, 0x00, 0x00);
+	}
+
+	public static Color color3DdarkShadow()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_3DDKSHADOW));
+	}
+
+	public static Color color3Dface()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_3DFACE));
+	}
+
+	public static Color colorBtnFace()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_BTNFACE));
+	}
+
+	public static Color color3DLight()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_3DLIGHT));
+	}
+
+	public static Color color3DShadow()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_3DSHADOW));
+	}
+
+	public static Color colorActiveBorder()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_ACTIVEBORDER));
+	}
+
+	public static Color colorActiveCaption()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_3DLIGHT));
+	}
+
+	public static Color colorAppWorkspace()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_APPWORKSPACE));
+	}
+
+	public static Color colorBackground()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_BACKGROUND));
+	}
+
+	public static Color colorBtnText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_BTNTEXT));
+	}
+
+	public static Color colorCaptionText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_CAPTIONTEXT));
+	}
+
+	public static Color colorGrayText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_GRAYTEXT));
+	}
+
+	public static Color colorHighLight()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_HIGHLIGHT));
+	}
+
+	public static Color colorHighLightText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_HIGHLIGHTTEXT));
+	}
+
+	public static Color colorInactiveBorder()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVEBORDER));
+	}
+
+	public static Color colorInactiveCaption()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVECAPTION));
+	}
+
+	public static Color colorInactiveCaptionText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVECAPTIONTEXT));
+	}
+
+	public static Color colorInfoBk()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_INFOBK));
+	}
+
+	public static Color colorInfoText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_INFOTEXT));
+	}
+
+	public static Color colorMenu()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_MENU));
+	}
+
+	public static Color colorMenuText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_MENUTEXT));
+	}
+
+	public static Color colorScrollBar()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_SCROLLBAR));
+	}
+
+	public static Color colorWindow()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_WINDOW));
+	}
+
+	public static Color colorWindowFrame()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_WINDOW));
+	}
+
+	public static Color colorWindowText()
+	{
+		return Color.fromCOLORREF(GetSysColor(COLOR_WINDOWTEXT));
 	}
 }
 
-abstract class Brush: GraphicObject
+final class TextFormat
 {
-	public void dispose()
-	{
-		checkException(GdipDeleteBrush(this._native));
-	}
-}
-
-final class StringFormat: GraphicObject
-{
-	private static StringFormat _dsf;
-
-	public this(StringFormatFlags sff = StringFormatFlags.NONE)
-	{
-		checkException(GdipCreateStringFormat(sff, LANG_NEUTRAL, &this._native));
-	}
-
-	public void dispose()
-	{
-		if(this !is _dsf)
-		{
-			checkException(GdipDeleteStringFormat(this._native));
-		}
-	}
-
-	public void horizontalAlignment(StringAlignment sa)
-	{
-		checkException(GdipSetStringFormatAlign(this._native, sa));
-	}
-
-	public void verticalAlignment(StringAlignment sa)
-	{
-		checkException(GdipSetStringFormatLineAlign(this._native, sa));
-	}
-
-	public void trimming(StringTrimming st)
-	{
-		checkException(GdipSetStringFormatTrimming(this._native, cast(GpStringTrimming)st));
-	}
-
-	public static StringFormat genericDefault()
-	{
-		if(!this._dsf)
-		{
-			GpStringFormat nsf;
-			checkException(GdipStringFormatGetGenericDefault(&nsf));
-
-			this._dsf = new StringFormat();
-			this._dsf._native = nsf;
-		}
-
-		return this._dsf;
-	}
-}
-
-class SolidBrush: Brush
-{
-	public this(Color c)
-	{
-		checkException(GdipCreateSolidFill(c, &this._native));
-	}
-}
-
-class HatchBrush: Brush
-{
-	public this(Color fc, Color bc, HatchStyle hs)
-	{
-		checkException(GdipCreateHatchBrush(cast(GpHatchStyle)hs, fc, bc, &this._native));
-	}
-}
-
-class Image: GraphicObject
-{
-	public abstract HGDIOBJ handle();
-
-	public void dispose()
-	{
-		checkException(GdipDisposeImage(this._native));
-	}
-
-	public final PixelFormat pixelFormat()
-	{
-		PixelFormat pf;
-
- 		checkException(GdipGetImagePixelFormat(this._native, cast(GpPixelFormat*)&pf));
-		return pf;
-	}
-
-	public final Rect bounds()
-	{
-		GpRectF rf = void;  //Inizializzato sotto
-		GpUnit unit = void; //Inizializzato sotto
-
-		checkException(GdipGetImageBounds(this._native, &rf, &unit));
-		return convertRect(rf);
-	}
-
-	public final void save(string fileName, EncoderFormat ef)
-	{
-		CLSID fClsid;
-		uint numEncoders, encoderSize;
-
-		CLSIDFromString(toUTF16z(ef), &fClsid);
-		GdipGetImageEncodersSize(&numEncoders, &encoderSize);
-		ImageCodecInfo* ici = cast(ImageCodecInfo*)malloc(encoderSize);
-		GdipGetImageEncoders(numEncoders, encoderSize, cast(GpImageCodecInfo)ici);
-
-		for(int i = 0; i < numEncoders; i++)
-		{
-			if(compareGUID(&fClsid, &ici[i].FormatID))
-			{
-				checkException(GdipSaveImageToFile(this._native, toUTF16z(fileName), &ici[i].Clsid, null));
-				return;
-			}
-		}
-
-		debug
-		{
-			throw new GdiException("Encoder Not Found", __FILE__, __LINE__);
-		}
-		else
-		{
-			throw new GdiException("Encoder Not Found");
-		}
-	}
-
-	public static Image fromFile(string fileName)
-	{
-		GpImage gImg;
-		GpImageType gImgType;
-
-		checkException(GdipLoadImageFromFile(toUTF16z(fileName), &gImg));
-		checkException(GdipGetImageType(gImg, &gImgType));
-
-		switch(gImgType)
-		{
-			case ImageType.BITMAP:
-				return Bitmap.fromImage(gImg);
-
-			case ImageType.METAFILE:
-				assert(false, "Metafile Not Implemented");
-
-			default:
-			{
-				debug
-				{
-					throw new GdiException("Unknown Image Type", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new GdiException("Unknown Image Type");
-				}
-			}
-		}
-	}
-}
-
-	class Bitmap: Image
-{
-	private HBITMAP _hBitmap;
+	private TextTrimming _trim = TextTrimming.NONE; // TextTrimming.CHARACTER.
+	private TextFormatFlags _flags = TextFormatFlags.NO_PREFIX | TextFormatFlags.WORD_BREAK;
+	private TextAlignment _align = TextAlignment.LEFT;
+	private DRAWTEXTPARAMS _params = {DRAWTEXTPARAMS.sizeof, 8, 0, 0};
 
 	public this()
 	{
 
 	}
 
-	public this(Size sz)
+	public this(TextFormat tf)
 	{
-		checkException(GdipCreateBitmapFromScan0(sz.width, sz.height, 0, PixelFormat.ARGB_32_BPP, null, &this._native));
+		this._trim = tf._trim;
+		this._flags = tf._flags;
+		this._align = tf._align;
+		this._params = tf._params;
 	}
 
-	public override void dispose()
+	public this(TextFormatFlags tff)
 	{
-		if(this._hBitmap)
-		{
-			DeleteObject(this._hBitmap);
-		}
-
-		super.dispose();
+		this._flags = tff;
 	}
 
-	public final HGDIOBJ handle()
+	public TextAlignment alignment()
 	{
-		if(!this._hBitmap)
-		{
-			checkException(GdipCreateHBITMAPFromBitmap(this._native, &this._hBitmap, Colors.TRANSPARENT));
-		}
-
-		return this._hBitmap;
+		return this._align;
 	}
 
-	public final BitmapData lockBits(ImageLockMode lockMode)
+	public void alignment(TextAlignment ta)
 	{
-		return this.lockBits(lockMode, this.pixelFormat);
+		this._align = ta;
 	}
 
-	public final BitmapData lockBits(ImageLockMode lockMode, PixelFormat pformat)
+	public void formatFlags(TextFormatFlags tff)
 	{
-		return this.lockBits(this.bounds, lockMode, pformat);
+		this._flags = tff;
 	}
 
-	public final BitmapData lockBits(Rect r, ImageLockMode lockMode, PixelFormat pformat)
+	public TextFormatFlags formatFlags()
 	{
-		BitmapData bd = void; //Inizializzata sotto.
-		checkException(GdipBitmapLockBits(this._native, &r.rect, lockMode, pformat, &bd));
-		return bd;
+		return this._flags;
 	}
 
-	public final void unlockBits(BitmapData bd)
+	public void trimming(TextTrimming tt)
 	{
-		checkException(GdipBitmapUnlockBits(this._native, &bd));
+		this._trim = tt;
 	}
 
-	package static Bitmap fromImage(GpImage gImg)
+	public TextTrimming trimming()
 	{
-		Bitmap bmp = new Bitmap();
-		bmp._native = gImg;
-		return bmp;
+		return this._trim;
 	}
 
-	public static Bitmap fromHBITMAP(HBITMAP hBmp)
+	public int tabLength()
 	{
-		GpBitmap gBmp;
-		checkException(GdipCreateBitmapFromHBITMAP(hBmp, null, &gBmp));
-
-		Bitmap bmp = new Bitmap();
-		bmp._native = gBmp;
-
-		return bmp;
-	}
-}
-
-class Icon: Handle!(HICON), IDisposable
-{
-	public this()
-	{
-
+		return _params.iTabLength;
 	}
 
-	public ~this()
+	public void tabLength(int tablen)
 	{
-		this.dispose();
+		this._params.iTabLength = tablen;
 	}
 
-	public void dispose()
+	public int leftMargin()
 	{
-		if(this._handle)
-		{
-			DestroyIcon(this._handle);
-		}
-
-		this._handle = null;
+		return this._params.iLeftMargin;
 	}
 
-	public static Icon fromFile(string fileName)
+	public void leftMargin(int sz)
 	{
-		HICON hIcon = LoadImageA(getHInstance(), toStringz(fileName), IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-
-		if(!hIcon)
-		{
-			debug
-			{
-				throw new GdiException("Cannot Load Icon from File", __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new GdiException("Cannot Load Icon from File");
-			}
-		}
-
-		return Icon.fromHICON(hIcon);
+		this._params.iLeftMargin = sz;
 	}
 
-	public static Icon fromHICON(HICON hIcon)
+	public int rightMargin()
 	{
-		Icon ico = new Icon();
-		ico._handle = hIcon;
-
-		return ico;
-	}
-}
-
-final class Cursor: IDisposable
-{
-	private HCURSOR _handle;
-	private bool _owned;
-
-	public ~this()
-	{
-		this.dispose();
+		return this._params.iRightMargin;
 	}
 
-	public void dispose()
+	public void rightMargin(int sz)
 	{
-		if(this._owned && this._handle)
-		{
-			DestroyCursor(this._handle);
-			this._handle = null;
-		}
-	}
-
-	public HCURSOR handle()
-	{
-		return this._handle;
-	}
-
-	public static Point location()
-	{
-		Point pt = void;
-
-		GetCursorPos(&pt.point);
-		return pt;
-	}
-
-	public static Cursor fromHCURSOR(HCURSOR hCursor, bool owned = true)
-	{
-		Cursor c = new Cursor();
-		c._handle = hCursor;
-		c._owned = owned;
-
-		return c;
-	}
-}
-
-final class Font: GraphicObject
-{
-	private GpFontFamily _ff;
-	private HFONT _hFont;
-
-	private this()
-	{
-
-	}
-
-	public this(Font f, FontStyle fs)
-	{
-		float fsize;
-		GpUnit unit;
-
-		checkException(GdipGetFamily(f.native, &this._ff));
-		checkException(GdipGetFontSize(f.native, &fsize));
-		checkException(GdipGetFontUnit(f.native, &unit));
-		checkException(GdipCreateFont(this._ff, fsize, cast(int)fs, unit, &this._native));
-	}
-
-	public this(string fontName, uint h, FontStyle fs = FontStyle.REGULAR, PixelUnit pu = PixelUnit.PIXEL)
-	{
-		checkException(GdipCreateFontFamilyFromName(toUTF16z(fontName), null, &this._ff));
-		checkException(GdipCreateFont(this._ff, h, cast(int)fs, cast(GpUnit)pu, &this._native));
-	}
-
-	public void dispose()
-	{
-		this.destroyHFont();
-		checkException(GdipDeleteFont(this._native));
-		checkException(GdipDeleteFontFamily(this._ff));
-	}
-
-	package void destroyHFont()
-	{
-		if(this._hFont)
-		{
-			DeleteObject(this._hFont);
-			this._hFont = null;
-		}
-	}
-
-	private void getTextMetrics(TEXTMETRICA* tm)
-	{
-		HDC hdc = GetDC(null);
-		HFONT hOldFont = SelectObject(hdc, this.handle);
-
-		GetTextMetricsA(hdc, tm);
-		SelectObject(hdc, hOldFont);
-		this.destroyHFont();
-		ReleaseDC(null, hdc);
-	}
-
-	public HFONT handle()
-	{
-		if(!this._hFont)
-		{
-			LOGFONTA lf = void;  //Inizializzato sotto.
-			GpGraphics g = void; //Inizializzato sotto.
-
-			HDC hdc = GetWindowDC(null);
-			checkException(GdipCreateFromHDC(hdc, &g));
-			checkException(GdipGetLogFontA(this._native, g, &lf));
-
-			this._hFont = CreateFontIndirectA(&lf);
-			ReleaseDC(null, hdc);
-		}
-
-		return this._hFont;
-	}
-
-	public Size size()
-	{
-		Size sz;
-		TEXTMETRICA	tm;
-
-		this.getTextMetrics(&tm);
-		sz.height = tm.tmHeight + tm.tmExternalLeading;
-		sz.width = tm.tmMaxCharWidth;
-		return sz;
-	}
-
-	public string name()
-	{
-		wchar[LF_FACESIZE] name;
-
-		GpFontFamily ff;
-		GdipGetFamily(this._native, &ff);
-		GdipGetFamilyName(ff, name.ptr, LANG_NEUTRAL);
-		return recalcString(toUTF8(name));
-	}
-
-	package static Font fromLOGFONT(LOGFONTA* lf)
-	{
-		GpFont gFont;
-		HDC hdc = GetWindowDC(null);
-		checkException(GdipCreateFontFromLogfontA(hdc, lf, &gFont));
-
-		Font f = new Font();
-		f._native = gFont;
-
-		ReleaseDC(null, hdc);
-		return f;
-	}
-
-	public static Font fromHFONT(HFONT hFont)
-	{
-		LOGFONTA lf = void;
-
-		if(GetObjectA(hFont, LOGFONTA.sizeof, &lf))
-		{
-            return Font.fromLOGFONT(&lf);
-		}
-		else
-		{
-			debug
-			{
-				throw new GdiException("Cannot Create Font (HFONT not valid)", __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new GdiException("Cannot Create Font (HFONT not valid)");
-			}
-		}
-	}
-}
-
-final class Pen: GraphicObject
-{
-	public this(Color c, uint w = 1, PenStyle ps = PenStyle.SOLID)
-	{
-		checkException(GdipCreatePen1(c, w, cast(GpUnit)PixelUnit.WORLD, &this._native));
-		checkException(GdipSetPenDashStyle(this._native, cast(GpDashStyle)ps));
-	}
-
-	public final void dispose()
-	{
-		checkException(GdipDeletePen(this._native));
-	}
-}
-
-final class Canvas: GraphicObject
-{
-	private HDC _nativeDC;
-
-	private this()
-	{
-
-	}
-
-	public void dispose()
-	{
-		if(this._nativeDC)
-		{
-			this.releaseDC();
-		}
-
-		checkException(GdipDeleteGraphics(this._native));
-	}
-
-	public Size measureText(string s, Font f)
-	{
-		static GpRectF r1 = NullRectF;
-		GpRectF r2;
-
-		checkException(GdipMeasureString(this._native, toUTF16z(s), s.length, f.native, &r1, null, &r2, null, null));
-		Rect r3 = convertRect(r2);
-		return r3.size;
-	}
-
-	public void drawArc(Pen p, int x, int y, int width, int height, float startAngle, float sweepAngle)
-	{
-		checkException(GdipDrawArcI(this._native, p.native, x, y, width, height, startAngle, sweepAngle));
-	}
-
-	public void drawArc(Pen p, Rect r, float startAngle, float sweepAngle)
-	{
-		this.drawArc(p, r.x, r.y, r.width, r.height, startAngle, sweepAngle);
-	}
-
-	public void drawBeizer(Pen p, Point p1, Point p2, Point p3, Point p4)
-	{
-		this.drawBeizer(p, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
-	}
-
-	public void drawBeizer(Pen p, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
-	{
-		checkException(GdipDrawBezierI(this._native, p.native, x1, y1, x2, y2, x3, y3, x4, y4));
-	}
-
-	public void drawPie(Pen p, Rect r, float startAngle, float sweepAngle)
-	{
-		this.drawPie(p, r.x, r.y, r.width, r.height, startAngle, sweepAngle);
-	}
-
-	public void drawPie(Pen p, int x, int y, int width, int height, float startAngle, float sweepAngle)
-	{
-		checkException(GdipDrawPieI(this._native, p.native, x, y, width, height, startAngle, sweepAngle));
-	}
-
-	public void fillPie(Brush b, Rect r, float startAngle, float sweepAngle)
-	{
-		this.fillPie(b, r.x, r.y, r.width, r.height, startAngle, sweepAngle);
-	}
-
-	public void fillPie(Brush b, int x, int y, int width, int height, float startAngle, float sweepAngle)
-	{
-		checkException(GdipFillPieI(this._native, b.native, x, y, width, height, startAngle, sweepAngle));
-	}
-
-	public void drawImage(Image img, int x, int y)
-	{
-		checkException(GdipDrawImageI(this._native, img.native, x, y));
-	}
-
-	public void drawImage(Image img, Rect r)
-	{
-		checkException(GdipDrawImageRectI(this._native, img.native, r.x, r.y, r.width, r.height));
-	}
-
-	public void drawImage(Image img, Point pt)
-	{
-		this.drawImage(img, pt.x, pt.y);
-	}
-
-	public void drawLine(Pen pen, int x1, int y1, int x2, int y2)
-	{
-		checkException(GdipDrawLineI(this._native, pen.native, x1, y1, x2, y2));
-	}
-
-	public void drawLine(Pen pen, Point from, Point to)
-	{
-		this.drawLine(pen, from.x, from.y, to.x, to.y);
-	}
-
-	public void drawLines(Pen pen, Point[] points)
-	{
-		POINT[] pts = new POINT[points.length];
-
-		foreach(int i, Point p; points)
-		{
-			pts[i] = p.point;
-		}
-
-		checkException(GdipDrawLinesI(this._native, pen.native, pts.ptr, pts.length)); //VERY SLOW!!!
-	}
-
-	public void drawString(string text, Rect r, Brush b, Font f, StringFormat sf)
-	{
-		GpRectF rf = convertRect(r);
-		checkException(GdipDrawString(this._native, toUTF16z(text), -1, f.native, &rf, sf.native, b.native));
-	}
-
-	public void drawString(string text, Point pt, Brush b, Font f, StringFormat sf)
-	{
-		Rect r = Rect(pt, NullSize);
-		this.drawString(text, r, b, f, sf);
-	}
-
-	public void drawString(string text, Rect r, Brush b, Font f)
-	{
-		this.drawString(text, r, b, f, StringFormat.genericDefault);
-	}
-
-	public void drawString(string text, Point pt, Brush b, Font f)
-	{
-		Rect r = Rect(pt, NullSize);
-		this.drawString(text, r, b, f, StringFormat.genericDefault);
-	}
-
-	public void drawBorder(Rect r, BorderType edgeType, BorderMode edgeMode)
-	{
-		HDC hdc = this.getHDC();
-		DrawEdge(hdc, &r.rect, edgeType, edgeMode);
-		this.releaseDC();
-	}
-
-	public void fillRectangle(Brush b, Rect r)
-	{
-		checkException(GdipFillRectangleI(this._native, b.native, r.x, r.y, r.width, r.height));
-	}
-
-	public void drawRectangle(Pen p, Rect r)
-	{
-		checkException(GdipDrawRectangleI(this._native, p.native, r.x, r.y, r.width, r.height));
-	}
-
-	public void fillEllipse(Brush b, Rect r)
-	{
-		checkException(GdipFillEllipseI(this._native, b.native, r.x, r.y, r.width, r.height));
-	}
-
-	public void drawEllipse(Pen p, Rect r)
-	{
-		checkException(GdipDrawEllipseI(this._native, p.native, r.x, r.y, r.width, r.height));
-	}
-
-	public HDC getHDC()
-	{
-		if(!this._nativeDC)
-		{
-			checkException(GdipGetDC(this._native, &this._nativeDC));
-		}
-
-		return this._nativeDC;
-	}
-
-	public void releaseDC()
-	{
-		if(this._nativeDC)
-		{
-			checkException(GdipReleaseDC(this._native, this._nativeDC));
-			this._nativeDC = null;
-		}
-	}
-
-	public static Canvas fromHDC(HDC hdc)
-	{
-		GpGraphics pGraph;
-		checkException(GdipCreateFromHDC(hdc, &pGraph));
-
-		Canvas c = new Canvas();
-		c._native = pGraph;
-		return c;
-	}
-
-	public static Canvas fromImage(Image img)
-	{
-		GpGraphics graph;
-		checkException(GdipGetImageGraphicsContext(img.native, &graph));
-
-		Canvas c = new Canvas();
-		c._native = graph;
-
-		return c;
-	}
-
-	public static Canvas fromHWND(HWND hWnd)
-	{
-		GpGraphics pGraph;
-		checkException(GdipCreateFromHWND(hWnd, &pGraph));
-
-		Canvas c = new Canvas();
-		c._native = pGraph;
-		return c;
+		this._params.iRightMargin = sz;
 	}
 }
 
@@ -1777,10 +1746,7 @@ final class Screen
 
 		return sz;
 	}
-}
 
-final class Desktop
-{
 	public static Rect workArea()
 	{
 		Rect r = void; //Inizializzata sotto
@@ -1789,8 +1755,8 @@ final class Desktop
 		return r;
 	}
 
-	public static HWND handle()
+	public static Canvas canvas()
 	{
-		return GetDesktopWindow();
+		return Canvas.fromHDC(GetWindowDC(null));
 	}
 }

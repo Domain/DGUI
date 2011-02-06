@@ -17,11 +17,8 @@
 
 module dgui.application;
 
-pragma(lib, "comdlg32.lib");
-pragma(lib, "comctl32.lib");
-pragma(lib, "ole32.lib");
 pragma(lib, "gdi32.lib");
-pragma(lib, "gdiplus.lib");
+pragma(lib, "comdlg32.lib");
 
 public import dgui.core.winapi;
 public import dgui.resources;
@@ -36,7 +33,6 @@ private const string INFO = "Exception Information:";
 private const string XP_MANIFEST_FILE = "dgui.xml.manifest";
 
 private const string ERR_MSG = "An application exception has occured.\r\n1) Click \"Ignore\" to continue (The program can be unstable).\r\n2) Click \"Quit\" to exit.\r\n";
-
 
 private const string XP_MANIFEST = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` "\r\n"
 									`<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">` "\r\n"
@@ -110,15 +106,15 @@ class Application
 			this.formBorderStyle = FormBorderStyle.FIXED_DIALOG;
 
 			this._lblHead = new Label();
-			this._lblHead.alignment = ContentAlignment.MIDDLE_LEFT;
-			this._lblHead.foreColor = Colors.DARK_RED;
+			this._lblHead.alignment = TextAlignment.MIDDLE | TextAlignment.LEFT;
+			this._lblHead.foreColor = Color(0xB4, 0x00, 0x00);
 			this._lblHead.dock = DockStyle.TOP;
 			this._lblHead.height = 50;
 			this._lblHead.text = ERR_MSG;
 			this._lblHead.parent = this;
 
 			this._lblInfo = new Label();
-			this._lblInfo.alignment = ContentAlignment.MIDDLE_LEFT;
+			this._lblInfo.alignment = TextAlignment.MIDDLE | TextAlignment.LEFT;
 			this._lblInfo.dock = DockStyle.TOP;
 			this._lblInfo.height = 50;
 			this._lblInfo.text = INFO;
@@ -153,13 +149,9 @@ class Application
 		private Button _btnQuit;
 	}
 
-	private static uint _gdipTok;
-
-	static this()
+	public static this()
 	{
-		GdiplusStartupInput gsi;
-		gsi.GdiplusVersion = 1;
-		GdiplusStartup(&_gdipTok, &gsi, null);
+		Application.enableManifest(); //Enable Manifest (if available)
 	}
 
 	public static HINSTANCE instance()
@@ -187,10 +179,8 @@ class Application
 		return Resources.instance;
 	}
 
-	public static void enableManifest()
+	private static void enableManifest()
 	{
-		initCommonControls();
-
 		HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
 
 		if(hKernel32)
@@ -224,6 +214,8 @@ class Application
 				std.file.remove(path);
 			}
 		}
+
+		initCommonControls();
 	}
 
 	private static void initCommonControls()
@@ -233,16 +225,16 @@ class Application
 		icc.dwSize = INITCOMMONCONTROLSEX.sizeof;
 		icc.dwICC = 0xFFFFFFFF;
 
-		HMODULE hComCtl32 = LoadLibraryA(toStringz("comctl32.dll"));
+		HMODULE hComCtl32 = LoadLibraryA("comctl32.dll");
 
 		if(hComCtl32)
 		{
-			InitCommonControlsExProc iccex = cast(InitCommonControlsExProc)GetProcAddress(hComCtl32, toStringz("InitCommonControlsEx"));
-			iccex(&icc);
-		}
-		else
-		{
-			InitCommonControlsEx(&icc);
+			InitCommonControlsExProc iccex = cast(InitCommonControlsExProc)GetProcAddress(hComCtl32, "InitCommonControlsEx");
+
+			if(iccex)
+			{
+				iccex(&icc);
+			}
 		}
 	}
 
@@ -253,7 +245,6 @@ class Application
 
 	public static void exit(int exitCode = 0)
 	{
-		GdiplusShutdown(_gdipTok);
 		ExitProcess(exitCode);
 	}
 
@@ -292,7 +283,6 @@ class Application
 			switch(ef.showDialog())
 			{
 				case DialogResult.ABORT:
-					GdiplusShutdown(_gdipTok);
 					TerminateProcess(GetCurrentProcess(), -1);
 					break;
 

@@ -68,6 +68,9 @@ class Form: ContainerControl, IDialogResult
 	{
 		this._formInfo.Result = dr;
 		this._formInfo.ModalCompleted = true; //E' arrivato il click di un pulsante.
+
+		ShowWindow(this._handle, SW_HIDE); // Hide this window (it waits to be destroyed)
+		SetActiveWindow(this._formInfo.hActiveWnd); // Restore the previous active window
 	}
 
 	public final void controlBox(bool b)
@@ -213,7 +216,7 @@ class Form: ContainerControl, IDialogResult
 		if((this._formInfo.StartPosition is FormStartPosition.CENTER_PARENT && !this.parent) ||
 			this._formInfo.StartPosition is FormStartPosition.CENTER_SCREEN)
 		{
-			Rect wa = Desktop.workArea;
+			Rect wa = Screen.workArea;
 			Rect b = this._controlInfo.Bounds;
 
 			this._controlInfo.Bounds.location = Point((wa.width - b.width) / 2,
@@ -317,6 +320,7 @@ class Form: ContainerControl, IDialogResult
 			pcw.ExtendedStyle |= WS_EX_APPWINDOW;
 		}
 
+		AdjustWindowRectEx(&this._controlInfo.Bounds.rect, pcw.Style, false, pcw.ExtendedStyle);
 		super.preCreateWindow(pcw);
 	}
 
