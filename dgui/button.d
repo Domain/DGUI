@@ -109,6 +109,12 @@ abstract class CheckedButton: AbstractButton
 			this.sendMessage(BM_SETCHECK, cs, 0);
 		}
 	}
+
+	protected override void onHandleCreated(EventArgs e)
+	{
+		this.sendMessage(BM_SETCHECK, this._checkState, 0);
+		super.onHandleCreated(e);
+	}
 }
 
 class Button: AbstractButton
