@@ -88,7 +88,7 @@ abstract class AbstractButton: SubclassedControl
 
 abstract class CheckedButton: AbstractButton
 {
-	private CheckState _checkState;
+	private CheckState _checkState = CheckState.UNCHECKED;
 
 	public CheckState checkState()
 	{
