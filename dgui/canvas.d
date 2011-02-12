@@ -524,7 +524,7 @@ abstract class Image: GraphicObject
 
 	protected static int getInfo(T)(HGDIOBJ hGdiObj, inout T t)
 	{
-		return GetObjectW(hGdiObj, T.sizeof, &t);
+		return GetObjectA(hGdiObj, T.sizeof, &t);
 	}
 
 	protected this(HGDIOBJ hGdiObj, bool owned)
@@ -601,6 +601,31 @@ class Bitmap: Image
 		ReleaseDC(null, hdc);
 
 		return hBitmap;
+	}
+
+	public Bitmap clone()
+	{
+		BITMAP b;
+		this.getInfo!(BITMAP)(this._handle, b);
+
+		HDC hdc = GetDC(null);
+		HDC hcdc1 = CreateCompatibleDC(hdc); // Contains this bitmap
+		HDC hcdc2 = CreateCompatibleDC(hdc); // The Bitmap will be copied here
+		HBITMAP hBitmap = CreateCompatibleBitmap(hdc, b.bmWidth, b.bmHeight); //Don't delete it, it will be deleted by the class Bitmap
+
+		HBITMAP hOldBitmap1 = SelectObject(hcdc1, this._handle);
+		HBITMAP hOldBitmap2 = SelectObject(hcdc2, hBitmap);
+
+		BitBlt(hcdc2, 0, 0, b.bmWidth, b.bmHeight, hcdc1, 0, 0, SRCCOPY);
+		SelectObject(hcdc2, hOldBitmap2);
+		SelectObject(hcdc1, hOldBitmap1);
+
+		DeleteDC(hcdc2);
+		DeleteDC(hcdc1);
+		ReleaseDC(null, hdc);
+
+		Bitmap bmp = new Bitmap(hBitmap, true);
+		return bmp;
 	}
 
 	public void getData(ref BitmapData bd)

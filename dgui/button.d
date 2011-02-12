@@ -88,7 +88,19 @@ abstract class AbstractButton: SubclassedControl
 
 abstract class CheckedButton: AbstractButton
 {
+	public Signal!(Control, EventArgs) checkChanged;
+
 	private CheckState _checkState = CheckState.UNCHECKED;
+
+	public bool checked()
+	{
+		return this.checkState is CheckState.CHECKED;
+	}
+
+	public void checked(bool b)
+	{
+		this.checkState = b ? CheckState.CHECKED : CheckState.UNCHECKED;
+	}
 
 	public CheckState checkState()
 	{
@@ -114,6 +126,42 @@ abstract class CheckedButton: AbstractButton
 	{
 		this.sendMessage(BM_SETCHECK, this._checkState, 0);
 		super.onHandleCreated(e);
+	}
+
+	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch(msg)
+		{
+			case WM_COMMAND:
+			{
+				switch(HIWORD(wParam))
+				{
+					 case BN_CLICKED:
+					 {
+						if(this._checkState !is this.checkState) //Is Check State Changed?
+						{
+							this._checkState = this.checkState;
+							this.onCheckChanged(EventArgs.empty);
+						}
+					 }
+					 break;
+
+					default:
+						break;
+				}
+			}
+			break;
+
+			default:
+				break;
+		}
+
+		return super.onReflectedMessage(msg, wParam, lParam);
+	}
+
+	protected void onCheckChanged(EventArgs e)
+	{
+		this.checkChanged(this, e);
 	}
 }
 

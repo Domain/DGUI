@@ -118,7 +118,7 @@ abstract class TextControl: SubclassedControl
 	}
 	body
 	{
-		this.sendMessage(WM_SETTEXT, 0, 0);
+		this.sendMessage(WM_CLEAR, 0, 0);
 	}
 
 	public bool modified()
