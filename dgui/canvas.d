@@ -17,9 +17,9 @@
 
 module dgui.canvas;
 
-import std.gc;
 import std.c.string;
 public import std.string;
+public import core.memory;
 public import dgui.core.winapi;
 public import dgui.core.idisposable;
 public import dgui.core.exception;
@@ -145,7 +145,7 @@ struct Color
 		COLORREF colorref;
 	}
 
-	public final bool valid()
+	@property public final bool valid()
 	{
 		return this._valid;
 	}
@@ -320,9 +320,9 @@ class Canvas: Handle!(HDC), IDisposable
 		COLORREF oldColorRef = SetTextColor(this._handle, foreColor.colorref);
 		int oldBkMode = SetBkMode(this._handle, TRANSPARENT);
 
-		DrawTextExA(this._handle, text.ptr, text.length, &r.rect,
-				    DT_EXPANDTABS | DT_TABSTOP | textFormat.formatFlags | textFormat.alignment | textFormat.trimming,
-				    &dtp);
+		DrawTextExA(this._handle, toStringz(text), text.length, &r.rect,
+				       DT_EXPANDTABS | DT_TABSTOP | textFormat.formatFlags | textFormat.alignment | textFormat.trimming,
+				       &dtp);
 
 		SetBkMode(this._handle, oldBkMode);
 		SetTextColor(this._handle, oldColorRef);
@@ -341,7 +341,8 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public final void drawText(string text, Rect r, Color foreColor)
 	{
-		this.drawText(text, r, foreColor, Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false));
+		scope Font f = Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false);
+		this.drawText(text, r, foreColor, f);
 	}
 
 	public final void drawText(string text, Rect r, Font f, TextFormat tf)
@@ -351,14 +352,19 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public final void drawText(string text, Rect r, TextFormat tf)
 	{
-		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)),
-					  Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false), tf);
+		scope Font f = Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false);
+		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)), f, tf);
+	}
+
+	public final void drawText(string text, Rect r, Font f)
+	{
+		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)), f);
 	}
 
 	public final void drawText(string text, Rect r)
 	{
-		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)),
-					  Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false));
+		scope Font f = Font.fromHFONT(GetCurrentObject(this._handle, OBJ_FONT), false);
+		this.drawText(text, r, Color.fromCOLORREF(GetTextColor(this._handle)), f);
 	}
 
 	public final void drawLine(Pen p, int x1, int y1, int x2, int y2)
@@ -522,7 +528,7 @@ abstract class Image: GraphicObject
 	public abstract Size size();
 	public abstract ImageType type();
 
-	protected static int getInfo(T)(HGDIOBJ hGdiObj, inout T t)
+	protected static int getInfo(T)(HGDIOBJ hGdiObj, ref T t)
 	{
 		return GetObjectA(hGdiObj, T.sizeof, &t);
 	}
@@ -639,20 +645,20 @@ class Bitmap: Image
 
 		bd.ImageSize = bi.bmiHeader.biSizeImage;
 		bd.BitsCount = bi.bmiHeader.biSizeImage / RGBQUAD.sizeof;
-		bd.Bits = cast(RGBQUAD*)malloc(bi.bmiHeader.biSizeImage);
+		bd.Bits = cast(RGBQUAD*)GC.malloc(bi.bmiHeader.biSizeImage);
 
 		switch(bi.bmiHeader.biBitCount) // Calculate color table size (if needed)
 		{
 			case 24:
-				bd.Info = cast(BITMAPINFO*)malloc(BITMAPINFOHEADER.sizeof);
+				bd.Info = cast(BITMAPINFO*)GC.malloc(BITMAPINFOHEADER.sizeof);
 				break;
 
 			case 16, 32:
-				bd.Info = cast(BITMAPINFO*)malloc(BITMAPINFOHEADER.sizeof + uint.sizeof * 3); // Needs Investigation
+				bd.Info = cast(BITMAPINFO*)GC.malloc(BITMAPINFOHEADER.sizeof + uint.sizeof * 3); // Needs Investigation
 				break;
 
 			default:
-				bd.Info = cast(BITMAPINFO*)malloc(BITMAPINFOHEADER.sizeof + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
+				bd.Info = cast(BITMAPINFO*)GC.malloc(BITMAPINFOHEADER.sizeof + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
 				break;
 		}
 
@@ -665,10 +671,13 @@ class Bitmap: Image
 	{
 		HDC hdc = GetDC(null);
 		SetDIBits(hdc, this._handle, 0, bd.Info.bmiHeader.biHeight, bd.Bits, bd.Info, DIB_RGB_COLORS);
+
 		ReleaseDC(null, hdc);
+		GC.free(bd.Bits);
+		GC.free(bd.Info);
 	}
 
-	public final Size size()
+	@property public final Size size()
 	{
 		BITMAP bmp = void; //Inizializzata da getInfo()
 
@@ -676,7 +685,7 @@ class Bitmap: Image
 		return Size(bmp.bmWidth, bmp.bmHeight);
 	}
 
-	public final ImageType type()
+	@property public final ImageType type()
 	{
 		return ImageType.BITMAP;
 	}
@@ -723,7 +732,7 @@ class Icon: Image
 		DestroyIcon(this._handle);
 	}
 
-	public final Size size()
+	@property public final Size size()
 	{
 		ICONINFO ii = void; //Inizializzata da GetIconInfo()
 		BITMAP bmp = void; //Inizializzata da getInfo()
@@ -781,7 +790,7 @@ class Icon: Image
 		return sz;
 	}
 
-	public final ImageType type()
+	@property public final ImageType type()
 	{
 		return ImageType.ICON_OR_CURSOR;
 	}
@@ -809,7 +818,7 @@ final class Cursor: Icon
 		DestroyCursor(this._handle);
 	}
 
-	public static Point location()
+	@property public static Point location()
 	{
 		Point pt;
 
@@ -857,7 +866,7 @@ final class Font: GraphicObject
 		ReleaseDC(null, hdc);
 	}
 
-	private static void doStyle(FontStyle style, inout LOGFONTA lf)
+	private static void doStyle(FontStyle style, ref LOGFONTA lf)
 	{
 		lf.lfCharSet = DEFAULT_CHARSET;
 		lf.lfWeight = FW_NORMAL;
@@ -915,7 +924,7 @@ class SolidBrush: Brush
 		super(CreateSolidBrush(color.colorref), true);
 	}
 
-	public final Color color()
+	@property public final Color color()
 	{
 		return this._color;
 	}
@@ -944,12 +953,12 @@ class HatchBrush: Brush
 		super(CreateHatchBrush(style, color.colorref), true);
 	}
 
-	public final Color color()
+	@property public final Color color()
 	{
 		return this._color;
 	}
 
-	public final HatchStyle style()
+	@property public final HatchStyle style()
 	{
 		return this._style;
 	}
@@ -975,7 +984,7 @@ class PatternBrush: Brush
 		super(CreatePatternBrush(bmp.handle), true);
 	}
 
-	public final Bitmap bitmap()
+	@property public final Bitmap bitmap()
 	{
 		return this._bmp;
 	}
@@ -1008,17 +1017,17 @@ final class Pen: GraphicObject
 		super(this._handle, true);
 	}
 
-	public PenStyle style()
+	@property public PenStyle style()
 	{
 		return this._style;
 	}
 
-	public int width()
+	@property public int width()
 	{
 		return this._width;
 	}
 
-	public Color color()
+	@property public Color color()
 	{
 		return this._color;
 	}
@@ -1031,17 +1040,17 @@ final class Pen: GraphicObject
 
 final class SystemPens
 {
-	public static Pen nullPen()
+	@property public static Pen nullPen()
 	{
 		return Pen.fromHPEN(GetStockObject(NULL_PEN), false);
 	}
 
-	public static Pen blackPen()
+	@property public static Pen blackPen()
 	{
 		return Pen.fromHPEN(GetStockObject(BLACK_PEN), false);
 	}
 
-	public static Pen whitePen()
+	@property public static Pen whitePen()
 	{
 		return Pen.fromHPEN(GetStockObject(WHITE_PEN), false);
 	}
@@ -1049,157 +1058,157 @@ final class SystemPens
 
 final class SystemBrushes
 {
-	public static SolidBrush blackBrush()
+	@property public static SolidBrush blackBrush()
 	{
 		return SolidBrush.fromHBRUSH(GetStockObject(BLACK_BRUSH), false);
 	}
 
-	public static SolidBrush darkGrayBrush()
+	@property public static SolidBrush darkGrayBrush()
 	{
 		return SolidBrush.fromHBRUSH(GetStockObject(DKGRAY_BRUSH), false);
 	}
 
-	public static SolidBrush grayBrush()
+	@property public static SolidBrush grayBrush()
 	{
 		return SolidBrush.fromHBRUSH(GetStockObject(GRAY_BRUSH), false);
 	}
 
-	public static SolidBrush lightGrayBrush()
+	@property public static SolidBrush lightGrayBrush()
 	{
 		return SolidBrush.fromHBRUSH(GetStockObject(LTGRAY_BRUSH), false);
 	}
 
-	public static SolidBrush nullBrush()
+	@property public static SolidBrush nullBrush()
 	{
 		return SolidBrush.fromHBRUSH(GetStockObject(NULL_BRUSH), false);
 	}
 
-	public static SolidBrush whiteBrush()
+	@property public static SolidBrush whiteBrush()
 	{
 		return SolidBrush.fromHBRUSH(GetStockObject(WHITE_BRUSH), false);
 	}
 
-		public static SolidBrush brush3DdarkShadow()
+	@property public static SolidBrush brush3DdarkShadow()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DDKSHADOW), false);
 	}
 
-	public static SolidBrush brush3Dface()
+	@property public static SolidBrush brush3Dface()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DFACE), false);
 	}
 
-	public static SolidBrush brushBtnFace()
+	@property public static SolidBrush brushBtnFace()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BTNFACE), false);
 	}
 
-	public static SolidBrush brush3DLight()
+	@property public static SolidBrush brush3DLight()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DLIGHT), false);
 	}
 
-	public static SolidBrush brush3DShadow()
+	@property public static SolidBrush brush3DShadow()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DSHADOW), false);
 	}
 
-	public static SolidBrush brushActiveBorder()
+	@property public static SolidBrush brushActiveBorder()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_ACTIVEBORDER), false);
 	}
 
-	public static SolidBrush brushActiveCaption()
+	@property public static SolidBrush brushActiveCaption()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DLIGHT), false);
 	}
 
-	public static SolidBrush brushAppWorkspace()
+	@property public static SolidBrush brushAppWorkspace()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_APPWORKSPACE), false);
 	}
 
-	public static SolidBrush brushBackground()
+	@property public static SolidBrush brushBackground()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BACKGROUND), false);
 	}
 
-	public static SolidBrush brushBtnText()
+	@property public static SolidBrush brushBtnText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BTNTEXT), false);
 	}
 
-	public static SolidBrush brushCaptionText()
+	@property public static SolidBrush brushCaptionText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_CAPTIONTEXT), false);
 	}
 
-	public static SolidBrush brushGrayText()
+	@property public static SolidBrush brushGrayText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_GRAYTEXT), false);
 	}
 
-	public static SolidBrush brushHighLight()
+	@property public static SolidBrush brushHighLight()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_HIGHLIGHT), false);
 	}
 
-	public static SolidBrush brushHighLightText()
+	@property public static SolidBrush brushHighLightText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_HIGHLIGHTTEXT), false);
 	}
 
-	public static SolidBrush brushInactiveBorder()
+	@property public static SolidBrush brushInactiveBorder()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVEBORDER), false);
 	}
 
-	public static SolidBrush brushInactiveCaption()
+	@property public static SolidBrush brushInactiveCaption()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVECAPTION), false);
 	}
 
-	public static SolidBrush brushInactiveCaptionText()
+	@property public static SolidBrush brushInactiveCaptionText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVECAPTIONTEXT), false);
 	}
 
-	public static SolidBrush brushInfoBk()
+	@property public static SolidBrush brushInfoBk()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INFOBK), false);
 	}
 
-	public static SolidBrush brushInfoText()
+	@property public static SolidBrush brushInfoText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INFOTEXT), false);
 	}
 
-	public static SolidBrush brushMenu()
+	@property public static SolidBrush brushMenu()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_MENU), false);
 	}
 
-	public static SolidBrush brushMenuText()
+	@property public static SolidBrush brushMenuText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_MENUTEXT), false);
 	}
 
-	public static SolidBrush brushScrollBar()
+	@property public static SolidBrush brushScrollBar()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_SCROLLBAR), false);
 	}
 
-	public static SolidBrush brushWindow()
+	@property public static SolidBrush brushWindow()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_WINDOW), false);
 	}
 
-	public static SolidBrush brushWindowFrame()
+	@property public static SolidBrush brushWindowFrame()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_WINDOW), false);
 	}
 
-	public static SolidBrush brushWindowText()
+	@property public static SolidBrush brushWindowText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_WINDOWTEXT), false);
 	}
@@ -1207,7 +1216,7 @@ final class SystemBrushes
 
 final class SystemFonts
 {
-	public static Font windowsFont()
+	@property public static Font windowsFont()
 	{
 		static Font f;
 
@@ -1229,7 +1238,7 @@ final class SystemFonts
 		return f;
 	}
 
-	public static Font ansiFixedFont()
+	@property public static Font ansiFixedFont()
 	{
 		static Font f;
 
@@ -1241,7 +1250,7 @@ final class SystemFonts
 		return f;
 	}
 
-	public static Font ansiVarFont()
+	@property public static Font ansiVarFont()
 	{
 		static Font f;
 
@@ -1253,7 +1262,7 @@ final class SystemFonts
 		return f;
 	}
 
-	public static Font deviceDefaultFont()
+	@property public static Font deviceDefaultFont()
 	{
 		static Font f;
 
@@ -1265,7 +1274,7 @@ final class SystemFonts
 		return f;
 	}
 
-	public static Font oemFixedFont()
+	@property public static Font oemFixedFont()
 	{
 		static Font f;
 
@@ -1277,7 +1286,7 @@ final class SystemFonts
 		return f;
 	}
 
-	public static Font systemFont()
+	@property public static Font systemFont()
 	{
 		static Font f;
 
@@ -1289,7 +1298,7 @@ final class SystemFonts
 		return f;
 	}
 
-	public static Font systemFixedFont()
+	@property public static Font systemFixedFont()
 	{
 		static Font f;
 
@@ -1304,7 +1313,7 @@ final class SystemFonts
 
 final class SystemCursors
 {
-	public static Cursor appStarting()
+	@property public static Cursor appStarting()
 	{
 		static Cursor c;
 
@@ -1316,7 +1325,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor arrow()
+	@property public static Cursor arrow()
 	{
 		static Cursor c;
 
@@ -1328,7 +1337,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor cross()
+	@property public static Cursor cross()
 	{
 		static Cursor c;
 
@@ -1340,7 +1349,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor ibeam()
+	@property public static Cursor ibeam()
 	{
 		static Cursor c;
 
@@ -1352,7 +1361,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor icon()
+	@property public static Cursor icon()
 	{
 		static Cursor c;
 
@@ -1364,7 +1373,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor no()
+	@property public static Cursor no()
 	{
 		static Cursor c;
 
@@ -1376,7 +1385,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor sizeALL()
+	@property public static Cursor sizeALL()
 	{
 		static Cursor c;
 
@@ -1388,7 +1397,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor sizeNESW()
+	@property public static Cursor sizeNESW()
 	{
 		static Cursor c;
 
@@ -1400,7 +1409,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor sizeNS()
+	@property public static Cursor sizeNS()
 	{
 		static Cursor c;
 
@@ -1412,7 +1421,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor sizeNWSE()
+	@property public static Cursor sizeNWSE()
 	{
 		static Cursor c;
 
@@ -1424,7 +1433,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor sizeWE()
+	@property public static Cursor sizeWE()
 	{
 		static Cursor c;
 
@@ -1436,7 +1445,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor upArrow()
+	@property public static Cursor upArrow()
 	{
 		static Cursor c;
 
@@ -1448,7 +1457,7 @@ final class SystemCursors
 		return c;
 	}
 
-	public static Cursor wait()
+	@property public static Cursor wait()
 	{
 		static Cursor c;
 
@@ -1463,212 +1472,212 @@ final class SystemCursors
 
 final class SystemColors
 {
-	public static Color red()
+	@property public static Color red()
 	{
 		return Color(0xFF, 0x00, 0x00);
 	}
 
-	public static Color green()
+	@property public static Color green()
 	{
 		return Color(0x00, 0xFF, 0x00);
 	}
 
-	public static Color blue()
+	@property public static Color blue()
 	{
 		return Color(0x00, 0x00, 0xFF);
 	}
 
-	public static Color black()
+	@property public static Color black()
 	{
 		return Color(0x00, 0x00, 0x00);
 	}
 
-	public static Color white()
+	@property public static Color white()
 	{
 		return Color(0xFF, 0xFF, 0xFF);
 	}
 
-	public static Color yellow()
+	@property public static Color yellow()
 	{
 		return Color(0xFF, 0xFF, 0x00);
 	}
 
-	public static Color magenta()
+	@property public static Color magenta()
 	{
 		return Color(0xFF, 0x00, 0xFF);
 	}
 
-	public static Color cyan()
+	@property public static Color cyan()
 	{
 		return Color(0x00, 0xFF, 0xFF);
 	}
 
-	public static Color darkGray()
+	@property public static Color darkGray()
 	{
 		return Color(0xA9, 0xA9, 0xA9);
 	}
 
-	public static Color lightGray()
+	@property public static Color lightGray()
 	{
 		return Color(0xD3, 0xD3, 0xD3);
 	}
 
-	public static Color darkRed()
+	@property public static Color darkRed()
 	{
 		return Color(0x8B, 0x00, 0x00);
 	}
 
-	public static Color darkGreen()
+	@property public static Color darkGreen()
 	{
 		return Color(0x00, 0x64, 0x00);
 	}
 
-	public static Color darkBlue()
+	@property public static Color darkBlue()
 	{
 		return Color(0x00, 0x00, 0x8B);
 	}
 
-	public static Color darkYellow()
+	@property public static Color darkYellow()
 	{
 		return Color(0x00, 0x80, 0x80);
 	}
 
-	public static Color darkMagenta()
+	@property public static Color darkMagenta()
 	{
 		return Color(0x80, 0x00, 0x80);
 	}
 
-	public static Color darkCyan()
+	@property public static Color darkCyan()
 	{
 		return Color(0x80, 0x80, 0x00);
 	}
 
-	public static Color transparent()
+	@property public static Color transparent()
 	{
 		return Color(0x00, 0x00, 0x00, 0x00);
 	}
 
-	public static Color color3DdarkShadow()
+	@property public static Color color3DdarkShadow()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DDKSHADOW));
 	}
 
-	public static Color color3Dface()
+	@property public static Color color3Dface()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DFACE));
 	}
 
-	public static Color colorBtnFace()
+	@property public static Color colorBtnFace()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_BTNFACE));
 	}
 
-	public static Color color3DLight()
+	@property public static Color color3DLight()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DLIGHT));
 	}
 
-	public static Color color3DShadow()
+	@property public static Color color3DShadow()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DSHADOW));
 	}
 
-	public static Color colorActiveBorder()
+	@property public static Color colorActiveBorder()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_ACTIVEBORDER));
 	}
 
-	public static Color colorActiveCaption()
+	@property public static Color colorActiveCaption()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DLIGHT));
 	}
 
-	public static Color colorAppWorkspace()
+	@property public static Color colorAppWorkspace()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_APPWORKSPACE));
 	}
 
-	public static Color colorBackground()
+	@property public static Color colorBackground()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_BACKGROUND));
 	}
 
-	public static Color colorBtnText()
+	@property public static Color colorBtnText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_BTNTEXT));
 	}
 
-	public static Color colorCaptionText()
+	@property public static Color colorCaptionText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_CAPTIONTEXT));
 	}
 
-	public static Color colorGrayText()
+	@property public static Color colorGrayText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_GRAYTEXT));
 	}
 
-	public static Color colorHighLight()
+	@property public static Color colorHighLight()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_HIGHLIGHT));
 	}
 
-	public static Color colorHighLightText()
+	@property public static Color colorHighLightText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_HIGHLIGHTTEXT));
 	}
 
-	public static Color colorInactiveBorder()
+	@property public static Color colorInactiveBorder()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVEBORDER));
 	}
 
-	public static Color colorInactiveCaption()
+	@property public static Color colorInactiveCaption()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVECAPTION));
 	}
 
-	public static Color colorInactiveCaptionText()
+	@property public static Color colorInactiveCaptionText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVECAPTIONTEXT));
 	}
 
-	public static Color colorInfoBk()
+	@property public static Color colorInfoBk()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_INFOBK));
 	}
 
-	public static Color colorInfoText()
+	@property public static Color colorInfoText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_INFOTEXT));
 	}
 
-	public static Color colorMenu()
+	@property public static Color colorMenu()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_MENU));
 	}
 
-	public static Color colorMenuText()
+	@property public static Color colorMenuText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_MENUTEXT));
 	}
 
-	public static Color colorScrollBar()
+	@property public static Color colorScrollBar()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_SCROLLBAR));
 	}
 
-	public static Color colorWindow()
+	@property public static Color colorWindow()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_WINDOW));
 	}
 
-	public static Color colorWindowFrame()
+	@property public static Color colorWindowFrame()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_WINDOW));
 	}
 
-	public static Color colorWindowText()
+	@property public static Color colorWindowText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_WINDOWTEXT));
 	}
@@ -1699,62 +1708,62 @@ final class TextFormat
 		this._flags = tff;
 	}
 
-	public TextAlignment alignment()
+	@property public TextAlignment alignment()
 	{
 		return this._align;
 	}
 
-	public void alignment(TextAlignment ta)
+	@property public void alignment(TextAlignment ta)
 	{
 		this._align = ta;
 	}
 
-	public void formatFlags(TextFormatFlags tff)
+	@property public void formatFlags(TextFormatFlags tff)
 	{
 		this._flags = tff;
 	}
 
-	public TextFormatFlags formatFlags()
+	@property public TextFormatFlags formatFlags()
 	{
 		return this._flags;
 	}
 
-	public void trimming(TextTrimming tt)
+	@property public void trimming(TextTrimming tt)
 	{
 		this._trim = tt;
 	}
 
-	public TextTrimming trimming()
+	@property public TextTrimming trimming()
 	{
 		return this._trim;
 	}
 
-	public int tabLength()
+	@property public int tabLength()
 	{
 		return _params.iTabLength;
 	}
 
-	public void tabLength(int tablen)
+	@property public void tabLength(int tablen)
 	{
 		this._params.iTabLength = tablen;
 	}
 
-	public int leftMargin()
+	@property public int leftMargin()
 	{
 		return this._params.iLeftMargin;
 	}
 
-	public void leftMargin(int sz)
+	@property public void leftMargin(int sz)
 	{
 		this._params.iLeftMargin = sz;
 	}
 
-	public int rightMargin()
+	@property public int rightMargin()
 	{
 		return this._params.iRightMargin;
 	}
 
-	public void rightMargin(int sz)
+	@property public void rightMargin(int sz)
 	{
 		this._params.iRightMargin = sz;
 	}
@@ -1762,7 +1771,7 @@ final class TextFormat
 
 final class Screen
 {
-	public static Size size()
+	@property public static Size size()
 	{
 		Size sz = void; //Inizializzata sotto
 
@@ -1772,7 +1781,7 @@ final class Screen
 		return sz;
 	}
 
-	public static Rect workArea()
+	@property public static Rect workArea()
 	{
 		Rect r = void; //Inizializzata sotto
 
@@ -1780,7 +1789,7 @@ final class Screen
 		return r;
 	}
 
-	public static Canvas canvas()
+	@property public static Canvas canvas()
 	{
 		return Canvas.fromHDC(GetWindowDC(null));
 	}

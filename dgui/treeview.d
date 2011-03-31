@@ -117,17 +117,17 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		TreeView.removeTreeNode(this);
 	}
 
-	public final TreeView treeView()
+	@property public final TreeView treeView()
 	{
 		return this._owner;
 	}
 
-	public final TreeNode parentNode()
+	@property public final TreeNode parentNode()
 	{
 		return this._parent;
 	}
 
-	public final bool selected()
+	@property public final bool selected()
 	{
 		if(this._owner && this._owner.created)
 		{
@@ -144,22 +144,22 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		return false;
 	}
 
-	public final Object tag()
+	@property public final Object tag()
 	{
 		return this._tag;
 	}
 
-	public final void tag(Object obj)
+	@property public final void tag(Object obj)
 	{
 		this._tag = obj;
 	}
 
-	public final string text()
+	@property public final string text()
 	{
 		return this._text;
 	}
 
-	public final void text(string txt)
+	@property public final void text(string txt)
 	{
 		this._text = txt;
 
@@ -174,12 +174,12 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		}
 	}
 
-	public final int imageIndex()
+	@property public final int imageIndex()
 	{
 		return this._imgIndex;
 	}
 
-	public final void imageIndex(int idx)
+	@property public final void imageIndex(int idx)
 	{
 		this._imgIndex = idx;
 
@@ -201,12 +201,12 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		}
 	}
 
-	public final int selectedImageIndex()
+	@property public final int selectedImageIndex()
 	{
 		return this._selImgIndex;
 	}
 
-	public final void selectedImageIndex(int idx)
+	@property public final void selectedImageIndex(int idx)
 	{
 		this._selImgIndex = idx;
 
@@ -223,7 +223,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		}
 	}
 
-	public final Collection!(TreeNode) nodes()
+	@property public final Collection!(TreeNode) nodes()
 	{
 		return this._nodes;
 	}
@@ -244,12 +244,12 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		}
 	}
 
-	public final bool hasNodes()
+	@property public final bool hasNodes()
 	{
 		return (this._nodes ? true : false);
 	}
 
-	public final int index()
+	@property public final int index()
 	{
 		if(this._parent && this._parent.hasNodes)
 		{
@@ -269,12 +269,12 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		return -1;
 	}
 
-	public override HTREEITEM handle()
+	@property public override HTREEITEM handle()
 	{
 		return super.handle();
 	}
 
-	package void handle(HTREEITEM hTreeNode)
+	@property package void handle(HTREEITEM hTreeNode)
 	{
 		this._handle = hTreeNode;
 	}
@@ -358,17 +358,17 @@ class TreeView: SubclassedControl
 		}
 	}
 
-	public final Collection!(TreeNode) nodes()
+	@property public final Collection!(TreeNode) nodes()
 	{
 		return this._nodes;
 	}
 
-	public final ImageList imageList()
+	@property public final ImageList imageList()
 	{
 		return this._imgList;
 	}
 
-	public final void imageList(ImageList imgList)
+	@property public final void imageList(ImageList imgList)
 	{
 		this._imgList = imgList;
 
@@ -378,12 +378,12 @@ class TreeView: SubclassedControl
 		}
 	}
 
-	public final TreeNode selectedNode()
+	@property public final TreeNode selectedNode()
 	{
 		return this._selectedNode;
 	}
 
-	public final void selectedNode(TreeNode node)
+	@property public final void selectedNode(TreeNode node)
 	{
 		this._selectedNode = node;
 
@@ -439,7 +439,7 @@ class TreeView: SubclassedControl
 		//node.dispose();
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_TREEVIEW;
 		pcw.ClassName = WC_DTREEVIEW;

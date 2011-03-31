@@ -80,4 +80,4 @@ public import dgui.messagebox/*, dgui.imagelist*/;
 public import /*dgui.menu,*/ dgui.toolbar, dgui.statusbar, dgui.progressbar, dgui.trackbar;
 public import dgui.colordialog, dgui.folderbrowserdialog, dgui.fontdialog, dgui.openfiledialog, dgui.savefiledialog;
 public import dgui.form, dgui.button, dgui.label, dgui.textbox, dgui.richtextbox, dgui.panel, dgui.tabcontrol,
-			  dgui.combobox, dgui.listbox, dgui.listview, dgui.treeview, dgui.picturebox, dgui.splitter;
+			 dgui.combobox, dgui.listbox, dgui.listview, dgui.treeview, dgui.picturebox, dgui.splitter;

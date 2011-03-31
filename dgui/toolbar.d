@@ -48,7 +48,7 @@ class ToolButton
 		this._enabled = enabled;
 	}
 
-	public final int index()
+	@property public final int index()
 	{
 		if(this._owner && this._owner.created && this._owner.buttons)
 		{
@@ -68,12 +68,12 @@ class ToolButton
 		return -1;
 	}
 
-	public final ToolButtonStyle style()
+	@property public final ToolButtonStyle style()
 	{
 		return this._tbs;
 	}
 
-	public final void style(ToolButtonStyle tbs)
+	@property public final void style(ToolButtonStyle tbs)
 	{
 		this._tbs = tbs;
 
@@ -89,12 +89,12 @@ class ToolButton
 		}
 	}
 
-	public final int imageIndex()
+	@property public final int imageIndex()
 	{
 		return this._imgIndex;
 	}
 
-	public final void imageIndex(int idx)
+	@property public final void imageIndex(int idx)
 	{
 		this._imgIndex = idx;
 
@@ -110,12 +110,12 @@ class ToolButton
 		}
 	}
 
-	public final bool enabled()
+	@property public final bool enabled()
 	{
 		return this._enabled;
 	}
 
-	public final void enabled(bool b)
+	@property public final void enabled(bool b)
 	{
 		this._enabled = b;
 
@@ -132,17 +132,17 @@ class ToolButton
 		}
 	}
 
-	public ContextMenu contextMenu()
+	@property public ContextMenu contextMenu()
 	{
 		return this._ctxMenu;
 	}
 
-	public void contextMenu(ContextMenu cm)
+	@property public void contextMenu(ContextMenu cm)
 	{
 		this._ctxMenu = cm;
 	}
 
-	public final ToolBar toolBar()
+	@property public final ToolBar toolBar()
 	{
 		return this._owner;
 	}
@@ -158,12 +158,12 @@ class ToolBar: SubclassedControl
 	private Collection!(ToolButton) _buttons;
 	private ImageList _imgList;
 
-	public final ImageList imageList()
+	@property public final ImageList imageList()
 	{
 		return this._imgList;
 	}
 
-	public final void imageList(ImageList imgList)
+	@property public final void imageList(ImageList imgList)
 	{
 		this._imgList = imgList;
 
@@ -236,7 +236,7 @@ class ToolBar: SubclassedControl
 		}
 	}
 
-	public final Collection!(ToolButton) buttons()
+	@property public final Collection!(ToolButton) buttons()
 	{
 		return this._buttons;
 	}
@@ -277,7 +277,7 @@ class ToolBar: SubclassedControl
 		tb.toolBar.sendMessage(TB_INSERTBUTTONA, tb.index, cast(LPARAM)&tbtn);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_TOOLBAR;
 		pcw.ClassName = WC_DTOOLBAR;

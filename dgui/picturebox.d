@@ -44,9 +44,9 @@ class PictureBox: Control
 		super.dispose();
 	}
 
-	alias Control.bounds bounds;
+	alias @property  Control.bounds bounds;
 
-	public override void bounds(Rect r)
+	@property public override void bounds(Rect r)
 	{
 		if(this._img && this._sm is SizeMode.AUTO_SIZE)
 		{
@@ -61,12 +61,12 @@ class PictureBox: Control
 		}
 	}
 
-	public final SizeMode sizeMode()
+	@property public final SizeMode sizeMode()
 	{
 		return this._sm;
 	}
 
-	public final void sizeMode(SizeMode sm)
+	@property public final void sizeMode(SizeMode sm)
 	{
 		this._sm = sm;
 
@@ -76,12 +76,12 @@ class PictureBox: Control
 		}
 	}
 
-	public final Image image()
+	@property public final Image image()
 	{
 		return this._img;
 	}
 
-	public final void image(Image img)
+	@property public final void image(Image img)
 	{
 		if(this._img)
 		{
@@ -96,7 +96,7 @@ class PictureBox: Control
 		}
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName  = WC_DPICTUREBOX;
 		pcw.DefaultCursor = SystemCursors.arrow;

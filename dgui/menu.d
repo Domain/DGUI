@@ -160,12 +160,12 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		}
 	}
 
-	public final string text()
+	@property public final string text()
 	{
 		return this._menuInfo.Text;
 	}
 
-	public final void text(string s)
+	@property public final void text(string s)
 	{
 		this._menuInfo.Text = s;
 
@@ -183,12 +183,12 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		}
 	}
 
-	public final Collection!(MenuItem) items()
+	@property public final Collection!(MenuItem) items()
 	{
 		return this._items;
 	}
 
-	public final int index()
+	@property public final int index()
 	{
 		if(this._menuInfo.Parent)
 		{
@@ -285,17 +285,17 @@ class MenuItem: Menu
 		this.onClick(EventArgs.empty);
 	}
 
-	public final MenuStyle style()
+	@property public final MenuStyle style()
 	{
 		return this._menuInfo.Style;
 	}
 
-	public final bool enabled()
+	@property public final bool enabled()
 	{
 		return this._menuInfo.Enabled;
 	}
 
-	public final void enabled(bool b)
+	@property public final void enabled(bool b)
 	{
 		this._menuInfo.Enabled = b;
 

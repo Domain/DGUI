@@ -55,7 +55,7 @@ class TabPage: ContainerControl
 
 	}
 
-	public final int index()
+	@property public final int index()
 	{
 		if(this._owner && this._owner.created && this._owner.tabPages)
 		{
@@ -75,19 +75,19 @@ class TabPage: ContainerControl
 		return -1;
 	}
 
-	package void tabControl(TabControl tc)
+	@property package void tabControl(TabControl tc)
 	{
 		this._owner = tc;
 	}
 
-	public final TabControl tabControl()
+	@property public final TabControl tabControl()
 	{
 		return this._owner;
 	}
 
-	alias Control.text text;
+	alias @property Control.text text;
 
-	public override void text(string txt)
+	@property public override void text(string txt)
 	{
 		super.text = txt;
 
@@ -103,12 +103,12 @@ class TabPage: ContainerControl
 		}
 	}
 
-	public final int imageIndex()
+	@property public final int imageIndex()
 	{
 		return this._imgIndex;
 	}
 
-	public final void imageIndex(int idx)
+	@property public final void imageIndex(int idx)
 	{
 		this._imgIndex = idx;
 
@@ -123,7 +123,7 @@ class TabPage: ContainerControl
 		}
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ExtendedStyle = WS_EX_STATICEDGE;
 		pcw.ClassName = WC_DTABPAGE;
@@ -170,12 +170,12 @@ class TabControl: OwnerDrawControl, IContainerControl
 		this._tabPages.removeAt(idx);
 	}
 
-	public final Collection!(TabPage) tabPages()
+	@property public final Collection!(TabPage) tabPages()
 	{
 		return this._tabPages;
 	}
 
-	public final TabPage selectedPage()
+	@property public final TabPage selectedPage()
 	{
 		if(this._tabPages)
 		{
@@ -185,17 +185,17 @@ class TabControl: OwnerDrawControl, IContainerControl
 		return null;
 	}
 
-	public final void selectedPage(TabPage stp)
+	@property public final void selectedPage(TabPage stp)
 	{
 		this.selectedIndex = stp.index;
 	}
 
-	public final int selectedIndex()
+	@property public final int selectedIndex()
 	{
 		return this._selIndex;
 	}
 
-	public final void selectedIndex(int idx)
+	@property public final void selectedIndex(int idx)
 	{
 		if(this._tabPages)
 		{
@@ -224,12 +224,12 @@ class TabControl: OwnerDrawControl, IContainerControl
 		}
 	}
 
-	public final ImageList imageList()
+	@property public final ImageList imageList()
 	{
 		return this._imgList;
 	}
 
-	public final void imageList(ImageList imgList)
+	@property public final void imageList(ImageList imgList)
 	{
 		this._imgList = imgList;
 
@@ -239,12 +239,12 @@ class TabControl: OwnerDrawControl, IContainerControl
 		}
 	}
 
-	public final TabAlignment alignment()
+	@property public final TabAlignment alignment()
 	{
 		return this._ta;
 	}
 
-	public final void alignment(TabAlignment ta)
+	@property public final void alignment(TabAlignment ta)
 	{
 		this.setStyle(this._ta, false);
 		this.setStyle(ta, true);
@@ -324,7 +324,7 @@ class TabControl: OwnerDrawControl, IContainerControl
 		this._tabPages.add(cast(TabPage)c);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_TABCONTROL;
 		pcw.ClassName = WC_DTABCONTROL;

@@ -29,12 +29,12 @@ class ProgressBar: SubclassedControl
 	private uint _step = 10;
 	private uint _position = 0;
 
-	public uint minRange()
+	@property public uint minRange()
 	{
 		return this._minRange;
 	}
 
-	public void minRange(uint mr)
+	@property public void minRange(uint mr)
 	{
 		this._minRange = mr;
 
@@ -44,12 +44,12 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	public uint maxRange()
+	@property public uint maxRange()
 	{
 		return this._maxRange;
 	}
 
-	public void maxRange(uint mr)
+	@property public void maxRange(uint mr)
 	{
 		this._maxRange = mr;
 
@@ -59,12 +59,12 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	public uint step()
+	@property public uint step()
 	{
 		return this._minRange;
 	}
 
-	public void step(uint s)
+	@property public void step(uint s)
 	{
 		this._step = s;
 
@@ -74,7 +74,7 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	public uint position()
+	@property public uint position()
 	{
 		if(this.created)
 		{
@@ -84,7 +84,7 @@ class ProgressBar: SubclassedControl
 		return this._position;
 	}
 
-	public void position(uint p)
+	@property public void position(uint p)
 	{
 		this._position = p;
 
@@ -94,7 +94,7 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	public void increment()
+	@property public void increment()
 	{
 		if(this.created)
 		{

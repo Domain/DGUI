@@ -35,7 +35,7 @@ abstract class AbstractButton: SubclassedControl
 {
 	private DialogResult _dr = DialogResult.NONE;
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_BUTTON;
 
@@ -92,17 +92,17 @@ abstract class CheckedButton: AbstractButton
 
 	private CheckState _checkState = CheckState.UNCHECKED;
 
-	public bool checked()
+	@property public bool checked()
 	{
 		return this.checkState is CheckState.CHECKED;
 	}
 
-	public void checked(bool b)
+	@property public void checked(bool b)
 	{
 		this.checkState = b ? CheckState.CHECKED : CheckState.UNCHECKED;
 	}
 
-	public CheckState checkState()
+	@property public CheckState checkState()
 	{
 		if(this.created)
 		{
@@ -112,7 +112,7 @@ abstract class CheckedButton: AbstractButton
 		return this._checkState;
 	}
 
-	public void checkState(CheckState cs)
+	@property public void checkState(CheckState cs)
 	{
 		this._checkState = cs;
 
@@ -174,17 +174,17 @@ class Button: AbstractButton
 		this.setStyle(BS_DEFPUSHBUTTON, true);
 	}
 
-	public DialogResult dialogResult()
+	@property public DialogResult dialogResult()
 	{
 		return this._dr;
 	}
 
-	public void dialogResult(DialogResult dr)
+	@property public void dialogResult(DialogResult dr)
 	{
 		this._dr = dr;
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DBUTTON;
 
@@ -201,7 +201,7 @@ class CheckBox: CheckedButton
 		this.setStyle(BS_AUTOCHECKBOX, true);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DCHECKBOX;
 
@@ -218,7 +218,7 @@ class RadioButton: CheckedButton
 		this.setStyle(BS_AUTORADIOBUTTON, true);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DRADIOBUTTON;
 

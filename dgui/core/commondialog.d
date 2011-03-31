@@ -26,17 +26,17 @@ class CommonDialog(T1, T2)
 	protected T2 _dlgRes;
 	protected string _title;
 
-	public string text()
+	@property public string text()
 	{
 		return this._title;
 	}
 
-	public T2 result()
+	@property public T2 result()
 	{
 		return this._dlgRes;
 	}
 
-	public void text(string s)
+	@property public void text(string s)
 	{
 		this._title = s;
 	}

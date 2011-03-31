@@ -32,7 +32,7 @@ class Collection(T)
 		this._t.length = 0;
 	}
 
-	public final int length()
+	@property public final int length()
 	{
 		return this._t.length;
 	}

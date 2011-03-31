@@ -71,7 +71,7 @@ class ListViewItem
 		this(owner, txt, imgIdx, check);
 	}
 
-	public final int index()
+	@property public final int index()
 	{
 		if(this._owner)
 		{
@@ -91,12 +91,12 @@ class ListViewItem
 		return -1;
 	}
 
-	public final int imageIndex()
+	@property public final int imageIndex()
 	{
 		return this._imgIdx;
 	}
 
-	public final void imageIndex(int imgIdx)
+	@property public final void imageIndex(int imgIdx)
 	{
 		if(this._parentItem)
 		{
@@ -118,12 +118,12 @@ class ListViewItem
 		}
 	}
 
-	public final string text()
+	@property public final string text()
 	{
 		return this._text;
 	}
 
-	public final void text(string s)
+	@property public final void text(string s)
 	{
 		this._text = s;
 
@@ -140,12 +140,12 @@ class ListViewItem
 		}
 	}
 
-	public final Object tag()
+	@property public final Object tag()
 	{
 		return this._tag;
 	}
 
-	public final void tag(Object obj)
+	@property public final void tag(Object obj)
 	{
 		this._tag = obj;
 	}
@@ -155,7 +155,7 @@ class ListViewItem
 		return this._checked;
 	}
 
-	public final bool checked()
+	@property public final bool checked()
 	{
 		if(this._owner && this._owner.created)
 		{
@@ -165,7 +165,7 @@ class ListViewItem
 		return this._checked;
 	}
 
-	public final void checked(bool b)
+	@property public final void checked(bool b)
 	{
 		if(this._parentItem)
 		{
@@ -207,17 +207,17 @@ class ListViewItem
 		}
 	}
 
-	public final Collection!(ListViewItem) subItems()
+	@property public final Collection!(ListViewItem) subItems()
 	{
 		return this._subItems;
 	}
 
-	public final ListView listView()
+	@property public final ListView listView()
 	{
 		return this._owner;
 	}
 
-	package ListViewItem parentItem()
+	@property package ListViewItem parentItem()
 	{
 		return this._parentItem;
 	}
@@ -227,7 +227,7 @@ class ListViewItem
 		this._subItems.removeAt(idx);
 	}
 
-	package int subitemIndex()
+	@property package int subitemIndex()
 	{
 		if(this._parentItem is this)
 		{
@@ -271,7 +271,7 @@ class ListViewColumn
 		this._cta = cta;
 	}
 
-	public int index()
+	@property public int index()
 	{
 		if(this._owner)
 		{
@@ -291,22 +291,22 @@ class ListViewColumn
 		return -1;
 	}
 
-	public string text()
+	@property public string text()
 	{
 		return this._text;
 	}
 
-	public int width()
+	@property public int width()
 	{
 		return this._width;
 	}
 
-	public ColumnTextAlign textAlign()
+	@property public ColumnTextAlign textAlign()
 	{
 		return this._cta;
 	}
 
-	public ListView listView()
+	@property public ListView listView()
 	{
 		return this._owner;
 	}
@@ -330,12 +330,12 @@ class ListView: OwnerDrawControl
 		this.setStyle(LVS_ALIGNTOP | LVS_AUTOARRANGE | LVS_SHAREIMAGELISTS, true);
 	}
 
-	public final ImageList imageList()
+	@property public final ImageList imageList()
 	{
 		return this._lvwInfo.ImgList;
 	}
 
-	public final void imageList(ImageList imgList)
+	@property public final void imageList(ImageList imgList)
 	{
 		 this._lvwInfo.ImgList = imgList;
 
@@ -346,7 +346,7 @@ class ListView: OwnerDrawControl
 		}
 	}
 
-	public final ViewStyle viewStyle()
+	@property public final ViewStyle viewStyle()
 	{
 		if(this.getStyle() & ViewStyle.LARGE_ICON)
 		{
@@ -368,17 +368,17 @@ class ListView: OwnerDrawControl
 		assert(false, "Unknwown ListView Style");
 	}
 
-	public final void viewStyle(ViewStyle vs)
+	@property public final void viewStyle(ViewStyle vs)
 	{
 		this.setStyle(vs, true);
 	}
 
-	public final bool fullRow()
+	@property public final bool fullRow()
 	{
 		return this._lvwInfo.FullRow;
 	}
 
-	public final void fullRow(bool b)
+	@property public final void fullRow(bool b)
 	{
 		this._lvwInfo.FullRow = b;
 
@@ -388,12 +388,12 @@ class ListView: OwnerDrawControl
 		}
 	}
 
-	public final bool gridLines()
+	@property public final bool gridLines()
 	{
 		return this._lvwInfo.GridLines;
 	}
 
-	public final void gridLines(bool b)
+	@property public final void gridLines(bool b)
 	{
 		this._lvwInfo.GridLines = b;
 
@@ -403,12 +403,12 @@ class ListView: OwnerDrawControl
 		}
 	}
 
-	public final bool checkBoxes()
+	@property public final bool checkBoxes()
 	{
 		return this._lvwInfo.CheckBoxes;
 	}
 
-	public final void checkBoxes(bool b)
+	@property public final void checkBoxes(bool b)
 	{
 		this._lvwInfo.CheckBoxes = b;
 
@@ -418,7 +418,7 @@ class ListView: OwnerDrawControl
 		}
 	}
 
-	public final ListViewItem selectedItem()
+	@property public final ListViewItem selectedItem()
 	in
 	{
 		assert(this.created);
@@ -519,12 +519,12 @@ class ListView: OwnerDrawControl
 		}
 	}
 
-	public final Collection!(ListViewItem) items()
+	@property public final Collection!(ListViewItem) items()
 	{
 		return this._items;
 	}
 
-	public final Collection!(ListViewColumn) columns()
+	@property public final Collection!(ListViewColumn) columns()
 	{
 		return this._columns;
 	}
@@ -584,7 +584,7 @@ class ListView: OwnerDrawControl
 		col.listView.sendMessage(LVM_INSERTCOLUMNA, col.listView._columns.length, cast(LPARAM)&lvc);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_LISTVIEW;
 		pcw.ClassName = WC_DLISTVIEW;

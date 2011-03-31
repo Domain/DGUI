@@ -154,27 +154,27 @@ class Application
 		Application.enableManifest(); //Enable Manifest (if available)
 	}
 
-	public static HINSTANCE instance()
+	@property public static HINSTANCE instance()
 	{
 		return getHInstance();
 	}
 
-	public static string executablePath()
+	@property public static string executablePath()
 	{
 		return getExecutablePath();
 	}
 
-	public static string tempPath()
+	@property public static string tempPath()
 	{
 		return getTempPath();
 	}
 
-	public static string startupPath()
+	@property public static string startupPath()
 	{
 		return getStartupPath();
 	}
 
-	public static Resources resources()
+	@property public static Resources resources()
 	{
 		return Resources.instance;
 	}
@@ -194,7 +194,7 @@ class Application
 				ActivateActCtxProc activateActCtx = cast(ActivateActCtxProc)GetProcAddress(hKernel32, "ActivateActCtx");
 
 				GetTempPathA(MAX_PATH, tempPath.ptr);
-				string path = std.path.join(std.string.toString(tempPath.ptr), XP_MANIFEST_FILE);
+				string path = std.path.join(to!(string)(tempPath.ptr), XP_MANIFEST_FILE);
 				std.file.write(path, XP_MANIFEST);
 
 				ACTCTXA actx;
@@ -276,7 +276,7 @@ class Application
 				WaitMessage(); //Aspetta fino al prossimo messaggio.
 			}
 		}
-		catch(Object e)
+		catch(Exception e)
 		{
 			scope ExceptionForm ef = new ExceptionForm(e);
 

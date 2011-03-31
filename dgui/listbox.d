@@ -72,7 +72,7 @@ class ListBox: OwnerDrawControl
 		this._items.removeAt(idx);
 	}
 
-	public final int selectedIndex()
+	@property public final int selectedIndex()
 	{
 		if(this.created)
 		{
@@ -82,7 +82,7 @@ class ListBox: OwnerDrawControl
 		return this._lbxInfo.SelectedIndex;
 	}
 
-	public final void selectedIndex(int i)
+	@property public final void selectedIndex(int i)
 	{
 		this._lbxInfo.SelectedIndex = i;
 
@@ -92,7 +92,7 @@ class ListBox: OwnerDrawControl
 		}
 	}
 
-	public final Object selectedItem()
+	@property public final Object selectedItem()
 	{
 		int idx = this.selectedIndex;
 
@@ -104,13 +104,13 @@ class ListBox: OwnerDrawControl
 		return null;
 	}
 
-	public final string selectedString()
+	@property public final string selectedString()
 	{
 		Object obj = this.selectedItem;
 		return (obj ? obj.toString() : null);
 	}
 
-	public final Collection!(Object) items()
+	@property public final Collection!(Object) items()
 	{
 		return this._items;
 	}
@@ -120,7 +120,7 @@ class ListBox: OwnerDrawControl
 		return lb.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toStringz(obj.toString()));
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_LISTBOX;
 		pcw.ClassName = WC_DLISTBOX;

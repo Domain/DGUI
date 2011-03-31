@@ -17,20 +17,19 @@
 
 module dgui.savefiledialog;
 
-public import std.string;
-
 public import dgui.core.commondialog;
+public import std.conv;
 
 class SaveFileDialog: CommonDialog!(OPENFILENAMEA, string)
 {
 	private string _filter;
 
-	public string filter()
+	@property public string filter()
 	{
 		return this._filter;
 	}
 
-	public void filter(string f)
+	@property public void filter(string f)
 	{
 		this._filter = makeFilter(f);
 	}
@@ -50,7 +49,7 @@ class SaveFileDialog: CommonDialog!(OPENFILENAMEA, string)
 
 		if(GetSaveFileNameA(&this._dlgStruct))
 		{
-			this._dlgRes = std.string.toString(buffer.ptr).dup; //Dup local buffer
+			this._dlgRes = to!(string)(buffer.ptr);
 			return true;
 		}
 

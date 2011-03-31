@@ -52,32 +52,32 @@ class ComboBoxItem
 		this._imgIndex = idx;
 	}
 
-	public final int index()
+	@property public final int index()
 	{
 		return this._idx;
 	}
 
-	package void index(int idx)
+	@property package void index(int idx)
 	{
 		this._idx = idx;
 	}
 
-	public final ComboBox comboBox()
+	@property public final ComboBox comboBox()
 	{
 		return this._owner;
 	}
 
-	package void comboBox(ComboBox cbx)
+	@property package void comboBox(ComboBox cbx)
 	{
 		this._owner = cbx;
 	}
 
-	public final int imageIndex()
+	@property public final int imageIndex()
 	{
 		return this._imgIndex;
 	}
 
-	public final void imageIndex(int idx)
+	@property public final void imageIndex(int idx)
 	{
 		this._imgIndex = idx;
 
@@ -93,12 +93,12 @@ class ComboBoxItem
 		}
 	}
 
-	public final string text()
+	@property public final string text()
 	{
 		return this._text;
 	}
 
-	public final void text(string txt)
+	@property public final void text(string txt)
 	{
 		this._text = txt;
 
@@ -114,12 +114,12 @@ class ComboBoxItem
 		}
 	}
 
-	public final Object tag()
+	@property public final Object tag()
 	{
 		return this._tag;
 	}
 
-	public final void tag(Object obj)
+	@property public final void tag(Object obj)
 	{
 		this._tag = obj;
 	}
@@ -167,7 +167,7 @@ class ComboBox: SubclassedControl
 		this._items.removeAt(idx);
 	}
 
-	public final int selectedIndex()
+	@property public final int selectedIndex()
 	{
 		if(this.created)
 		{
@@ -177,7 +177,7 @@ class ComboBox: SubclassedControl
 		return this._cbxInfo.SelectedIndex;
 	}
 
-	public final void selectedIndex(int i)
+	@property public final void selectedIndex(int i)
 	{
 		this._cbxInfo.SelectedIndex = i;
 
@@ -202,7 +202,7 @@ class ComboBox: SubclassedControl
 		this.selectedIndex = -1;
 	}
 
-	public final ComboBoxItem selectedItem()
+	@property public final ComboBoxItem selectedItem()
 	{
 		if(this.created)
 		{
@@ -221,12 +221,12 @@ class ComboBox: SubclassedControl
 		return null;
 	}
 
-	public final ImageList imageList()
+	@property public final ImageList imageList()
 	{
 		return this._cbxInfo.ImgList;
 	}
 
-	public void imageList(ImageList imgList)
+	@property public void imageList(ImageList imgList)
 	{
 		this._cbxInfo.ImgList = imgList;
 
@@ -236,7 +236,7 @@ class ComboBox: SubclassedControl
 		}
 	}
 
-	public final void dropDownStyle(DropDownStyles dds)
+	@property public final void dropDownStyle(DropDownStyles dds)
 	{
 		if(dds !is this._cbxInfo.DDStyle)
 		{
@@ -246,7 +246,7 @@ class ComboBox: SubclassedControl
 		}
 	}
 
-	public final Collection!(ComboBoxItem) items()
+	@property public final Collection!(ComboBoxItem) items()
 	{
 		return this._items;
 	}
@@ -272,7 +272,7 @@ class ComboBox: SubclassedControl
 		this.itemChanged(this, e);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_COMBOBOXEX;
 		pcw.ClassName = WC_DCOMBOBOX;

@@ -21,12 +21,12 @@ abstract class Handle(T)
 {
 	protected T _handle;
 
-	public final bool created()
+	@property public final bool created()
 	{
 		return cast(bool)this._handle;
 	}
 
-	public /*final*/ T handle()
+	@property  public /*final*/ T handle()
 	{
 		return this._handle;
 	}

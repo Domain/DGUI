@@ -33,27 +33,27 @@ class Label: SubclassedControl
 	private LabelDrawMode _drawMode = LabelDrawMode.NORMAL;
 	private TextAlignment _textAlign = TextAlignment.MIDDLE | TextAlignment.LEFT;
 
-	public final LabelDrawMode drawMode()
+	@property public final LabelDrawMode drawMode()
 	{
 		return this._drawMode;
 	}
 
-	public final void drawMode(LabelDrawMode ldm)
+	@property public final void drawMode(LabelDrawMode ldm)
 	{
 		this._drawMode = ldm;
 	}
 
-	public final TextAlignment alignment()
+	@property public final TextAlignment alignment()
 	{
 		return this._textAlign;
 	}
 
-	public final void alignment(TextAlignment ta)
+	@property public final void alignment(TextAlignment ta)
 	{
 		this._textAlign = ta;
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DLABEL;
 		pcw.OldClassName = WC_STATIC;

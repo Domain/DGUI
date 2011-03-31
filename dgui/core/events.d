@@ -30,7 +30,7 @@ class EventArgs
 
 	}
 
-	public static EventArgs empty()
+	@property public static EventArgs empty()
 	{
 		if(!this._empty)
 		{
@@ -45,12 +45,12 @@ class CancelEventArgs: EventArgs
 {
 	private bool _cancel = false;
 
-	public bool cancel()
+	@property public bool cancel()
 	{
 		return this._cancel;
 	}
 
-	public void cancel(bool b)
+	@property public void cancel(bool b)
 	{
 		this._cancel = b;
 	}
@@ -67,12 +67,12 @@ class PaintEventArgs: EventArgs
 		this._clipRectangle = r;
 	}
 
-	public final Canvas canvas()
+	@property public final Canvas canvas()
 	{
 		return this._canvas;
 	}
 
-	public final Rect clipRectangle()
+	@property public final Rect clipRectangle()
 	{
 		return this._clipRectangle;
 	}
@@ -97,27 +97,27 @@ class DrawItemEventArgs: EventArgs
 		this._index = index;
 	}
 
-	public Canvas canvas()
+	@property public Canvas canvas()
 	{
 		return this._canvas;
 	}
 
-	public DrawItemState itemState()
+	@property public DrawItemState itemState()
 	{
 		return this._state;
 	}
 
-	public Rect itemRect()
+	@property public Rect itemRect()
 	{
 		return this._itemRect;
 	}
 
-	public Color foreColor()
+	@property public Color foreColor()
 	{
 		return this._foreColor;
 	}
 
-	public Color backColor()
+	@property public Color backColor()
 	{
 		return this._backColor;
 	}
@@ -136,7 +136,7 @@ class DrawItemEventArgs: EventArgs
 		}
 	}
 
-	public int index()
+	@property public int index()
 	{
 		return this._index;
 	}
@@ -157,32 +157,32 @@ class MeasureItemEventArgs: EventArgs
 		this._index = index;
 	}
 
-	public Canvas canvas()
+	@property public Canvas canvas()
 	{
 		return this._canvas;
 	}
 
-	public int width()
+	@property public int width()
 	{
 		return this._width;
 	}
 
-	public void width(int w)
+	@property public void width(int w)
 	{
 		this._width = w;
 	}
 
-	public int height()
+	@property public int height()
 	{
 		return this._height;
 	}
 
-	public void height(int h)
+	@property public void height(int h)
 	{
 		this._height = h;
 	}
 
-	public int index()
+	@property public int index()
 	{
 		return this._index;
 	}
@@ -199,12 +199,12 @@ class MouseEventArgs: EventArgs
 		this._mKeys = mk;
 	}
 
-	public Point location()
+	@property public Point location()
 	{
 		return this._cursorPos;
 	}
 
-	public MouseKeys keys()
+	@property public MouseKeys keys()
 	{
 		return this._mKeys;
 	}
@@ -221,7 +221,7 @@ class MouseWheelEventArgs: MouseEventArgs
 		super(cursorPos, mk);
 	}
 
-	public MouseWheel wheel()
+	@property public MouseWheel wheel()
 	{
 		return this._mw;
 	}
@@ -238,12 +238,12 @@ class ScrollEventArgs: EventArgs
 		this._mode = sm;
 	}
 
-	public ScrollDir direction()
+	@property public ScrollDir direction()
 	{
 		return this._dir;
 	}
 
-	public ScrollMode mode()
+	@property public ScrollMode mode()
 	{
 		return this._mode;
 	}
@@ -259,17 +259,17 @@ class KeyEventArgs: EventArgs
 		this._keys = keys;
 	}
 
-	public Keys keyCode()
+	@property public Keys keyCode()
 	{
 		return this._keys;
 	}
 
-	public bool handled()
+	@property public bool handled()
 	{
 		return this._handled;
 	}
 
-	public void handled(bool b)
+	@property public void handled(bool b)
 	{
 		this._handled = b;
 	}
@@ -285,7 +285,7 @@ class KeyCharEventArgs: KeyEventArgs
 		this._keyChar = keyCh;
 	}
 
-	public char keyChar()
+	@property public char keyChar()
 	{
 		return this._keyChar;
 	}
@@ -300,7 +300,7 @@ class ItemCheckedEventArgs(T): EventArgs
 		this._checkedItem = item;
 	}
 
-	public T item()
+	@property public T item()
 	{
 		return this._checkedItem;
 	}
@@ -317,12 +317,12 @@ class ItemChangedEventArgs(T): EventArgs
 		this._newItem = nItem;
 	}
 
-	public T oldItem()
+	@property public T oldItem()
 	{
 		return this._oldItem;
 	}
 
-	public T newItem()
+	@property public T newItem()
 	{
 		return this._newItem;
 	}

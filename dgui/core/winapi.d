@@ -1908,7 +1908,7 @@ extern(Windows)
 		UINT mask;
 		UINT lpReserved1;
 		UINT lpReserved2;
-		LPSTR pszText;
+		LPCTSTR pszText;
 		int cchTextMax;
 		int iImage;
 	}
@@ -1957,7 +1957,7 @@ extern(Windows)
 	{
 		UINT mask;
 		int iItem;
-		LPSTR pszText;
+		LPCSTR pszText;
 		int cchTextMax;
 		int iImage;
 		int iSelectedImage;
@@ -2065,7 +2065,7 @@ extern(Windows)
 		int iSubItem;
 		UINT state;
 		UINT stateMask;
-		LPSTR pszText;
+		LPCSTR pszText;
 		int cchTextMax;
 		int iImage;
 		LPARAM lParam;
@@ -2082,7 +2082,7 @@ extern(Windows)
 		UINT mask;
 		int fmt;
 		int cx;
-		LPSTR pszText;
+		LPCSTR pszText;
 		int cchTextMax;
 		int iSubItem;
 	}
@@ -2200,7 +2200,7 @@ extern(Windows)
 		HTREEITEM hItem;
 		UINT state;
 		UINT stateMask;
-		LPSTR pszText;
+		LPCTSTR pszText;
 		int cchTextMax;
 		int iImage;
 		int iSelectedImage;
@@ -2293,7 +2293,7 @@ extern(Windows)
 		UINT mask;
 		UINT lpReserved1;
 		UINT lpReserved2;
-		LPSTR pszText;
+		LPCTSTR pszText;
 		int cchTextMax;
 		int iImage;
 		LPARAM lParam;
@@ -2334,7 +2334,7 @@ extern(Windows)
 		HBITMAP hbmpChecked;
 		HBITMAP hbmpUnchecked;
 		DWORD dwItemData;
-		LPSTR dwTypeData;
+		LPCSTR dwTypeData;
 		UINT cch;
 		//HBITMAP hbmpItem;
 	}
@@ -2683,11 +2683,11 @@ extern(Windows)
 	BOOL DrawIconEx(HDC hdc, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, UINT diFlags);
 	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
-	int DrawTextExA(HDC hdc, LPTSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
+	int DrawTextExA(HDC hdc, LPCTSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
 	BOOL ExtTextOutA(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, uint cbCount, int* lpDx);
 	BOOL BitBlt(HDC hdcDest, int nXDest,int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 	BOOL PlgBlt(HDC hdcDest, POINT *lpPoint, HDC hdcSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HBITMAP hbmMask, int xMask, int yMask);
-	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, VOID *lpvBits);
+	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, const(void*) lpvBits);
 	BOOL PatBlt(HDC hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, DWORD dwRop);
 	HBITMAP CreateCompatibleBitmap(HDC hdc, int nWidth, int nHeight);
 	BOOL SetBrushOrgEx(HDC hdc, int nXOrg, int nYOrg, LPPOINT lppt);

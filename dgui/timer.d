@@ -65,12 +65,12 @@ final class Timer: IDisposable
 		}
 	}
 
-	public uint time()
+	@property public uint time()
 	{
 		return this._time;
 	}
 
-	public void time(uint t)
+	@property public void time(uint t)
 	{
 		this._time = t >= 0 ? t : t * (-1); //Se e' < 0 moltiplica per -1 cosi' torna positivo.
 	}

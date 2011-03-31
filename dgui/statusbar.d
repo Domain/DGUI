@@ -35,12 +35,12 @@ final class StatusPart
 		this._width = w;
 	}
 
-	public string text()
+	@property public string text()
 	{
 		return this._text;
 	}
 
-	public void text(string s)
+	@property public void text(string s)
 	{
 		this._text = s;
 
@@ -50,12 +50,12 @@ final class StatusPart
 		}
 	}
 
-	public int width()
+	@property public int width()
 	{
 		return this._width;
 	}
 
-	public int index()
+	@property public int index()
 	{
 		foreach(int i, StatusPart sp; this._owner.parts)
 		{
@@ -68,7 +68,7 @@ final class StatusPart
 		return -1;
 	}
 
-	public StatusBar statusBar()
+	@property public StatusBar statusBar()
 	{
 		return this._owner;
 	}
@@ -109,12 +109,12 @@ class StatusBar: SubclassedControl
 	}
 	*/
 
-	public bool partsVisible()
+	@property public bool partsVisible()
 	{
 		return this._partsVisible;
 	}
 
-	public void partsVisible(bool b)
+	@property public void partsVisible(bool b)
 	{
 		this._partsVisible = b;
 
@@ -124,7 +124,7 @@ class StatusBar: SubclassedControl
 		}
 	}
 
-	public Collection!(StatusPart) parts()
+	@property public Collection!(StatusPart) parts()
 	{
 		return this._parts;
 	}
@@ -155,7 +155,7 @@ class StatusBar: SubclassedControl
 		}
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		this._controlInfo.Dock = DockStyle.BOTTOM; //Forza il dock
 

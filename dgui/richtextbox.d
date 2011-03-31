@@ -73,7 +73,7 @@ class RichTextBox: TextControl
 		this.sendMessage(EM_REDO, 0, 0);
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		++_refCount;
 

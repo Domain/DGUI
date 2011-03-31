@@ -66,7 +66,7 @@ class MainForm: Form
 
 		for(int i = 0; i < bd.BitsCount; i++) // Gray Scale!
 		{
-			int mid = (bd.Bits[i].rgbRed + bd.Bits[i].rgbGreen + bd.Bits[i].rgbBlue) / 3;
+			ubyte mid = cast(ubyte)((bd.Bits[i].rgbRed + bd.Bits[i].rgbGreen + bd.Bits[i].rgbBlue) / 3);
 
 			bd.Bits[i].rgbRed = mid;
 			bd.Bits[i].rgbGreen = mid;

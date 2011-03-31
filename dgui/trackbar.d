@@ -31,12 +31,12 @@ class TrackBar: SubclassedControl
 	private int _position = 0;
 	private int _lastValue = 0;
 
-	public uint minRange()
+	@property public uint minRange()
 	{
 		return this._minRange;
 	}
 
-	public void minRange(uint mr)
+	@property public void minRange(uint mr)
 	{
 		this._minRange = mr;
 
@@ -46,12 +46,12 @@ class TrackBar: SubclassedControl
 		}
 	}
 
-	public uint maxRange()
+	@property public uint maxRange()
 	{
 		return this._maxRange;
 	}
 
-	public void maxRange(uint mr)
+	@property public void maxRange(uint mr)
 	{
 		this._maxRange = mr;
 
@@ -61,7 +61,7 @@ class TrackBar: SubclassedControl
 		}
 	}
 
-	public int position()
+	@property public int position()
 	{
 		if(this.created)
 		{
@@ -71,7 +71,7 @@ class TrackBar: SubclassedControl
 		return this._position;
 	}
 
-	public void position(int p)
+	@property public void position(int p)
 	{
 		this._position = p;
 

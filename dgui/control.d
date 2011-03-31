@@ -31,12 +31,12 @@ debug
 	public import std.stdio;
 }
 
-final void convertRect(inout Rect rect, Control from, Control to)
+final void convertRect(ref Rect rect, Control from, Control to)
 {
 	MapWindowPoints(from ? from.handle : null, to ? to.handle : null, cast(POINT*)&rect.rect, 2);
 }
 
-final void convertPoint(inout Point pt, Control from, Control to)
+final void convertPoint(ref Point pt, Control from, Control to)
 {
 	MapWindowPoints(from ? from.handle : null, to ? to.handle : null, &pt.point, 1);
 }
@@ -136,17 +136,17 @@ abstract class Control: Handle!(HWND), IDisposable
 		this._handle = null;
 	}
 
-	public final Collection!(Control) controls()
+	@property public final Collection!(Control) controls()
 	{
 		return this._childControls;
 	}
 
-	public final Rect bounds()
+	@property public final Rect bounds()
 	{
 		return this._controlInfo.Bounds;
  	}
 
-	public void bounds(Rect rect)
+	@property public void bounds(Rect rect)
 	{
 		if(this.created)
 		{
@@ -158,7 +158,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final BorderStyle borderStyle()
+	@property public final BorderStyle borderStyle()
 	{
 		if(this.getExStyle() & WS_EX_CLIENTEDGE)
 		{
@@ -172,7 +172,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		return BorderStyle.NONE;
 	}
 
-	public final void borderStyle(BorderStyle bs)
+	@property public final void borderStyle(BorderStyle bs)
 	{
 		switch(bs)
 		{
@@ -197,12 +197,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Control parent()
+	@property public final Control parent()
 	{
 		return this._controlInfo.Parent;
 	}
 
-	public final void parent(Control c)
+	@property public final void parent(Control c)
 	{
 		this._controlInfo.Parent = c;
 		this.setStyle(WS_CHILD, true); //E' un child
@@ -240,12 +240,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Color backColor()
+	@property public final Color backColor()
 	{
 		return this._controlInfo.BackColor;
 	}
 
-	public final void backColor(Color c)
+	@property public final void backColor(Color c)
 	{
 		if(this._controlInfo.BackBrush)
 		{
@@ -261,12 +261,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Color foreColor()
+	@property public final Color foreColor()
 	{
 		return this._controlInfo.ForeColor;
 	}
 
-	public final void foreColor(Color c)
+	@property public final void foreColor(Color c)
 	{
 		if(this._controlInfo.ForeBrush)
 		{
@@ -282,17 +282,17 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final bool scrollBars()
+	@property public final bool scrollBars()
 	{
 		return cast(bool)(this.getStyle() & (WS_VSCROLL | WS_HSCROLL));
 	}
 
-	public final void scrollBars(bool b)
+	@property public final void scrollBars(bool b)
 	{
 		this.setStyle(WS_VSCROLL | WS_HSCROLL, true);
 	}
 
-	public final string text()
+	@property public final string text()
 	{
 		if(this.created)
 		{
@@ -306,7 +306,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		return this._controlInfo.Text;
 	}
 
-	public void text(string s) //Sovrascritto in TabPage
+	@property public void text(string s) //Sovrascritto in TabPage
 	{
 		this._controlInfo.Text = s;
 
@@ -316,12 +316,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Font font()
+	@property public final Font font()
 	{
 		return this._controlInfo.DefaultFont;
 	}
 
-	public final void font(Font f)
+	@property public final void font(Font f)
 	{
 		if(this.created)
 		{
@@ -336,12 +336,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		this._controlInfo.DefaultFont = f;
 	}
 
-	public final Point location()
+	@property public final Point location()
 	{
 		return this.bounds.location;
 	}
 
-	public final void location(Point pt)
+	@property public final void location(Point pt)
 	{
 		this._controlInfo.Bounds.location = pt;
 
@@ -351,12 +351,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Size size()
+	@property public final Size size()
 	{
 		return this._controlInfo.Bounds.size;
  	}
 
-	public final void size(Size sz)
+	@property public final void size(Size sz)
 	{
 		this._controlInfo.Bounds.size = sz;
 
@@ -366,12 +366,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final ContextMenu contextMenu()
+	@property public final ContextMenu contextMenu()
 	{
 		return this._controlInfo.CtxMenu;
 	}
 
-	public final void contextMenu(ContextMenu cm)
+	@property public final void contextMenu(ContextMenu cm)
 	{
 		if(this._controlInfo.CtxMenu !is cm)
 		{
@@ -384,12 +384,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final int width()
+	@property public final int width()
 	{
 		return this._controlInfo.Bounds.width;
 	}
 
-	public final void width(int w)
+	@property public final void width(int w)
 	{
 		this._controlInfo.Bounds.width = w;
 
@@ -399,12 +399,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final int height()
+	@property public final int height()
 	{
 		return this._controlInfo.Bounds.height;
 	}
 
-	public final void height(int h)
+	@property public final void height(int h)
 	{
 		this._controlInfo.Bounds.height = h;
 
@@ -414,12 +414,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final DockStyle dock()
+	@property public final DockStyle dock()
 	{
 		return this._controlInfo.Dock;
 	}
 
-	public final void dock(DockStyle ds)
+	@property public final void dock(DockStyle ds)
 	{
 		this._controlInfo.Dock = ds;
 
@@ -429,7 +429,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Cursor cursor()
+	@property public final Cursor cursor()
 	{
 		if(this.created)
 		{
@@ -439,7 +439,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		return this._controlInfo.DefaultCursor;
 	}
 
-	public final void cursor(Cursor c)
+	@property public final void cursor(Cursor c)
 	{
 		if(this._controlInfo.DefaultCursor)
 		{
@@ -454,12 +454,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final bool visible()
+	@property public final bool visible()
 	{
 		return cast(bool)(this.getStyle() & WS_VISIBLE);
 	}
 
-	public final void visible(bool b)
+	@property public final void visible(bool b)
 	{
 		if(this.created)
 		{
@@ -476,12 +476,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final bool enabled()
+	@property public final bool enabled()
 	{
 		return !(this.getStyle() & WS_DISABLED);
 	}
 
-	public final void enabled(bool b)
+	@property public final void enabled(bool b)
 	{
 		if(this.created)
 		{
@@ -549,7 +549,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	public final void doDock()
 	{
-		static void dockSingle(Control t, inout Rect da)
+		static void dockSingle(Control t, ref Rect da)
 		{
 			switch(t.dock)
 			{
@@ -943,7 +943,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	protected void preCreateWindow(inout PreCreateWindow pcw)
+	protected void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		ClassStyles cstyle = pcw.ClassStyle | ClassStyles.PARENTDC | ClassStyles.DBLCLKS;
 
@@ -1358,7 +1358,7 @@ abstract class SubclassedControl: Control
 {
 	private WNDPROC _oldWndProc; // Window procedure originale
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		if(this._controlInfo.Parent) // Ha un parent
 		{
@@ -1510,12 +1510,12 @@ abstract class OwnerDrawControl: SubclassedControl
 
 	protected ItemDrawMode _drawMode = ItemDrawMode.NORMAL;
 
-	public ItemDrawMode drawMode()
+	@property public ItemDrawMode drawMode()
 	{
 		return this._drawMode;
 	}
 
-	public void drawMode(ItemDrawMode dm)
+	@property public void drawMode(ItemDrawMode dm)
 	{
 		this._drawMode = dm;
 	}

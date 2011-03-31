@@ -19,6 +19,7 @@ module dgui.registry;
 
 pragma(lib, "advapi32.lib");
 
+import std.conv;
 import std.string;
 import dgui.core.idisposable;
 import dgui.core.exception;
@@ -48,7 +49,7 @@ abstract class RegistryValue(T): IRegistryValue
 		this._value = val;
 	}
 
-	public abstract RegistryValueType valueType();
+	@property public abstract RegistryValueType valueType();
 	public abstract string toString();
 }
 
@@ -59,7 +60,7 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 		super(b);
 	}
 
-	public RegistryValueType valueType()
+	@property public RegistryValueType valueType()
 	{
 		return RegistryValueType.BINARY;
 	}
@@ -94,21 +95,21 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 	}
 }
 
-final class RegistryValueString: RegistryValue!(string)
+final class RegistryValueString: RegistryValue!(char[])
 {
-	public this(string s)
+	public this(char[] s)
 	{
 		super(s);
 	}
 
-	public RegistryValueType valueType()
+	@property public RegistryValueType valueType()
 	{
 		return RegistryValueType.STRING;
 	}
 
 	public string toString()
 	{
-		return this._value;
+		return this._value.idup;
 	}
 
 	public void write(RegistryKey owner, string name)
@@ -136,14 +137,14 @@ final class RegistryValueDword: RegistryValue!(uint)
 		super(i);
 	}
 
-	public RegistryValueType valueType()
+	@property public RegistryValueType valueType()
 	{
 		return RegistryValueType.DWORD;
 	}
 
 	public string toString()
 	{
-		return std.string.toString(this._value);
+		return to!(string)(this._value);
 	}
 
 	public void write(RegistryKey owner, string name)
@@ -171,14 +172,14 @@ final class RegistryValueQword: RegistryValue!(ulong)
 		super(l);
 	}
 
-	public RegistryValueType valueType()
+	@property public RegistryValueType valueType()
 	{
 		return RegistryValueType.QWORD;
 	}
 
 	public string toString()
 	{
-		return std.string.toString(this._value);
+		return to!(string)(this._value);
 	}
 
 	public void write(RegistryKey owner, string name)
@@ -237,11 +238,11 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		{
 			debug
 			{
-				throw new RegistryException(format("Cannot open Key %s", std.string.toString(name.ptr)), __FILE__, __LINE__);
+				throw new RegistryException(format("Cannot open Key %s", to!(string)(name.ptr)), __FILE__, __LINE__);
 			}
 			else
 			{
-				throw new RegistryException(format("Cannot open Key %s", std.string.toString(name.ptr)));
+				throw new RegistryException(format("Cannot open Key %s", to!(string)(name.ptr)));
 			}
 		}
 
@@ -249,11 +250,11 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		{
 			debug
 			{
-				throw new RegistryException(format("Cannot query Key %s", std.string.toString(name.ptr)), __FILE__, __LINE__);
+				throw new RegistryException(format("Cannot query Key %s", to!(string)(name.ptr)), __FILE__, __LINE__);
 			}
 			else
 			{
-				throw new RegistryException(format("Cannot query Key %s", std.string.toString(name.ptr)));
+				throw new RegistryException(format("Cannot query Key %s", to!(string)(name.ptr)));
 			}
 		}
 
@@ -262,7 +263,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 			uint size = MAX_KEY_LENGTH;
 
 			RegEnumKeyExA(hDelKey, 0, keyName.ptr, &size, null, null, null, null);
-			this.doDeleteSubKey(hDelKey, std.string.toString(keyName.ptr));
+			this.doDeleteSubKey(hDelKey, to!(string)(keyName.ptr));
 		}
 
 		for(int i = 0; i < valuesCount; i++)
@@ -285,11 +286,11 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 			{
 				debug
 				{
-					throw new RegistryException(format("Cannot delete Value %s", std.string.toString(valName.ptr)), __FILE__, __LINE__);
+					throw new RegistryException(format("Cannot delete Value %s", to!(string)(valName.ptr)), __FILE__, __LINE__);
 				}
 				else
 				{
-					throw new RegistryException(format("Cannot delete Value %s", std.string.toString(valName.ptr)));
+					throw new RegistryException(format("Cannot delete Value %s", to!(string)(valName.ptr)));
 				}
 			}
 		}
@@ -300,11 +301,11 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		{
 			debug
 			{
-				throw new RegistryException(format("Cannot delete Key %s", std.string.toString(name.ptr)), __FILE__, __LINE__);
+				throw new RegistryException(format("Cannot delete Key %s", to!(string)(name.ptr)), __FILE__, __LINE__);
 			}
 			else
 			{
-				throw new RegistryException(format("Cannot delete Key %s", std.string.toString(name.ptr)));
+				throw new RegistryException(format("Cannot delete Key %s", to!(string)(name.ptr)));
 			}
 		}
 	}
@@ -315,7 +316,6 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		uint disp;
 
 		int res = RegCreateKeyExA(this._handle, toStringz(name), 0, null, 0, KEY_ALL_ACCESS, null, &hKey, &disp);
-		printf("Res: %d\n", res);
 
 		switch(res)
 		{
@@ -424,7 +424,7 @@ final class Registry
 
 	}
 
-	public static RegistryKey classesRoot()
+	@property public static RegistryKey classesRoot()
 	{
 		if(!_classesRoot)
 		{
@@ -434,7 +434,7 @@ final class Registry
 		return _classesRoot;
 	}
 
-	public static RegistryKey currentConfig()
+	@property public static RegistryKey currentConfig()
 	{
 		if(!_currentConfig)
 		{
@@ -444,7 +444,7 @@ final class Registry
 		return _currentConfig;
 	}
 
-	public static RegistryKey currentUser()
+	@property public static RegistryKey currentUser()
 	{
 		if(!_currentUser)
 		{
@@ -454,7 +454,7 @@ final class Registry
 		return _currentUser;
 	}
 
-	public static RegistryKey dynData()
+	@property public static RegistryKey dynData()
 	{
 		if(!_dynData)
 		{
@@ -464,7 +464,7 @@ final class Registry
 		return _dynData;
 	}
 
-	public static RegistryKey localMachine()
+	@property public static RegistryKey localMachine()
 	{
 		if(!_localMachine)
 		{
@@ -474,7 +474,7 @@ final class Registry
 		return _localMachine;
 	}
 
-	public static RegistryKey performanceData()
+	@property public static RegistryKey performanceData()
 	{
 		if(!_performanceData)
 		{
@@ -485,7 +485,7 @@ final class Registry
 	}
 
 
-	public static RegistryKey users()
+	@property public static RegistryKey users()
 	{
 		if(!_users)
 		{

@@ -17,7 +17,7 @@
 
 module dgui.core.utils;
 
-import std.string;
+import std.conv;
 import std.stdio;
 import std.path;
 public import dgui.core.winapi;
@@ -54,7 +54,7 @@ string getExecutablePath()
 		char[] path = new char[MAX_PATH];
 
 		GetModuleFileNameA(null, path.ptr, path.length);
-		exePath = toString(path.ptr);
+		exePath = to!(string)(path.ptr);
 	}
 
 	return exePath;
@@ -81,7 +81,7 @@ string getTempPath()
 		char[] path = new char[MAX_PATH];
 
 		GetTempPathA(MAX_PATH, path.ptr);
-		tempPath = toString(path.ptr);
+		tempPath = to!(string)(path.ptr);
 	}
 
 	return tempPath;
@@ -89,7 +89,7 @@ string getTempPath()
 
 string makeFilter(string userFilter)
 {
-	char[] newFilter = userFilter;
+	char[] newFilter = cast(char[])userFilter;
 
 	foreach(ref char ch; newFilter)
 	{
@@ -100,12 +100,12 @@ string makeFilter(string userFilter)
 	}
 
 	newFilter ~= '\0';
-	return newFilter;
+	return newFilter.idup;
 }
 
-string recalcString(string s)
+string recalcString(char[] s)
 {
-	return std.string.toString(s.ptr);
+	return to!(string)(s.ptr);
 }
 
 class ObjectContainer(T)

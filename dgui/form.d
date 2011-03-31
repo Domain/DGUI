@@ -43,7 +43,7 @@ class Form: ContainerControl, IDialogResult
 	public Signal!(Control, EventArgs) close;
 	public Signal!(Control, CancelEventArgs) closing;
 
-	public final void formBorderStyle(FormBorderStyle fbs)
+	@property public final void formBorderStyle(FormBorderStyle fbs)
 	{
 		if(this.created)
 		{
@@ -64,7 +64,7 @@ class Form: ContainerControl, IDialogResult
 		this._formInfo.FrameBorder = fbs;
 	}
 
-	public final void dialogResult(DialogResult dr)
+	@property public final void dialogResult(DialogResult dr)
 	{
 		this._formInfo.Result = dr;
 		this._formInfo.ModalCompleted = true; //E' arrivato il click di un pulsante.
@@ -73,7 +73,7 @@ class Form: ContainerControl, IDialogResult
 		SetActiveWindow(this._formInfo.hActiveWnd); // Restore the previous active window
 	}
 
-	public final void controlBox(bool b)
+	@property public final void controlBox(bool b)
 	{
 		this._formInfo.ControlBox = b;
 
@@ -83,7 +83,7 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	public final void maximizeBox(bool b)
+	@property public final void maximizeBox(bool b)
 	{
 		this._formInfo.MaximizeBox = b;
 
@@ -93,7 +93,7 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	public final void minimizeBox(bool b)
+	@property public final void minimizeBox(bool b)
 	{
 		this._formInfo.MinimizeBox = b;
 
@@ -103,7 +103,7 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	public final void showInTaskbar(bool b)
+	@property public final void showInTaskbar(bool b)
 	{
 		this._formInfo.ShowInTaskbar = b;
 
@@ -113,12 +113,12 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	public final MenuBar menu()
+	@property public final MenuBar menu()
 	{
 		return this._formInfo.Menu;
 	}
 
-	public final void menu(MenuBar mb)
+	@property public final void menu(MenuBar mb)
 	{
 		if(this.created)
 		{
@@ -134,12 +134,12 @@ class Form: ContainerControl, IDialogResult
 		this._formInfo.Menu = mb;
 	}
 
-	public final Icon icon()
+	@property public final Icon icon()
 	{
 		return this._formInfo.FormIcon;
 	}
 
-	public final void icon(Icon ico)
+	@property public final void icon(Icon ico)
 	{
 		if(this.created)
 		{
@@ -155,7 +155,7 @@ class Form: ContainerControl, IDialogResult
 		this._formInfo.FormIcon = ico;
 	}
 
-	public final void startPosition(FormStartPosition fsp)
+	@property public final void startPosition(FormStartPosition fsp)
 	{
 		this._formInfo.StartPosition = fsp;
 	}
@@ -299,7 +299,7 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_FORM;
 		pcw.DefaultCursor = SystemCursors.arrow;

@@ -76,7 +76,7 @@ final class Resources
 		return cast(T*)LockResource(LoadResource(null, hRsrc));
 	}
 
-	public static Resources instance()
+	@property public static Resources instance()
 	{
 		if(!_rsrc)
 		{

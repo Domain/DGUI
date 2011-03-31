@@ -20,9 +20,8 @@ module dgui.folderbrowserdialog;
 pragma(lib, "shell32.lib");
 
 public import dgui.core.winapi;
-public import std.string;
-
 public import dgui.core.commondialog;
+public import std.conv;
 
 class FolderBrowserDialog: CommonDialog!(BROWSEINFOA, string)
 {
@@ -41,7 +40,7 @@ class FolderBrowserDialog: CommonDialog!(BROWSEINFOA, string)
 		if(pidl)
 		{
 			SHGetPathFromIDListA(pidl, buffer.ptr); //Ricava il path intero.
-			this._dlgRes = std.string.toString(buffer.ptr).dup;
+			this._dlgRes = to!(string)(buffer.ptr);
 			return true;
 		}
 

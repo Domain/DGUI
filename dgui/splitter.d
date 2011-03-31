@@ -77,7 +77,7 @@ class Splitter: Control
 		}
 	}
 
-	private Control splitControl()
+	@property private Control splitControl()
 	{
 		Control ctrl;
 
@@ -267,7 +267,7 @@ class Splitter: Control
 		}
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DSPLITTER;
 		pcw.ClassStyle = ClassStyles.HREDRAW | ClassStyles.VREDRAW;

@@ -134,27 +134,27 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 		imageList_Remove(this._handle, -1);
 	}
 
-	public final Collection!(Icon) images()
+	@property public final Collection!(Icon) images()
 	{
 		return this._images;
 	}
 
-	public final Size size()
+	@property public final Size size()
 	{
 		return this._size;
 	}
 
-	public final void size(Size sz)
+	@property public final void size(Size sz)
 	{
 		this._size = sz;
 	}
 
-	public final ColorDepth colorDepth()
+	@property public final ColorDepth colorDepth()
 	{
 		return this._depth;
 	}
 
-	public final void colorDepth(ColorDepth depth)
+	@property public final void colorDepth(ColorDepth depth)
 	{
 		this._depth = depth;
 	}

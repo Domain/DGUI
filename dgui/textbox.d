@@ -52,12 +52,12 @@ abstract class TextControl: SubclassedControl
 		}
 	}
 
-	public final bool readOnly()
+	@property public final bool readOnly()
 	{
 		return !(this.getStyle() & ES_READONLY);
 	}
 
-	public final void readOnly(bool b)
+	@property public final void readOnly(bool b)
 	{
 		this.setStyle(ES_READONLY, b);
 	}
@@ -121,7 +121,7 @@ abstract class TextControl: SubclassedControl
 		this.sendMessage(WM_CLEAR, 0, 0);
 	}
 
-	public bool modified()
+	@property public bool modified()
 	{
 		if(this.created)
 		{
@@ -131,7 +131,7 @@ abstract class TextControl: SubclassedControl
 		return false;
 	}
 
-	public void modified(bool b)
+	@property public void modified(bool b)
 	in
 	{
 		assert(this.created);
@@ -141,12 +141,12 @@ abstract class TextControl: SubclassedControl
 		this.sendMessage(EM_SETMODIFY, b, 0);
 	}
 
-	public int textLength()
+	@property public int textLength()
 	{
 		return this.sendMessage(WM_GETTEXTLENGTH, 0, 0);
 	}
 
-	public final string selectedText()
+	@property public final string selectedText()
 	{
 		CHARRANGE chrg = void; //Inizializzata sotto
 
@@ -154,7 +154,7 @@ abstract class TextControl: SubclassedControl
 		return this.text[chrg.cpMin..chrg.cpMax];
 	}
 
-	public final int selectionStart()
+	@property public final int selectionStart()
 	{
 		CHARRANGE chrg = void; //Inizializzata sotto
 
@@ -162,7 +162,7 @@ abstract class TextControl: SubclassedControl
 		return chrg.cpMin;
 	}
 
-	public final int selectionLength()
+	@property public final int selectionLength()
 	{
 		CHARRANGE chrg = void; //Inizializzata sotto
 
@@ -170,7 +170,7 @@ abstract class TextControl: SubclassedControl
 		return chrg.cpMax - chrg.cpMin;
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ExtendedStyle = WS_EX_CLIENTEDGE;
 		pcw.DefaultBackColor = SystemColors.colorWindow;
@@ -211,12 +211,12 @@ class TextBox: TextControl
 	private bool _numbersOnly = false;
 	private bool _passText = false;
 
-	public final CharacterCasing characterCasing()
+	@property public final CharacterCasing characterCasing()
 	{
 		return this._chChasing;
 	}
 
-	public final void characterCasing(CharacterCasing ch)
+	@property public final void characterCasing(CharacterCasing ch)
 	{
 		if(this.created)
 		{
@@ -227,7 +227,7 @@ class TextBox: TextControl
 		this._chChasing = ch;
 	}
 
-	public final void numbersOnly(bool b)
+	@property public final void numbersOnly(bool b)
 	{
 		this._numbersOnly = b;
 
@@ -237,7 +237,7 @@ class TextBox: TextControl
 		}
 	}
 
-	public final void passwordText(bool b)
+	@property public final void passwordText(bool b)
 	{
 		this._passText = b;
 
@@ -247,7 +247,7 @@ class TextBox: TextControl
 		}
 	}
 
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.OldClassName = WC_EDIT;
 		pcw.ClassName = WC_DEDIT;

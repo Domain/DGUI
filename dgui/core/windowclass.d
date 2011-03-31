@@ -20,7 +20,7 @@ module dgui.core.windowclass;
 public import dgui.core.winapi;
 public import dgui.core.enums;
 public import dgui.canvas;
-public import std.string;
+public import std.conv;
 
 private alias WNDPROC[string] ClassMap; //Tiene traccia delle window procedure originali: [OrgClassName | OrgWndProc]
 
@@ -74,8 +74,8 @@ public WNDPROC superClassWindowClass(string oldClassName, string newClassName, W
 	oldWc.cbSize = WNDCLASSEXA.sizeof;
 	newWc.cbSize = WNDCLASSEXA.sizeof;
 
-	char* pOldClassName = toStringz(oldClassName);
-	char* pNewClassName = toStringz(newClassName);
+	immutable(char)* pOldClassName = toStringz(oldClassName);
+	immutable(char)* pNewClassName = toStringz(newClassName);
 
 	if(!GetClassInfoExA(hInst, pNewClassName, &newWc)) // IF Classe Non Trovata THEN
 	{

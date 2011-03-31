@@ -23,7 +23,7 @@ private const string WC_DPANEL = "DPanel";
 
 class Panel: ContainerControl
 {
-	protected override void preCreateWindow(inout PreCreateWindow pcw)
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DPANEL;
 

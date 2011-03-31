@@ -51,17 +51,17 @@ struct Rect
 		return r;
 	}
 
-	public bool opEquals(Rect r)
+	public const bool opEquals(ref const Rect r)
 	{
 		return this.left == r.left && this.top == r.top && this.right == r.right && this.bottom == r.bottom;
 	}
 
-	public int x()
+	public @property int x()
 	{
 		return this.left;
 	}
 
-	public void x(int newX)
+	public @property void x(int newX)
 	{
 		int w = this.width;
 
@@ -69,12 +69,12 @@ struct Rect
 		this.right = newX + w;
 	}
 
-	public int y()
+	public @property int y()
 	{
 		return this.top;
 	}
 
-	public void y(int newY)
+	public @property void y(int newY)
 	{
 		int h = this.height;
 
@@ -82,32 +82,32 @@ struct Rect
 		this.bottom = newY + h;
 	}
 
-	public int width()
+	public @property int width()
 	{
 		return this.right - this.left;
 	}
 
-	public void width(int w)
+	public @property void width(int w)
 	{
 		this.right = this.left + w;
 	}
 
-	public int height()
+	public @property int height()
 	{
 		return this.bottom - this.top;
 	}
 
-	public void height(int h)
+	public @property void height(int h)
 	{
 		this.bottom = this.top + h;
 	}
 
-	public Point location()
+	public @property Point location()
 	{
 		return Point(this.left, this.top);
 	}
 
-	public void location(Point pt)
+	public @property void location(Point pt)
 	{
 		Size sz = this.size; //Copia dimensioni
 
@@ -117,18 +117,18 @@ struct Rect
 		this.bottom = this.top + sz.height;
 	}
 
-	public Size size()
+	public @property Size size()
 	{
 		return Size(this.width, this.height);
 	}
 
-	public void size(Size sz)
+	public @property void size(Size sz)
 	{
 		this.right = this.left + sz.width;
 		this.bottom = this.top + sz.height;
 	}
 
-	public bool empty()
+	public @property bool empty()
 	{
 		return this.width <= 0 && this.height <= 0;
 	}
@@ -155,7 +155,7 @@ struct Point
 		POINT point;
 	}
 
-	public bool opEquals(Point pt)
+	public bool opEquals(ref const Point pt) const
 	{
 		return this.x == pt.x && this.y == pt.y;
 	}
@@ -183,7 +183,7 @@ struct Size
 		SIZE size;
 	}
 
-	public bool opEquals(Size sz)
+	public bool opEquals(ref const Size sz) const
 	{
 		return this.width == sz.width && this.height == sz.height;
 	}
@@ -198,6 +198,6 @@ struct Size
 	}
 }
 
-public const Rect NullRect = Rect.init;
-public const Point NullPoint = Point.init;
-public const Size NullSize = Size.init;
+public const Rect NullRect; // = Rect.init;
+public const Point NullPoint; // = Point.init;
+public const Size NullSize; // = Size.init;
