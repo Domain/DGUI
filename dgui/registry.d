@@ -95,9 +95,9 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 	}
 }
 
-final class RegistryValueString: RegistryValue!(char[])
+final class RegistryValueString: RegistryValue!(string)
 {
-	public this(char[] s)
+	public this(string s)
 	{
 		super(s);
 	}
@@ -395,7 +395,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 			case REG_SZ:
 				char[] val = new char[len];
 				RegQueryValueExA(this._handle, toStringz(name), null, &type, cast(ubyte*)val.ptr, &len);
-				ival = new RegistryValueString(val);
+				ival = new RegistryValueString(val.idup); //FIXME: .idup ... is valid? Need investigation
 				break;
 
 			default:
