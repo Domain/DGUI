@@ -1056,6 +1056,74 @@ final class SystemPens
 	}
 }
 
+final class SystemIcons
+{
+	@property public static Icon application()
+	{
+		static Icon ico;
+
+		if(!ico)
+		{
+			HICON hIco = LoadImageA(null, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			ico = Icon.fromHICON(hIco);
+		}
+
+		return ico;
+	}
+
+	@property public static Icon asterisk()
+	{
+		static Icon ico;
+
+		if(!ico)
+		{
+			HICON hIco = LoadImageA(null, IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			ico = Icon.fromHICON(hIco);
+		}
+
+		return ico;
+	}
+
+	@property public static Icon error()
+	{
+		static Icon ico;
+
+		if(!ico)
+		{
+			HICON hIco = LoadImageA(null, IDI_ERROR, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			ico = Icon.fromHICON(hIco);
+		}
+
+		return ico;
+	}
+
+	@property public static Icon question()
+	{
+		static Icon ico;
+
+		if(!ico)
+		{
+			HICON hIco = LoadImageA(null, IDI_QUESTION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			ico = Icon.fromHICON(hIco);
+		}
+
+		return ico;
+	}
+
+	@property public static Icon warning()
+	{
+		static Icon ico;
+
+		if(!ico)
+		{
+			HICON hIco = LoadImageA(null, IDI_WARNING, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			ico = Icon.fromHICON(hIco);
+		}
+
+		return ico;
+	}
+}
+
 final class SystemBrushes
 {
 	@property public static SolidBrush blackBrush()
