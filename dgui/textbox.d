@@ -208,8 +208,64 @@ abstract class TextControl: SubclassedControl
 class TextBox: TextControl
 {
 	private CharacterCasing _chChasing  = CharacterCasing.NORMAL;
+	private uint _maxLength = 0;
+	private bool _multiline = false;
 	private bool _numbersOnly = false;
 	private bool _passText = false;
+
+	@property public final bool multiline()
+	{
+		return this._multiline;
+	}
+
+	@property public final void multiline(bool b)
+	{
+		this._multiline = b;
+
+		if(this.created)
+		{
+			this.setStyle(ES_MULTILINE, b);
+		}
+	}
+
+	@property public final uint maxLength()
+	{
+		if(!this._maxLength)
+		{
+			if(this._multiline)
+			{
+				return 0xFFFFFFFF;
+			}
+			else
+			{
+				return 0xFFFFFFFE;
+			}
+		}
+
+		return this._maxLength;
+	}
+
+	@property public final void maxLength(uint len)
+	{
+		this._maxLength = len;
+
+		if(!len)
+		{
+			if(this._multiline)
+			{
+				len = 0xFFFFFFFF;
+			}
+			else
+			{
+				len = 0xFFFFFFFE;
+			}
+		}
+
+		if(this.created)
+		{
+			this.sendMessage(EM_SETLIMITTEXT, len, 0);
+		}
+	}
 
 	@property public final CharacterCasing characterCasing()
 	{
@@ -251,7 +307,7 @@ class TextBox: TextControl
 	{
 		pcw.OldClassName = WC_EDIT;
 		pcw.ClassName = WC_DEDIT;
-		pcw.Style |= this._chChasing;
+		pcw.Style |= this._chChasing | (this._multiline ? ES_MULTILINE : 0);
 
 		if(this._numbersOnly)
 		{
@@ -265,5 +321,15 @@ class TextBox: TextControl
 
 		this.height = 20;
 		super.preCreateWindow(pcw);
+	}
+
+	protected override void onHandleCreated(EventArgs e)
+	{
+		if(this._maxLength)
+		{
+			this.sendMessage(EM_SETLIMITTEXT, this._maxLength, 0);
+		}
+
+		super.onHandleCreated(e);
 	}
 }
