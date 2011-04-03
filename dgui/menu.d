@@ -60,6 +60,7 @@ struct MenuInfo
 	Menu Parent;
 	string Text;
 	bool Enabled = true;
+	bool Checked = false;
 }
 
 abstract class Menu: Handle!(HMENU), IDisposable
@@ -125,7 +126,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		if(m.style is MenuStyle.NORMAL)
 		{
 			minfo.fMask |= MIIM_DATA | MIIM_STRING | MIIM_STATE;
-			minfo.fState = m.enabled ? MFS_ENABLED : MFS_DISABLED;
+			minfo.fState = (m.enabled ? MFS_ENABLED : MFS_DISABLED) | (m.checked ? MFS_CHECKED : 0);
 			minfo.dwTypeData = toStringz(m._menuInfo.Text);
 		}
 		else if(m.style is MenuStyle.SEPARATOR)
@@ -308,6 +309,37 @@ class MenuItem: Menu
 			minfo.cbSize = MENUITEMINFOA.sizeof;
 			minfo.fMask = MIIM_STATE;
 			minfo.fState = b ? MFS_ENABLED : MFS_DISABLED;
+
+			SetMenuItemInfoA(this._menuInfo.Parent.handle, idx, true, &minfo);
+		}
+	}
+
+	@property public final bool checked()
+	{
+		return this._menuInfo.Checked;
+	}
+
+	@property public final void checked(bool b)
+	{
+		this._menuInfo.Checked = b;
+
+		if(this._menuInfo.Parent && this._menuInfo.Parent.created)
+		{
+			int idx = this.index;
+
+			MENUITEMINFOA minfo;
+
+			minfo.cbSize = MENUITEMINFOA.sizeof;
+			minfo.fMask = MIIM_STATE;
+
+			if(b)
+			{
+				minfo.fState |= MFS_CHECKED;
+			}
+			else
+			{
+				minfo.fState &= ~MFS_CHECKED;
+			}
 
 			SetMenuItemInfoA(this._menuInfo.Parent.handle, idx, true, &minfo);
 		}
