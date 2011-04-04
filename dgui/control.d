@@ -88,6 +88,7 @@ abstract class Control: Handle!(HWND), IDisposable
 {
 	protected Collection!(Control) _childControls;
 	protected ControlInfo _controlInfo;
+	private Object _tag;
 
 	public Signal!(Control, KeyCharEventArgs) keyChar;
 	public Signal!(Control, KeyEventArgs) keyDown;
@@ -139,6 +140,16 @@ abstract class Control: Handle!(HWND), IDisposable
 	@property public final Collection!(Control) controls()
 	{
 		return this._childControls;
+	}
+
+	@property public final Object tag()
+	{
+		return this._tag;
+	}
+
+	@property public final void tag(Object o)
+	{
+		this._tag = o;
 	}
 
 	@property public final Rect bounds()
