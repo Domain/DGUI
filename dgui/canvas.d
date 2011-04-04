@@ -512,6 +512,11 @@ abstract class GraphicObject: Handle!(HGDIOBJ), IDisposable
 		}
 	}
 
+	protected static int getInfo(T)(HGDIOBJ hGdiObj, ref T t)
+	{
+		return GetObjectA(hGdiObj, T.sizeof, &t);
+	}
+
 	public void dispose()
 	{
 		DeleteObject(this._handle);
@@ -527,11 +532,6 @@ abstract class Image: GraphicObject
 
 	public abstract Size size();
 	public abstract ImageType type();
-
-	protected static int getInfo(T)(HGDIOBJ hGdiObj, ref T t)
-	{
-		return GetObjectA(hGdiObj, T.sizeof, &t);
-	}
 
 	protected this(HGDIOBJ hGdiObj, bool owned)
 	{
@@ -864,6 +864,15 @@ final class Font: GraphicObject
 		this._handle = CreateFontIndirectA(&lf);
 
 		ReleaseDC(null, hdc);
+	}
+
+	public this(Font f, FontStyle fs)
+	{
+		LOGFONTA lf;
+
+		getInfo!(LOGFONTA)(f.handle, lf);
+		doStyle(fs, lf);
+		this._handle = CreateFontIndirectA(&lf);
 	}
 
 	private static void doStyle(FontStyle style, ref LOGFONTA lf)
