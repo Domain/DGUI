@@ -17,7 +17,7 @@
 
 module dgui.core.exception;
 
-public import dgui.core.winapi;
+import dgui.core.winapi;
 import std.windows.syserror;
 import std.string;
 

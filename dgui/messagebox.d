@@ -17,9 +17,9 @@
 
 module dgui.messagebox;
 
-public import std.string;
-public import dgui.core.winapi;
-public import dgui.core.enums;
+import std.string;
+import dgui.core.enums;
+import dgui.core.winapi;
 
 enum MsgBoxButtons: uint
 {

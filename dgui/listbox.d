@@ -17,10 +17,9 @@
 
 module dgui.listbox;
 
-public import dgui.control;
-
-const string WC_LISTBOX = "ListBox";
-const string WC_DLISTBOX = "DListBox";
+import dgui.core.utils;
+import dgui.control;
+import std.string;
 
 struct ListBoxInfo
 {
@@ -110,9 +109,14 @@ class ListBox: OwnerDrawControl
 		return (obj ? obj.toString() : null);
 	}
 
-	@property public final Collection!(Object) items()
+	@property public final Object[] items()
 	{
-		return this._items;
+		if(this._items)
+		{
+			return this._items.get();
+		}
+
+		return null;
 	}
 
 	private static int insertItem(ListBox lb, Object obj)

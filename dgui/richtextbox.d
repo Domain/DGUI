@@ -36,11 +36,8 @@
 
 module dgui.richtextbox;
 
+import dgui.control;
 public import dgui.textbox;
-public import dgui.core.winapi;
-
-private const string WC_RICHEDIT = "RichEdit20A";
-private const string WC_DRICHEDIT = "DRichTextBox";
 
 class RichTextBox: TextControl
 {

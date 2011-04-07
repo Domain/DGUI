@@ -17,10 +17,8 @@
 
 module dgui.picturebox;
 
-public import dgui.control;
-public import dgui.canvas;
-
-private const string WC_DPICTUREBOX = "DPicturebox";
+import dgui.control;
+import dgui.canvas;
 
 enum SizeMode
 {

@@ -17,10 +17,12 @@
 
 module dgui.core.windowclass;
 
-public import dgui.core.winapi;
-public import dgui.core.enums;
-public import dgui.canvas;
-public import std.conv;
+import std.string;
+import dgui.core.winapi;
+import dgui.core.exception;
+import dgui.core.utils;
+import dgui.core.enums;
+import dgui.canvas;
 
 private alias WNDPROC[string] ClassMap; //Tiene traccia delle window procedure originali: [OrgClassName | OrgWndProc]
 

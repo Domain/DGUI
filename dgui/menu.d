@@ -17,15 +17,15 @@
 
 module dgui.menu;
 
-public import dgui.core.winapi;
 import std.string;
-
-public import dgui.core.collection;
-public import dgui.core.idisposable;
-public import dgui.core.events;
-public import dgui.core.signal;
-public import dgui.core.handle;
-public import dgui.core.utils;
+import dgui.core.winapi;
+import dgui.core.geometry;
+import dgui.core.collection;
+import dgui.core.idisposable;
+import dgui.core.events;
+import dgui.core.signal;
+import dgui.core.handle;
+import dgui.core.utils;
 
 enum: uint
 {
@@ -184,9 +184,14 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		}
 	}
 
-	@property public final Collection!(MenuItem) items()
+	@property public final MenuItem[] items()
 	{
-		return this._items;
+		if(this._items)
+		{
+			return this._items.get();
+		}
+
+		return null;
 	}
 
 	@property public final int index()

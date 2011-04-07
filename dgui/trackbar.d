@@ -17,10 +17,7 @@
 
 module dgui.trackbar;
 
-public import dgui.control;
-
-private const string WC_TRACKBAR = "msctls_trackbar32";
-private const string WC_DTRACKBAR = "DTrackBar";
+import dgui.control;
 
 class TrackBar: SubclassedControl
 {

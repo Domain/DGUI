@@ -17,7 +17,47 @@
 
 module dgui.core.enums;
 
-public import dgui.core.winapi;
+import dgui.core.winapi;
+
+enum
+{
+	// Windows Classes
+	WC_BUTTON 		= "Button",
+	WC_COMBOBOXEX 	= "ComboBoxEx32",
+	WC_STATIC 		= "STATIC",
+	WC_LISTBOX 		= "ListBox",
+	WC_LISTVIEW 	= "SysListView32",
+	WC_DPICTUREBOX  = "DPicturebox",
+	WC_PROGRESSBAR  = "msctls_progress32",
+	WC_RICHEDIT 	= "RichEdit20A",
+	WC_STATUSBAR 	= "msctls_statusbar32",
+	WC_TABCONTROL   = "SysTabControl32",
+	WC_EDIT			= "EDIT",
+	WC_TOOLBAR 		= "ToolBarWindow32",
+	WC_TRACKBAR		= "msctls_trackbar32",
+	WC_TREEVIEW 	= "SysTreeView32",
+
+	// DGui Classes
+	WC_DTABPAGE 	= "DTabPage",
+	WC_DSPLITTER 	= "DSplitter",
+	WC_DPANEL		= "DPanel",
+	WC_FORM 		= "DForm",
+	WC_DBUTTON 		= "DButton",
+	WC_DCHECKBOX 	= "DCheckBox",
+	WC_DRADIOBUTTON = "DRadioButton",
+	WC_DCOMBOBOX 	= "DComboBox",
+	WC_DLABEL 		= "DLabel",
+	WC_DLISTBOX 	= "DListBox",
+	WC_DLISTVIEW 	= "DListView",
+	WC_DPROGRESSBAR = "DProgressBar",
+	WC_DRICHEDIT 	= "DRichTextBox",
+	WC_DSTATUSBAR 	= "DStatusBar",
+	WC_DTABCONTROL  = "DTabControl",
+	WC_DEDIT 		= "DTextBox",
+	WC_DTOOLBAR 	= "DToolBar",
+	WC_DTRACKBAR 	= "DTrackBar",
+	WC_DTREEVIEW 	= "DTreeView",
+}
 
 enum ClassStyles: uint
 {

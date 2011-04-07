@@ -17,9 +17,11 @@
 
 module dgui.imagelist;
 
-public import dgui.core.winapi;
-public import dgui.core.collection;
-public import dgui.canvas;
+import dgui.core.winapi;
+import dgui.core.collection;
+import dgui.core.handle;
+import dgui.core.idisposable;
+import dgui.canvas;
 
 enum ColorDepth: uint
 {
@@ -134,9 +136,14 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 		imageList_Remove(this._handle, -1);
 	}
 
-	@property public final Collection!(Icon) images()
+	@property public final Icon[] images()
 	{
-		return this._images;
+		if(this._images)
+		{
+			return this._images.get();
+		}
+
+		return null;
 	}
 
 	@property public final Size size()

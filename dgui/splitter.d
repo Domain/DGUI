@@ -17,9 +17,8 @@
 
 module dgui.splitter;
 
-public import dgui.control;
+import dgui.control;
 
-private const string WC_DSPLITTER = "DSplitter";
 private const int SPLITTER_SIZE = 6;
 private const ubyte[] BITMAP_BITS = [ 0xAA, 0, 0x55, 0, 0xAA, 0, 0x55, 0,
 									  0xAA, 0, 0x55, 0, 0xAA, 0, 0x55, 0, ];

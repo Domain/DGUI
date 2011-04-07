@@ -17,11 +17,10 @@
 
 module dgui.listview;
 
-public import dgui.control;
-public import dgui.imagelist;
-
-private const string WC_LISTVIEW = "SysListView32";
-private const string WC_DLISTVIEW = "DListView";
+import dgui.core.utils;
+import dgui.control;
+import dgui.imagelist;
+import std.string;
 
 enum ColumnTextAlign: int
 {
@@ -207,9 +206,14 @@ class ListViewItem
 		}
 	}
 
-	@property public final Collection!(ListViewItem) subItems()
+	@property public final ListViewItem[] subItems()
 	{
-		return this._subItems;
+		if(this._subItems)
+		{
+			return this._subItems.get();
+		}
+
+		return null;
 	}
 
 	@property public final ListView listView()
@@ -560,7 +564,7 @@ class ListView: OwnerDrawControl
 				item.listView.sendMessage(LVM_SETITEMSTATE, idx, cast(LPARAM)&lvi);
 			}
 
-			Collection!(ListViewItem) subItems = item.subItems;
+			ListViewItem[] subItems = item.subItems;
 
 			if(subItems)
 			{

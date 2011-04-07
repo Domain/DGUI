@@ -17,12 +17,7 @@
 
 module dgui.button;
 
-public import dgui.control;
-
-package const string WC_BUTTON = "Button";
-private const string WC_DBUTTON = "DButton";
-private const string WC_DCHECKBOX = "DCheckBox";
-private const string WC_DRADIOBUTTON = "DRadioButton";
+import dgui.control;
 
 enum CheckState: uint
 {

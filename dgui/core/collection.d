@@ -32,6 +32,11 @@ class Collection(T)
 		this._t.length = 0;
 	}
 
+	public final T[] get()
+	{
+		return this._t;
+	}
+
 	@property public final int length()
 	{
 		return this._t.length;

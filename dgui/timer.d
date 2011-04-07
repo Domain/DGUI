@@ -17,10 +17,12 @@
 
 module dgui.timer;
 
+import std.string;
+import dgui.core.winapi;
 import dgui.core.idisposable;
 import dgui.core.signal;
 import dgui.core.events;
-import dgui.core.winapi;
+import dgui.core.exception;
 
 final class Timer: IDisposable
 {

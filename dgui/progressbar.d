@@ -19,9 +19,6 @@ module dgui.progressbar;
 
 import dgui.control;
 
-private const string WC_PROGRESSBAR = "msctls_progress32";
-private const string WC_DPROGRESSBAR = "DProgressBar";
-
 class ProgressBar: SubclassedControl
 {
 	private uint _minRange = 0;

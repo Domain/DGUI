@@ -18,14 +18,14 @@
 module dgui.canvas;
 
 import std.c.string;
-public import std.string;
-public import core.memory;
-public import dgui.core.winapi;
-public import dgui.core.idisposable;
-public import dgui.core.exception;
+import std.string;
+import core.memory;
+import dgui.core.winapi;
+import dgui.core.idisposable;
+import dgui.core.exception;
+import dgui.core.handle;
+import dgui.core.utils;
 public import dgui.core.geometry;
-public import dgui.core.handle;
-public import dgui.core.utils;
 
 enum FontStyle: ubyte
 {

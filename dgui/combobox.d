@@ -17,12 +17,10 @@
 
 module dgui.combobox;
 
-public import utf = std.utf;
 public import dgui.imagelist;
-public import dgui.control;
-
-private const string WC_COMBOBOXEX = "ComboBoxEx32";
-private const string WC_DCOMBOBOX = "DComboBox";
+import dgui.core.utils;
+import dgui.control;
+import std.string;
 
 enum DropDownStyles: uint
 {
@@ -246,9 +244,14 @@ class ComboBox: SubclassedControl
 		}
 	}
 
-	@property public final Collection!(ComboBoxItem) items()
+	@property public final ComboBoxItem[] items()
 	{
-		return this._items;
+		if(this._items)
+		{
+			return this._items.get();
+		}
+
+		return null;
 	}
 
 	private ComboBoxItem insertItem(ComboBoxItem cbi)

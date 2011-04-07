@@ -17,12 +17,8 @@
 
 module dgui.textbox;
 
-public import dgui.core.winapi;
-public import dgui.control;
-public import std.string;
-
-private const string WC_EDIT = "EDIT";
-private const string WC_DEDIT = "DTextBox";
+import dgui.control;
+import std.string;
 
 enum CharacterCasing
 {

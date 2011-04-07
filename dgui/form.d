@@ -17,9 +17,7 @@
 
 module dgui.form;
 
-public import dgui.control;
-
-private const string WC_FORM = "DForm";
+import dgui.control;
 
 private struct FormInfo
 {

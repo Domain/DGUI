@@ -20,60 +20,64 @@ module dgui.application;
 pragma(lib, "gdi32.lib");
 pragma(lib, "comdlg32.lib");
 
-public import dgui.core.winapi;
 public import dgui.resources;
-private import dgui.richtextbox;
-private import dgui.form;
-private import dgui.button;
-private import dgui.label;
-private import std.path;
-private import std.file;
+import dgui.core.winapi;
+import dgui.core.utils;
+import dgui.richtextbox;
+import dgui.control;
+import dgui.form;
+import dgui.button;
+import dgui.label;
+import std.file;
+import std.conv;
+import std.string;
 
-private const string INFO = "Exception Information:";
-private const string XP_MANIFEST_FILE = "dgui.xml.manifest";
-
-private const string ERR_MSG = "An application exception has occured.\r\n1) Click \"Ignore\" to continue (The program can be unstable).\r\n2) Click \"Quit\" to exit.\r\n";
-
-private const string XP_MANIFEST = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` "\r\n"
-									`<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">` "\r\n"
-									  `<assemblyIdentity` "\r\n"
-										  `version="1.0.0.0"` "\r\n"
-										  `processorArchitecture="X86"` "\r\n"
-										  `name="client"` "\r\n"
-										  `type="win32"` "\r\n"
-									  `/>` "\r\n"
-									  `<description></description>` "\r\n"
-									 "\r\n"
-									  `<!-- Enable Windows XP and higher themes with common controls -->` "\r\n"
-									  `<dependency>` "\r\n"
-										`<dependentAssembly>` "\r\n"
-										  `<assemblyIdentity` "\r\n"
-											`type="win32"` "\r\n"
-											`name="Microsoft.Windows.Common-Controls"` "\r\n"
-											`version="6.0.0.0"` "\r\n"
-											`processorArchitecture="X86"` "\r\n"
-											`publicKeyToken="6595b64144ccf1df"` "\r\n"
-											`language="*"` "\r\n"
-										  `/>` "\r\n"
-										`</dependentAssembly>` "\r\n"
-									  `</dependency>` "\r\n"
-									  "\r\n"
-									  `<!-- Disable Windows Vista UAC compatibility heuristics -->` "\r\n"
-									  `<trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">` "\r\n"
-										`<security>` "\r\n"
-										  `<requestedPrivileges>` "\r\n"
-											`<requestedExecutionLevel level="asInvoker"/>` "\r\n"
-										  `</requestedPrivileges>` "\r\n"
-										`</security>` "\r\n"
-									  `</trustInfo> ` "\r\n"
-									  "\r\n"
-									  `<!-- Enable Windows Vista-style font scaling on Vista -->` "\r\n"
-									  `<asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">` "\r\n"
-										`<asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">` "\r\n"
-										  `<dpiAware>true</dpiAware>` "\r\n"
-										`</asmv3:windowsSettings>` "\r\n"
-									  `</asmv3:application>` "\r\n"
-									`</assembly>` "\r\n";
+enum
+{
+	INFO = "Exception Information:",
+	XP_MANIFEST_FILE = "dgui.xml.manifest",
+	ERR_MSG = "An application exception has occured.\r\n1) Click \"Ignore\" to continue (The program can be unstable).\r\n2) Click \"Quit\" to exit.\r\n",
+	XP_MANIFEST = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` "\r\n"
+					`<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">` "\r\n"
+					  `<assemblyIdentity` "\r\n"
+						`version="1.0.0.0"` "\r\n"
+						`processorArchitecture="X86"` "\r\n"
+						`name="client"` "\r\n"
+						`type="win32"` "\r\n"
+						`/>` "\r\n"
+						`<description></description>` "\r\n"
+						"\r\n"
+						`<!-- Enable Windows XP and higher themes with common controls -->` "\r\n"
+						`<dependency>` "\r\n"
+							`<dependentAssembly>` "\r\n"
+							  `<assemblyIdentity` "\r\n"
+								`type="win32"` "\r\n"
+								`name="Microsoft.Windows.Common-Controls"` "\r\n"
+								`version="6.0.0.0"` "\r\n"
+								`processorArchitecture="X86"` "\r\n"
+								`publicKeyToken="6595b64144ccf1df"` "\r\n"
+								`language="*"` "\r\n"
+						 	    `/>` "\r\n"
+							`</dependentAssembly>` "\r\n"
+						 `</dependency>` "\r\n"
+						  "\r\n"
+						  `<!-- Disable Windows Vista UAC compatibility heuristics -->` "\r\n"
+						  `<trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">` "\r\n"
+							`<security>` "\r\n"
+								`<requestedPrivileges>` "\r\n"
+									`<requestedExecutionLevel level="asInvoker"/>` "\r\n"
+								`</requestedPrivileges>` "\r\n"
+							`</security>` "\r\n"
+						  `</trustInfo> ` "\r\n"
+						  "\r\n"
+						  `<!-- Enable Windows Vista-style font scaling on Vista -->` "\r\n"
+						  `<asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">` "\r\n"
+						  `<asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">` "\r\n"
+						  `<dpiAware>true</dpiAware>` "\r\n"
+						  `</asmv3:windowsSettings>` "\r\n"
+						  `</asmv3:application>` "\r\n"
+					`</assembly>` "\r\n",
+}
 
 /*
 private const string XP_MANIFEST =  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` "\r\n"

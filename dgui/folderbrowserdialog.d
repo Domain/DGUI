@@ -19,9 +19,9 @@ module dgui.folderbrowserdialog;
 
 pragma(lib, "shell32.lib");
 
-public import dgui.core.winapi;
+import std.conv;
+import std.string;
 public import dgui.core.commondialog;
-public import std.conv;
 
 class FolderBrowserDialog: CommonDialog!(BROWSEINFOA, string)
 {

@@ -17,14 +17,20 @@
 
 module dgui.control;
 
-public import std.string;
-public import std.array;
-
 public import dgui.core.winapi;
-public import dgui.core.windowclass;
+public import dgui.core.exception;
+public import dgui.core.enums;
+public import dgui.core.geometry;
 public import dgui.core.collection;
 public import dgui.core.events;
+public import dgui.core.signal;
+public import dgui.core.handle;
+public import dgui.core.idisposable;
+public import dgui.canvas;
 public import dgui.menu;
+import dgui.core.windowclass;
+import dgui.core.utils;
+import std.string;
 
 debug
 {
@@ -137,9 +143,14 @@ abstract class Control: Handle!(HWND), IDisposable
 		this._handle = null;
 	}
 
-	@property public final Collection!(Control) controls()
+	@property public final Control[] controls()
 	{
-		return this._childControls;
+		if(this._childControls)
+		{
+			return this._childControls.get();
+		}
+
+		return null;
 	}
 
 	@property public final Object tag()

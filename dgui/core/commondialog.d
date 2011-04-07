@@ -17,8 +17,8 @@
 
 module dgui.core.commondialog;
 
-public import dgui.core.winapi;
 public import dgui.canvas;
+public import dgui.core.winapi;
 
 class CommonDialog(T1, T2)
 {

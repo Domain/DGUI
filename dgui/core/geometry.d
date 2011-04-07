@@ -17,7 +17,7 @@
 
 module dgui.core.geometry;
 
-public import dgui.core.winapi;
+import dgui.core.winapi;
 
 struct Rect
 {

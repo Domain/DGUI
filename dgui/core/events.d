@@ -17,9 +17,9 @@
 
 module dgui.core.events;
 
-public import dgui.core.signal;
-public import dgui.core.enums;
-public import dgui.canvas;
+import dgui.core.winapi;
+import dgui.core.enums;
+import dgui.canvas;
 
 class EventArgs
 {

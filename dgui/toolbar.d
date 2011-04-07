@@ -17,11 +17,9 @@
 
 module dgui.toolbar;
 
-public import dgui.control;
+import dgui.core.utils;
+import dgui.control;
 public import dgui.imagelist;
-
-private const string WC_TOOLBAR = "ToolBarWindow32";
-private const string WC_DTOOLBAR = "DToolBar";
 
 enum ToolButtonStyle: ubyte
 {
@@ -236,9 +234,14 @@ class ToolBar: SubclassedControl
 		}
 	}
 
-	@property public final Collection!(ToolButton) buttons()
+	@property public final ToolButton[] buttons()
 	{
-		return this._buttons;
+		if(this._buttons)
+		{
+			return this._buttons.get();
+		}
+
+		return null;
 	}
 
 	private void forceToolbarSize()

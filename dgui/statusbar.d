@@ -17,10 +17,8 @@
 
 module dgui.statusbar;
 
-public import dgui.control;
-
-private const string WC_STATUSBAR = "msctls_statusbar32";
-private const string WC_DSTATUSBAR = "DStatusBar";
+import dgui.control;
+import std.string;
 
 final class StatusPart
 {
@@ -124,15 +122,20 @@ class StatusBar: SubclassedControl
 		}
 	}
 
-	@property public Collection!(StatusPart) parts()
+	@property public StatusPart[] parts()
 	{
-		return this._parts;
+		if(this._parts)
+		{
+			return this._parts.get();
+		}
+
+		return null;
 	}
 
-	private static void insertPart(StatusPart sp)
+	private static void insertPart(StatusPart stp)
 	{
-		StatusBar owner = sp.statusBar;
-		Collection!(StatusPart) sparts = owner.parts;
+		StatusBar owner = stp.statusBar;
+		StatusPart[] sparts = owner.parts;
 		uint[] parts = new uint[sparts.length];
 
 		foreach(int i, StatusPart sp; sparts)

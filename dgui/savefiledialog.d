@@ -17,8 +17,10 @@
 
 module dgui.savefiledialog;
 
+import std.conv;
+import std.string;
+import dgui.core.utils;
 public import dgui.core.commondialog;
-public import std.conv;
 
 class SaveFileDialog: CommonDialog!(OPENFILENAMEA, string)
 {

@@ -1,9 +1,11 @@
 ﻿module dgui.resources;
 
-public import dgui.core.winapi;
-public import dgui.core.geometry;
-public import dgui.canvas;
-public import std.string;
+import dgui.core.winapi;
+import dgui.core.geometry;
+import dgui.core.utils;
+import dgui.core.exception;
+import dgui.canvas;
+import std.string;
 
 final class Resources
 {

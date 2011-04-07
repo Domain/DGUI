@@ -17,7 +17,6 @@
 
 module dgui.colordialog;
 
-public import std.string;
 public import dgui.core.commondialog;
 
 class ColorDialog: CommonDialog!(CHOOSECOLORA, Color)

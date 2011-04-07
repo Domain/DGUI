@@ -17,13 +17,9 @@
 
 module dgui.tabcontrol;
 
-public import dgui.imagelist;
-public import dgui.control;
-public import std.string;
-
-private const string WC_TABCONTROL ="SysTabControl32";
-private const string WC_DTABCONTROL = "DTabControl";
-private const string WC_DTABPAGE = "DTabPage";
+import dgui.imagelist;
+import dgui.control;
+import std.string;
 
 private struct TcItem
 {
@@ -170,9 +166,14 @@ class TabControl: OwnerDrawControl, IContainerControl
 		this._tabPages.removeAt(idx);
 	}
 
-	@property public final Collection!(TabPage) tabPages()
+	@property public final TabPage[] tabPages()
 	{
-		return this._tabPages;
+		if(this._tabPages)
+		{
+			return this._tabPages.get();
+		}
+
+		return null;
 	}
 
 	@property public final TabPage selectedPage()

@@ -18,10 +18,8 @@
 module dgui.core.utils;
 
 import std.conv;
-import std.stdio;
 import std.path;
-public import dgui.core.winapi;
-public import dgui.canvas;
+import dgui.core.winapi;
 
 T winCast(T)(Object o)
 {

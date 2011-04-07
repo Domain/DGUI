@@ -17,9 +17,7 @@
 
 module dgui.panel;
 
-public import dgui.control;
-
-private const string WC_DPANEL = "DPanel";
+import dgui.control;
 
 class Panel: ContainerControl
 {

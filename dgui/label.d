@@ -17,10 +17,7 @@
 
 module dgui.label;
 
-public import dgui.control;
-
-private const string WC_STATIC = "STATIC";
-private const string WC_DLABEL = "DLabel";
+import dgui.control;
 
 enum LabelDrawMode: ubyte
 {

@@ -21,6 +21,7 @@ pragma(lib, "advapi32.lib");
 
 import std.conv;
 import std.string;
+import dgui.core.winapi;
 import dgui.core.idisposable;
 import dgui.core.exception;
 import dgui.core.handle;

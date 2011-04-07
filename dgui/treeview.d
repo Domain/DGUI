@@ -17,11 +17,9 @@
 
 module dgui.treeview;
 
+import dgui.core.utils;
 import dgui.control;
 import dgui.imagelist;
-
-private const string WC_TREEVIEW = "SysTreeView32";
-private const string WC_DTREEVIEW = "DTreeView";
 
 class TreeNode: Handle!(HTREEITEM)//, IDisposable
 {
@@ -223,9 +221,14 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		}
 	}
 
-	@property public final Collection!(TreeNode) nodes()
+	@property public final TreeNode[] nodes()
 	{
-		return this._nodes;
+		if(this._nodes)
+		{
+			return this._nodes.get();
+		}
+
+		return null;
 	}
 
 	public final void collapse()
