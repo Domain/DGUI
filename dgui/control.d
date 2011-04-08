@@ -890,16 +890,6 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	protected void lockRedraw(bool lock)
-	{
-		this.sendMessage(WM_SETREDRAW, !lock, 0);
-
-		if(!lock)
-		{
-			RedrawWindow(this._handle, null, null, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
-		}
-	}
-
 	protected final void initDC(HDC hdc)
 	{
 		SetBkColor(hdc, this.backColor.colorref);
@@ -1479,6 +1469,7 @@ abstract class ContainerControl: Control, IContainerControl
 		if(this.created)
 		{
 			c.create();
+			this.doDock();
 		}
 	}
 

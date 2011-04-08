@@ -462,14 +462,10 @@ class TreeView: SubclassedControl
 
 		if(this._nodes)
 		{
-			this.lockRedraw(true);
-
 			foreach(TreeNode tn; this._nodes)
 			{
 				TreeView.createTreeNode(tn);
 			}
-
-			this.lockRedraw(false);
 		}
 
 		super.onHandleCreated(e);
