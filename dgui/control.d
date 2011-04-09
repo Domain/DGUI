@@ -483,19 +483,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	@property public final void visible(bool b)
 	{
-		if(this.created)
-		{
-			SetWindowPos(this._handle, null, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | (b ? SWP_SHOWWINDOW : SWP_HIDEWINDOW)); // Ridisegna il componente
-
-			if(this._controlInfo.Parent)
-			{
-				this._controlInfo.Parent.doDock(); // Aggiusta le dimensioni dei componenti
-			}
-		}
-		else
-		{
-			this.setStyle(WS_VISIBLE, b);
-		}
+		b ? this.show() : this.hide();
 	}
 
 	@property public final bool enabled()
@@ -517,12 +505,31 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	public void show()
 	{
-		this.setStyle(WS_VISIBLE, true);
+		if(this.created)
+		{
+			SetWindowPos(this._handle, null, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+			if(this._controlInfo.Parent)
+			{
+				this._controlInfo.Parent.doDock();
+			}
+		}
+		else
+		{
+			this.setStyle(WS_VISIBLE, true);
+		}
 	}
 
 	public final void hide()
 	{
-		this.setStyle(WS_VISIBLE, false);
+		if(this.created)
+		{
+			SetWindowPos(this._handle, null, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
+		}
+		else
+		{
+			this.setStyle(WS_VISIBLE, false);
+		}
 	}
 
 	public final void redraw()
@@ -1469,7 +1476,11 @@ abstract class ContainerControl: Control, IContainerControl
 		if(this.created)
 		{
 			c.create();
-			this.doDock();
+
+			if(c.dock !is DockStyle.NONE)
+			{
+				this.doDock();
+			}
 		}
 	}
 
