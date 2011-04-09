@@ -1379,7 +1379,7 @@ abstract class SubclassedControl: Control
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
-		if(this._controlInfo.Parent) // Ha un parent
+		if(this._controlInfo.Parent) // Has a parent
 		{
 			pcw.Style |= WS_TABSTOP;
 		}
@@ -1392,7 +1392,7 @@ abstract class SubclassedControl: Control
 		this.originalWndProc(WM_ERASEBKGND, cast(WPARAM)hdc, 0);
 	}
 
-	protected final int originalWndProc(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override int originalWndProc(uint msg, WPARAM wParam, LPARAM lParam)
 	{
 		if(!IsWindowUnicode(this._handle))
 		{

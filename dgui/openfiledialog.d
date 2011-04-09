@@ -36,7 +36,7 @@ class OpenFileDialog: CommonDialog!(OPENFILENAMEA, string)
 		this._filter = makeFilter(f);
 	}
 
-	public bool showDialog()
+	public override bool showDialog()
 	{
 		char[MAX_PATH] buffer = void;
 		buffer[] = '\0';

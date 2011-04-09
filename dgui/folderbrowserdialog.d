@@ -25,7 +25,7 @@ public import dgui.core.commondialog;
 
 class FolderBrowserDialog: CommonDialog!(BROWSEINFOA, string)
 {
-	public bool showDialog()
+	public override bool showDialog()
 	{
 		char[MAX_PATH] buffer = void;
 		buffer[0] = '\0';

@@ -350,7 +350,7 @@ class MenuItem: Menu
 		}
 	}
 
-	protected final void makeMenu()
+	protected override void makeMenu()
 	{
 		this._handle = CreatePopupMenu();
 	}
@@ -363,7 +363,7 @@ class MenuItem: Menu
 
 class MenuBar: Menu
 {
-	protected final void makeMenu()
+	protected override void makeMenu()
 	{
 		this._handle = CreateMenu();
 		this.initMenu();
@@ -382,7 +382,7 @@ class ContextMenu: Menu
 		TrackPopupMenu(this._handle, TPM_LEFTALIGN, pt.x, pt.y, 0, hWnd, null);
 	}
 
-	protected final void makeMenu()
+	protected override void makeMenu()
 	{
 		this._handle = CreatePopupMenu();
 		this.initMenu();

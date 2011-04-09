@@ -42,6 +42,12 @@ enum ImageType
 	ICON_OR_CURSOR = 1,
 }
 
+enum GradientFillMode
+{
+	VERTICAL,
+	HORIZONTAL,
+}
+
 enum EdgeType: uint
 {
 	RAISED_OUTER = BDR_RAISEDOUTER,
@@ -231,6 +237,53 @@ class Canvas: Handle!(HDC), IDisposable
 
 			default:
 				break;
+		}
+	}
+
+	/* From: http://www.winapizone.net/tutorials/winapi/functions/gradientfill.php */
+	void gradientFill(Rect r, Color firstColor, Color secondColor, GradientFillMode gfm)
+	{
+		ubyte startRed = firstColor.red;
+		ubyte startGreen = firstColor.green;
+		ubyte startBlue = firstColor.blue;
+
+		ubyte endRed = secondColor.red;
+		ubyte endGreen = secondColor.green;
+		ubyte endBlue = secondColor.blue;
+
+		scope SolidBrush endColor = new SolidBrush(secondColor);
+		this.fillRectangle(endColor, r);
+
+		//Gradient line width/height
+		int dy = 2;
+		int length = (gfm is GradientFillMode.VERTICAL ? r.height : r.width) - dy;
+
+		for(int dn = 0; dn <= length; dn += dy)
+		{
+			ubyte currentRed = cast(ubyte)(MulDiv(endRed - startRed, dn, length) + startRed);
+			ubyte currentGreen = cast(ubyte)(MulDiv(endGreen - startGreen, dn, length) + startGreen);
+			ubyte currentBlue = cast(ubyte)(MulDiv(endBlue - startBlue, dn, length) + startBlue);
+
+			Rect currentRect;
+
+			if(gfm is GradientFillMode.VERTICAL)
+			{
+				currentRect.left = r.left;
+				currentRect.top = r.top + dn;
+				//currentRect.right = currentRect.left + rcGradient.right - rcGradient.left;
+				currentRect.right = currentRect.left + r.width;
+				currentRect.bottom = currentRect.top + dy;
+			}
+			else
+			{
+				currentRect.left = r.left + dn;
+				currentRect.top = r.top;
+				currentRect.right = currentRect.left + dy;
+				//currentRect.bottom = currentRect.top + rcGradient->bottom - rcGradient->top;
+			}
+
+			scope SolidBrush currentColor = new SolidBrush(Color(currentRed, currentGreen, currentBlue));
+			this.fillRectangle(currentColor, currentRect);
 		}
 	}
 
@@ -530,8 +583,8 @@ abstract class Image: GraphicObject
 
 	}
 
-	public abstract Size size();
-	public abstract ImageType type();
+	@property public abstract Size size();
+	@property public abstract ImageType type();
 
 	protected this(HGDIOBJ hGdiObj, bool owned)
 	{
@@ -677,7 +730,7 @@ class Bitmap: Image
 		GC.free(bd.Info);
 	}
 
-	@property public final Size size()
+	@property public override Size size()
 	{
 		BITMAP bmp = void; //Inizializzata da getInfo()
 
@@ -685,7 +738,7 @@ class Bitmap: Image
 		return Size(bmp.bmWidth, bmp.bmHeight);
 	}
 
-	@property public final ImageType type()
+	@property public override ImageType type()
 	{
 		return ImageType.BITMAP;
 	}
@@ -732,7 +785,7 @@ class Icon: Image
 		DestroyIcon(this._handle);
 	}
 
-	@property public final Size size()
+	@property public override Size size()
 	{
 		ICONINFO ii = void; //Inizializzata da GetIconInfo()
 		BITMAP bmp = void; //Inizializzata da getInfo()
@@ -790,7 +843,7 @@ class Icon: Image
 		return sz;
 	}
 
-	@property public final ImageType type()
+	@property public override ImageType type()
 	{
 		return ImageType.ICON_OR_CURSOR;
 	}

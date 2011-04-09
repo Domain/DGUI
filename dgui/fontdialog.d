@@ -21,7 +21,7 @@ public import dgui.core.commondialog;
 
 class FontDialog: CommonDialog!(CHOOSEFONTA, Font)
 {
-	public bool showDialog()
+	public override bool showDialog()
 	{
 		LOGFONTA lf = void;
 

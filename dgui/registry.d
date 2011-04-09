@@ -38,7 +38,6 @@ interface IRegistryValue
 {
 	public void write(RegistryKey owner, string name);
 	public RegistryValueType valueType();
-	public string toString();
 }
 
 abstract class RegistryValue(T): IRegistryValue
@@ -51,7 +50,6 @@ abstract class RegistryValue(T): IRegistryValue
 	}
 
 	@property public abstract RegistryValueType valueType();
-	public abstract string toString();
 }
 
 final class RegistryValueBinary: RegistryValue!(ubyte[])
@@ -61,12 +59,12 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 		super(b);
 	}
 
-	@property public RegistryValueType valueType()
+	@property public override RegistryValueType valueType()
 	{
 		return RegistryValueType.BINARY;
 	}
 
-	public string toString()
+	public override string toString()
 	{
 		string s;
 
@@ -103,12 +101,12 @@ final class RegistryValueString: RegistryValue!(string)
 		super(s);
 	}
 
-	@property public RegistryValueType valueType()
+	@property public override RegistryValueType valueType()
 	{
 		return RegistryValueType.STRING;
 	}
 
-	public string toString()
+	public override string toString()
 	{
 		return this._value.idup;
 	}
@@ -138,12 +136,12 @@ final class RegistryValueDword: RegistryValue!(uint)
 		super(i);
 	}
 
-	@property public RegistryValueType valueType()
+	@property public override RegistryValueType valueType()
 	{
 		return RegistryValueType.DWORD;
 	}
 
-	public string toString()
+	public override string toString()
 	{
 		return to!(string)(this._value);
 	}
@@ -173,12 +171,12 @@ final class RegistryValueQword: RegistryValue!(ulong)
 		super(l);
 	}
 
-	@property public RegistryValueType valueType()
+	@property public override RegistryValueType valueType()
 	{
 		return RegistryValueType.QWORD;
 	}
 
-	public string toString()
+	public override string toString()
 	{
 		return to!(string)(this._value);
 	}

@@ -21,7 +21,7 @@ public import dgui.core.commondialog;
 
 class ColorDialog: CommonDialog!(CHOOSECOLORA, Color)
 {
-	public bool showDialog()
+	public override bool showDialog()
 	{
 		this._dlgStruct.lStructSize = CHOOSECOLORA.sizeof;
 		this._dlgStruct.hwndOwner = GetActiveWindow();
