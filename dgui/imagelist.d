@@ -89,6 +89,23 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 		imageList_Destroy(this._handle);
 	}
 
+	public override HIMAGELIST handle()
+	{
+		if(!this.created)
+		{
+			if(this._size == NullSize)
+			{
+				this._size.width = 16;
+				this._size.height = 16;
+			}
+
+			this._handle = imageList_Create(this._size.width, this._size.height, this._depth | ILC_MASK, 0, 0);
+			imageList_SetBkColor(this._handle, CLR_NONE);
+		}
+
+		return super.handle;
+	}
+
 	public final void drawIcon(int i, Canvas dest, Point pos)
 	{
 		imageList_Draw(this._handle, i, dest.handle, pos.x, pos.y, ILD_NORMAL);
