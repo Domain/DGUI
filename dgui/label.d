@@ -25,7 +25,7 @@ enum LabelDrawMode: ubyte
 	OWNER_DRAW = 1,
 }
 
-class Label: SubclassedControl
+class Label: Control
 {
 	private LabelDrawMode _drawMode = LabelDrawMode.NORMAL;
 	private TextAlignment _textAlign = TextAlignment.MIDDLE | TextAlignment.LEFT;
@@ -53,7 +53,6 @@ class Label: SubclassedControl
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_DLABEL;
-		pcw.OldClassName = WC_STATIC;
 
 		super.preCreateWindow(pcw);
 	}
@@ -69,7 +68,6 @@ class Label: SubclassedControl
 
 			GetClientRect(this._handle, &r.rect);
 
-			//scope TextFormat tf = new TextFormat(TextFormatFlags.SINGLE_LINE);
 			scope TextFormat tf = new TextFormat(TextFormatFlags.WORD_BREAK);
 			tf.alignment = this._textAlign;
 
