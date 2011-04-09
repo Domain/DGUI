@@ -24,7 +24,7 @@ enum
 	// Windows Classes
 	WC_BUTTON 		= "Button",
 	WC_COMBOBOXEX 	= "ComboBoxEx32",
-	WC_STATIC 		= "STATIC",
+	//WC_STATIC 		= "STATIC",
 	WC_LISTBOX 		= "ListBox",
 	WC_LISTVIEW 	= "SysListView32",
 	WC_DPICTUREBOX  = "DPicturebox",
