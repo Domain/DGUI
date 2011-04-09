@@ -17,8 +17,9 @@
 
 module dgui.canvas;
 
-import std.c.string;
+import std.path;
 import std.string;
+import std.c.string;
 import core.memory;
 import dgui.core.winapi;
 import dgui.core.idisposable;
@@ -625,7 +626,7 @@ class Bitmap: Image
 
 	protected this(string fileName)
 	{
-		HBITMAP hBitmap = LoadImageA(getHInstance(), toStringz(fileName), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		HBITMAP hBitmap = LoadImageA(null, toStringz(fileName), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
 
 		if(!hBitmap)
 		{
@@ -763,17 +764,27 @@ class Icon: Image
 
 	protected this(string fileName)
 	{
-		HICON hIcon = LoadImageA(getHInstance(), toStringz(fileName), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		HICON hIcon;
+
+		if(!icmp(getExt(fileName), "ico"))
+		{
+			hIcon = LoadImageA(null, toStringz(fileName), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		}
+		else
+		{
+			ushort dummy = 0;
+			hIcon = ExtractAssociatedIconA(null, toStringz(fileName), &dummy);
+		}
 
 		if(!hIcon)
 		{
 			debug
 			{
-				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName), __FILE__, __LINE__);
+				throw new Win32Exception(format("Cannot load Icon From File: '%s'", fileName), __FILE__, __LINE__);
 			}
 			else
 			{
-				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName));
+				throw new Win32Exception(format("Cannot load Icon From File: '%s'", fileName));
 			}
 		}
 
