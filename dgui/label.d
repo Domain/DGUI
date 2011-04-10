@@ -30,6 +30,18 @@ class Label: Control
 	private LabelDrawMode _drawMode = LabelDrawMode.NORMAL;
 	private TextAlignment _textAlign = TextAlignment.MIDDLE | TextAlignment.LEFT;
 
+	alias @property Control.text text;
+
+	@property public override void text(string s)
+	{
+		super.text = s;
+
+		if(this.created)
+		{
+			this.invalidate();
+		}
+	}
+
 	@property public final LabelDrawMode drawMode()
 	{
 		return this._drawMode;
