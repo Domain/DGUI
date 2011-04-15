@@ -2614,6 +2614,7 @@ extern(Windows)
 	/* *** Shell32.lib *** */
 	ITEMIDLIST* SHBrowseForFolderA(BROWSEINFOA* lpbi);
 	BOOL SHGetPathFromIDListA(ITEMIDLIST* pidl, char* pszPath);
+	HICON ExtractAssociatedIconA(HINSTANCE hInst, LPCTSTR lpIconPath, WORD* lpiIcon);
 
 	/* *** Comdlg32 *** */
 	BOOL ChooseColorA(CHOOSECOLORA* lpcc);
