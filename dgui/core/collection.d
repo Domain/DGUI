@@ -37,7 +37,7 @@ class Collection(T)
 		return this._t;
 	}
 
-	@property public final int length()
+	@property public final int length() nothrow
 	{
 		return this._t.length;
 	}
@@ -77,7 +77,7 @@ class Collection(T)
 		return -1;
 	}
 
-	public T opIndex(int i)
+	public T opIndex(int i) nothrow
 	{
 		if(i >= 0 && i < this._t.length)
 		{

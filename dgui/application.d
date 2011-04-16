@@ -254,7 +254,7 @@ class Application
 
 	private static int doRun(Form mainForm, bool cont)
 	{
-		MSG m = void; //Non serve l'inizializzazione, ci pensa GetMessage()
+		int res = 0;
 
 		try
 		{
@@ -264,27 +264,11 @@ class Application
 				mainForm.show();
 			}
 
-			for(;;)
-			{
-				while(PeekMessageA(&m, null, 0, 0, PM_REMOVE)) //Gestisci tutti i messaggi in coda
-				{
-					if(m.message == WM_QUIT) //Esci dal programma
-					{
-						break;
-					}
-
-					TranslateMessage(&m);
-					DispatchMessageA(&m);
-				}
-
-				WaitMessage(); //Aspetta fino al prossimo messaggio.
-			}
+			res = Application.doEvents();
 		}
 		catch(Exception e)
 		{
-			scope ExceptionForm ef = new ExceptionForm(e);
-
-			switch(ef.showDialog())
+			switch(Application.showExceptionForm(e))
 			{
 				case DialogResult.ABORT:
 					TerminateProcess(GetCurrentProcess(), -1);
@@ -298,7 +282,40 @@ class Application
 			}
 		}
 
+		return res;
+	}
+
+	package static uint doEvents()
+	{
+		MSG m = void; //Non serve l'inizializzazione, ci pensa GetMessage()
+
+		while(GetMessageA(&m, null, 0, 0))
+		{
+			TranslateMessage(&m);
+			DispatchMessageA(&m);
+		}
+
 		return m.wParam;
+	}
+
+	package static void doDialogEvents(HWND hWnd)
+	{
+		MSG m = void; //Non serve l'inizializzazione, ci pensa GetMessage()
+
+		while(GetMessageA(&m, null, 0, 0))
+		{
+			if(!IsDialogMessageA(hWnd, &m))
+			{
+				TranslateMessage(&m);
+				DispatchMessageA(&m);
+			}
+		}
+	}
+
+	package static DialogResult showExceptionForm(Exception e)
+	{
+		ExceptionForm ef = new ExceptionForm(e);
+		return ef.showDialog();
 	}
 
 	private static void onMainFormClose(Control sender, EventArgs e)

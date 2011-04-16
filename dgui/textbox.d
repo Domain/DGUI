@@ -49,7 +49,7 @@ abstract class TextControl: SubclassedControl
 		}
 	}
 
-	@property alias Control.text text;
+	@property alias SubclassedControl.text text;
 
 	@property public override void text(string t)
 	{

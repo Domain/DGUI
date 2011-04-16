@@ -147,14 +147,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 
 	public void dispose()
 	{
-		if(this._items)
-		{
-			foreach(MenuItem mi; this._items)
-			{
-				mi.dispose();
-			}
-		}
-
+		//From MSDN: DestroyMenu is recursive, that is, it will destroy the menu and all its submenus.
 		if(this.created)
 		{
 			DestroyMenu(this._handle);
@@ -286,7 +279,7 @@ class MenuItem: Menu
 		this._menuInfo.Enabled = e;
 	}
 
-	package void performClick() //FixMe: Non va bene in OOP
+	package void performClick()
 	{
 		this.onClick(EventArgs.empty);
 	}

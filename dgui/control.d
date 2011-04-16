@@ -32,11 +32,6 @@ import dgui.core.windowclass;
 import dgui.core.utils;
 import std.string;
 
-debug
-{
-	public import std.stdio;
-}
-
 final void convertRect(ref Rect rect, Control from, Control to)
 {
 	MapWindowPoints(from ? from.handle : null, to ? to.handle : null, cast(POINT*)&rect.rect, 2);
@@ -137,6 +132,17 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this._handle)
 		{
+			/* From MSDN: Destroys the specified window.
+			    The function sends WM_DESTROY and WM_NCDESTROY messages to the window
+			    to deactivate it and remove the keyboard focus from it.
+			    The function also destroys the window's menu, flushes the thread message queue,
+			    destroys timers, removes clipboard ownership, and breaks the clipboard viewer chain
+			    (if the window is at the top of the viewer chain).If the specified window is a parent
+			    or owner window, DestroyWindow automatically destroys the associated child or owned
+			    windows when it destroys the parent or owner window. The function first destroys child
+			    or owned windows, and then it destroys the parent or owner window
+			*/
+
 			DestroyWindow(this._handle);
 		}
 
@@ -1451,19 +1457,6 @@ abstract class SubclassedControl: Control
 
 abstract class ContainerControl: Control, IContainerControl
 {
-	public override void dispose()
-	{
-		if(this._childControls)
-		{
-			foreach(Control t; this._childControls)
-			{
-				t.dispose();
-			}
-		}
-
-		super.dispose();
-	}
-
 	protected final void addChildControl(Control c)
 	{
 		if(!this._childControls)
@@ -1518,7 +1511,7 @@ abstract class ContainerControl: Control, IContainerControl
 		{
 			case WM_CLOSE:
 				super.wndProc(msg, wParam, lParam);
-				this.dispose();
+				//this.dispose();
 				return 0;
 
 			default:

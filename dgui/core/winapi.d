@@ -2695,11 +2695,11 @@ extern(Windows)
 	HWND GetCapture();
 
 	/* *** Comctl32.dll *** */
-	BOOL ImageList_DrawEx(HIMAGELIST himl, int i, HDC hdcDst, int x, int y, int dx, int dy, COLORREF rgbBk, COLORREF rgbFg, UINT fStyle);
-	BOOL ImageList_Draw(HIMAGELIST himl, int i, HDC hdcDst, int x, int y, UINT fStyle);
-	HIMAGELIST ImageList_Create(int cx, int cy, UINT flags, int cInitial, int cGrow);
-	int ImageList_AddMasked(HIMAGELIST himl, HBITMAP hbmImage, COLORREF crMask);
-	int ImageList_Add(HIMAGELIST himl, HBITMAP hbmImage, HBITMAP hbmMask);
+	//BOOL ImageList_DrawEx(HIMAGELIST himl, int i, HDC hdcDst, int x, int y, int dx, int dy, COLORREF rgbBk, COLORREF rgbFg, UINT fStyle);
+	//BOOL ImageList_Draw(HIMAGELIST himl, int i, HDC hdcDst, int x, int y, UINT fStyle);
+	//HIMAGELIST ImageList_Create(int cx, int cy, UINT flags, int cInitial, int cGrow);
+	//int ImageList_AddMasked(HIMAGELIST himl, HBITMAP hbmImage, COLORREF crMask);
+	//int ImageList_Add(HIMAGELIST himl, HBITMAP hbmImage, HBITMAP hbmMask);
 	BOOL InitCommonControlsEx(INITCOMMONCONTROLSEX* lpInitCtrls);
 	COLORREF ImageList_SetBkColor(HIMAGELIST, COLORREF);
 	int ImageList_AddIcon(HIMAGELIST himl, HICON hicon);

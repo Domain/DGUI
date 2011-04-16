@@ -17,6 +17,7 @@
 
 module dgui.form;
 
+import dgui.application;
 import dgui.control;
 
 private struct FormInfo
@@ -27,7 +28,6 @@ private struct FormInfo
 	DialogResult Result = DialogResult.CANCEL;
 	FormBorderStyle FrameBorder = FormBorderStyle.SIZEABLE;
 	HWND hActiveWnd;
-	bool ModalCompleted = false;
 	bool MaximizeBox = true;
 	bool MinimizeBox = true;
 	bool ControlBox = true;
@@ -65,9 +65,9 @@ class Form: ContainerControl, IDialogResult
 	@property public final void dialogResult(DialogResult dr)
 	{
 		this._formInfo.Result = dr;
-		this._formInfo.ModalCompleted = true; //E' arrivato il click di un pulsante.
 
 		ShowWindow(this._handle, SW_HIDE); // Hide this window (it waits to be destroyed)
+		EnableWindow(this._formInfo.hActiveWnd, true);
 		SetActiveWindow(this._formInfo.hActiveWnd); // Restore the previous active window
 	}
 
@@ -165,34 +165,26 @@ class Form: ContainerControl, IDialogResult
 			try
 			{
 				this._formInfo.hActiveWnd = GetActiveWindow();
+
 				EnableWindow(this._formInfo.hActiveWnd, false);
 				this.create(true);
-
-				MSG m = void; //Inizializzato sotto.
-
-				for(;;)
-				{
-					if(this._formInfo.ModalCompleted)
-					{
-						break;
-					}
-
-					while(PeekMessageA(&m, null, 0, 0, PM_REMOVE)) //Gestisci tutti i messaggi in coda
-					{
-						if(!IsDialogMessageA(this._handle, &m))
-						{
-							TranslateMessage(&m);
-							DispatchMessageA(&m);
-						}
-					}
-
-					WaitMessage(); //Aspetta fino al prossimo messaggio.
-				}
+				Application.doDialogEvents(this._handle);
 			}
-			finally
+			catch(Exception e)
 			{
-				EnableWindow(this._formInfo.hActiveWnd, true);
-				SetActiveWindow(this._formInfo.hActiveWnd);
+				switch(Application.showExceptionForm(e))
+				{
+					case DialogResult.ABORT:
+						TerminateProcess(GetCurrentProcess(), -1);
+						break;
+
+					case DialogResult.IGNORE:
+						Application.doDialogEvents(this._handle);
+						break;
+
+					default:
+						break;
+				}
 			}
 		}
 

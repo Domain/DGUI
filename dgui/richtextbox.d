@@ -58,6 +58,8 @@ class RichTextBox: TextControl
 			FreeLibrary(_hRichDll);
 			_hRichDll = null;
 		}
+
+		super.dispose();
 	}
 
 	public void redo()

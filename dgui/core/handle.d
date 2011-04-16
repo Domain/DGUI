@@ -21,7 +21,7 @@ abstract class Handle(T)
 {
 	protected T _handle;
 
-	@property public final bool created()
+	@property public final bool created() nothrow
 	{
 		return cast(bool)this._handle;
 	}

@@ -20,6 +20,7 @@ module dgui.core.utils;
 import std.conv;
 import std.path;
 import dgui.core.winapi;
+import dgui.core.enums;
 
 T winCast(T)(Object o)
 {
