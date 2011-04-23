@@ -115,7 +115,7 @@ class ProgressBar: SubclassedControl
 		pcw.OldClassName = WC_PROGRESSBAR;
 		pcw.ClassName = WC_DPROGRESSBAR;
 
-		assert(this._controlInfo.Dock is DockStyle.FILL, "ProgressBar: Invalid Dock Style");
+		assert(this._controlInfo.Dock !is DockStyle.FILL, "ProgressBar: Invalid Dock Style");
 
 		if(this._controlInfo.Dock is DockStyle.LEFT || this._controlInfo.Dock is DockStyle.RIGHT)
 		{
