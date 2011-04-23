@@ -45,7 +45,7 @@ final void convertPoint(ref Point pt, Control from, Control to)
 struct PreCreateWindow
 {
 	string ClassName;
-	string OldClassName; //Per fare SuperClassing
+	string OldClassName; //Used in Superlassing
 	Color DefaultBackColor;
 	Color DefaultForeColor;
 	Cursor DefaultCursor;
@@ -73,6 +73,7 @@ private struct ControlInfo
 	uint ExtendedStyle = 0;
 	uint Style = 0;
 	bool MouseEnter = false;
+	bool CanNotify = true;
 }
 
 interface IDialogResult
@@ -233,11 +234,11 @@ abstract class Control: Handle!(HWND), IDisposable
 	@property public final void parent(Control c)
 	{
 		this._controlInfo.Parent = c;
-		this.setStyle(WS_CHILD, true); //E' un child
+		this.setStyle(WS_CHILD, true);
 
 		IContainerControl cc = cast(IContainerControl)c;
 
-		if(cc) //Non è un ContainerControl, associa solo l'handle.
+		if(cc) //Is not a ContainerControl, associate handle only.
 		{
 			cc.addChildControl(this);
 		}
@@ -568,6 +569,11 @@ abstract class Control: Handle!(HWND), IDisposable
 		InvalidateRect(this._handle, r == NullRect ? null : &r.rect, false);
 	}
 
+	@property protected bool ownClickMsg()
+	{
+		return false;
+	}
+
 	public final uint sendMessage(uint msg, WPARAM wParam, LPARAM lParam)
 	in
 	{
@@ -576,10 +582,13 @@ abstract class Control: Handle!(HWND), IDisposable
 	body
 	{
 		/*
-		 * Emulazione invio messaggi
+		 * SendMessage() emulation
 		 */
 
-		return this.wndProc(msg, wParam, lParam);
+		this._controlInfo.CanNotify = false;
+		int res = this.wndProc(msg, wParam, lParam);
+		this._controlInfo.CanNotify = true;
+		return res;
 	}
 
 	public final void doDock()
@@ -793,7 +802,7 @@ abstract class Control: Handle!(HWND), IDisposable
 			hParent = this._controlInfo.Parent.handle;
 		}
 
-		if(modal) //E' una finestra modale?
+		if(modal) //Is a modal window?
 		{
 			hParent = GetActiveWindow();
 		}
@@ -1197,8 +1206,13 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			case WM_NOTIFY, WM_COMMAND, WM_MEASUREITEM, WM_DRAWITEM, WM_CTLCOLOREDIT, WM_CTLCOLORBTN:
 			{
-				this.originalWndProc(msg, wParam, lParam);
-				return this.reflectMessage(msg, wParam, lParam);
+				if(this._controlInfo.CanNotify) //Avoid fake notification messages caused by component's properties (like text(), checked(), ...)
+				{
+					this.originalWndProc(msg, wParam, lParam);
+					return this.reflectMessage(msg, wParam, lParam);
+				}
+
+				return this.originalWndProc(msg, wParam, lParam);
 			}
 
 			case WM_KEYDOWN:
@@ -1309,10 +1323,13 @@ abstract class Control: Handle!(HWND), IDisposable
 					mk |= MouseKeys.RIGHT;
 				}
 
-				scope MouseEventArgs e = new MouseEventArgs(Point(LOWORD(lParam), HIWORD(lParam)), mk);
+				Point p = Point(LOWORD(lParam), HIWORD(lParam));
+				scope MouseEventArgs e = new MouseEventArgs(p, mk);
 				this.onMouseKeyUp(e);
 
-				if(msg == WM_LBUTTONUP)
+				convertPoint(p, this, null);
+
+				if(msg == WM_LBUTTONUP && !this.ownClickMsg && WindowFromPoint(p.point) == this._handle)
 				{
 					this.onClick(EventArgs.empty);
 				}
@@ -1385,11 +1402,6 @@ abstract class SubclassedControl: Control
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
-		if(this._controlInfo.Parent) // Has a parent
-		{
-			pcw.Style |= WS_TABSTOP;
-		}
-
 		this._oldWndProc = superClassWindowClass(pcw.OldClassName, pcw.ClassName, &SubclassedControl.msgRouter);
 	}
 
@@ -1483,7 +1495,7 @@ abstract class ContainerControl: Control, IContainerControl
 		{
 			foreach(Control c; this.controls)
 			{
-				if(!c.created) //Check aggiuntivo: Evita di creare componenti duplicati (aggiunti a runtime).
+				if(!c.created) //Extra Check: Avoid creating duplicate components (added at runtime)
 				{
 					c.create();
 					this.doDock();
@@ -1492,11 +1504,18 @@ abstract class ContainerControl: Control, IContainerControl
 		}
 	}
 
+	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	{
+		pcw.ExtendedStyle |= WS_EX_CONTROLPARENT;
+
+		super.preCreateWindow(pcw);
+	}
+
 	protected override void onHandleCreated(EventArgs e)
 	{
-		this.doChildControls();   //Prima Crea i Componenti inseriti a compile-time...
-		this.doDock(); //...poi fai il dock...
-		super.onHandleCreated(e); //...e poi gestisci l'evento e crea i componenti aggiunti a runtime (se ce ne sono).
+		this.doChildControls();   //Create compile-time components first...
+		this.doDock(); //...dock it...
+		super.onHandleCreated(e); //...handle runtime created components.
 	}
 
 	protected override void onResize(EventArgs e)

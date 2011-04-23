@@ -244,72 +244,15 @@ class Application
 
 	public static int run(Form mainForm)
 	{
-		return doRun(mainForm, false);
+		mainForm.close.attach(&onMainFormClose);
+		mainForm.show();
+
+		return 0;
 	}
 
 	public static void exit(int exitCode = 0)
 	{
 		ExitProcess(exitCode);
-	}
-
-	private static int doRun(Form mainForm, bool cont)
-	{
-		int res = 0;
-
-		try
-		{
-			if(!cont)
-			{
-				mainForm.close.attach(&onMainFormClose);
-				mainForm.show();
-			}
-
-			res = Application.doEvents();
-		}
-		catch(Exception e)
-		{
-			switch(Application.showExceptionForm(e))
-			{
-				case DialogResult.ABORT:
-					TerminateProcess(GetCurrentProcess(), -1);
-					break;
-
-				case DialogResult.IGNORE:
-					return Application.doRun(mainForm, true);
-
-				default:
-					break;
-			}
-		}
-
-		return res;
-	}
-
-	package static uint doEvents()
-	{
-		MSG m = void; //Non serve l'inizializzazione, ci pensa GetMessage()
-
-		while(GetMessageA(&m, null, 0, 0))
-		{
-			TranslateMessage(&m);
-			DispatchMessageA(&m);
-		}
-
-		return m.wParam;
-	}
-
-	package static void doDialogEvents(HWND hWnd)
-	{
-		MSG m = void; //Non serve l'inizializzazione, ci pensa GetMessage()
-
-		while(GetMessageA(&m, null, 0, 0))
-		{
-			if(!IsDialogMessageA(hWnd, &m))
-			{
-				TranslateMessage(&m);
-				DispatchMessageA(&m);
-			}
-		}
 	}
 
 	package static DialogResult showExceptionForm(Exception e)

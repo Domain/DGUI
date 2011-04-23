@@ -28,6 +28,7 @@ private struct FormInfo
 	DialogResult Result = DialogResult.CANCEL;
 	FormBorderStyle FrameBorder = FormBorderStyle.SIZEABLE;
 	HWND hActiveWnd;
+	bool IsModal = false;
 	bool MaximizeBox = true;
 	bool MinimizeBox = true;
 	bool ControlBox = true;
@@ -158,47 +159,66 @@ class Form: ContainerControl, IDialogResult
 		this._formInfo.StartPosition = fsp;
 	}
 
-	public final DialogResult showDialog()
+	private void doEvents()
 	{
-		if(!this.created)
+		MSG m = void;
+
+		while(GetMessageA(&m, null, 0, 0))
 		{
-			try
+			if(!IsDialogMessageA(this._handle, &m))
 			{
-				this._formInfo.hActiveWnd = GetActiveWindow();
-
-				EnableWindow(this._formInfo.hActiveWnd, false);
-				this.create(true);
-				Application.doDialogEvents(this._handle);
-			}
-			catch(Exception e)
-			{
-				switch(Application.showExceptionForm(e))
-				{
-					case DialogResult.ABORT:
-						TerminateProcess(GetCurrentProcess(), -1);
-						break;
-
-					case DialogResult.IGNORE:
-						Application.doDialogEvents(this._handle);
-						break;
-
-					default:
-						break;
-				}
+				TranslateMessage(&m);
+				DispatchMessageA(&m);
 			}
 		}
+	}
 
-		return this._formInfo.Result;
+	private void doShow(bool isModal = false)
+	{
+		try
+		{
+			if(!this.created)
+			{
+				this._formInfo.IsModal = isModal;
+
+				if(isModal)
+				{
+					this._formInfo.hActiveWnd = GetActiveWindow();
+					EnableWindow(this._formInfo.hActiveWnd, false);
+				}
+
+				this.create(isModal);
+				this.doEvents();
+			}
+		}
+		catch(Exception e)
+		{
+			switch(Application.showExceptionForm(e))
+			{
+				case DialogResult.ABORT:
+					TerminateProcess(GetCurrentProcess(), -1);
+					break;
+
+				case DialogResult.IGNORE:
+					this.doShow(isModal);
+					break;
+
+				default:
+					break;
+			}
+		}
 	}
 
 	public override void show()
 	{
-		if(!this.created)
-		{
-			this.create();
-		}
-
+		this.doShow();
 		super.show();
+	}
+
+	public final DialogResult showDialog()
+	{
+		this.doShow(true);
+		return this._formInfo.Result;
 	}
 
 	private final void doFormStartPosition()
@@ -345,7 +365,7 @@ class Form: ContainerControl, IDialogResult
 				{
 					this.onClose(EventArgs.empty);
 
-					if(this._formInfo.hActiveWnd)
+					if(this._formInfo.IsModal)
 					{
 						EnableWindow(this._formInfo.hActiveWnd, true);
 						SetActiveWindow(this._formInfo.hActiveWnd);

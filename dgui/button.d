@@ -32,9 +32,15 @@ abstract class AbstractButton: SubclassedControl
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.Style |= WS_TABSTOP;
 		pcw.OldClassName = WC_BUTTON;
 
 		super.preCreateWindow(pcw);
+	}
+
+	@property protected override bool ownClickMsg()
+	{
+		return true;
 	}
 
 	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
@@ -47,11 +53,32 @@ abstract class AbstractButton: SubclassedControl
 				{
 					 case BN_CLICKED:
 					 {
-						 if(this._dr !is DialogResult.NONE)
-						 {
+						MouseKeys mk = MouseKeys.NONE;
+
+						if(GetAsyncKeyState(MK_LBUTTON))
+						{
+							mk |= MouseKeys.LEFT;
+						}
+
+						if(GetAsyncKeyState(MK_MBUTTON))
+						{
+							mk |= MouseKeys.MIDDLE;
+						}
+
+						if(GetAsyncKeyState(MK_RBUTTON))
+						{
+							mk |= MouseKeys.RIGHT;
+						}
+
+						Point p = Point(LOWORD(lParam), HIWORD(lParam));
+						scope MouseEventArgs e = new MouseEventArgs(p, mk);
+						this.onClick(EventArgs.empty);
+
+						if(this._dr !is DialogResult.NONE)
+						{
 							IDialogResult iresult = cast(IDialogResult)this.topLevelControl;
 							iresult.dialogResult = this._dr;
-						 }
+						}
 					 }
 					 break;
 
@@ -162,13 +189,6 @@ abstract class CheckedButton: AbstractButton
 
 class Button: AbstractButton
 {
-	public this()
-	{
-		super();
-
-		this.setStyle(BS_DEFPUSHBUTTON, true);
-	}
-
 	@property public DialogResult dialogResult()
 	{
 		return this._dr;
@@ -181,6 +201,7 @@ class Button: AbstractButton
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.Style |= BS_DEFPUSHBUTTON;
 		pcw.ClassName = WC_DBUTTON;
 
 		super.preCreateWindow(pcw);
@@ -189,15 +210,9 @@ class Button: AbstractButton
 
 class CheckBox: CheckedButton
 {
-	public this()
-	{
-		super();
-
-		this.setStyle(BS_AUTOCHECKBOX, true);
-	}
-
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.Style |= BS_AUTOCHECKBOX;
 		pcw.ClassName = WC_DCHECKBOX;
 
 		super.preCreateWindow(pcw);
@@ -206,15 +221,9 @@ class CheckBox: CheckedButton
 
 class RadioButton: CheckedButton
 {
-	public this()
-	{
-		super();
-
-		this.setStyle(BS_AUTORADIOBUTTON, true);
-	}
-
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.Style |= BS_AUTORADIOBUTTON;
 		pcw.ClassName = WC_DRADIOBUTTON;
 
 		super.preCreateWindow(pcw);

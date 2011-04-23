@@ -121,7 +121,7 @@ class TabPage: ContainerControl
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
-		pcw.ExtendedStyle = WS_EX_STATICEDGE;
+		pcw.ExtendedStyle |= WS_EX_STATICEDGE;
 		pcw.ClassName = WC_DTABPAGE;
 		pcw.DefaultCursor = SystemCursors.arrow;
 
@@ -327,6 +327,7 @@ class TabControl: OwnerDrawControl, IContainerControl
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.ExtendedStyle |= WS_EX_CONTROLPARENT;
 		pcw.OldClassName = WC_TABCONTROL;
 		pcw.ClassName = WC_DTABCONTROL;
 		pcw.DefaultCursor = SystemCursors.arrow;

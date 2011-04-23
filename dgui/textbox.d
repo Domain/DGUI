@@ -29,7 +29,6 @@ enum CharacterCasing
 
 abstract class TextControl: SubclassedControl
 {
-	private bool _canNotify = true;
 	public Signal!(Control, EventArgs) textChanged;
 
 	public this()
@@ -47,13 +46,6 @@ abstract class TextControl: SubclassedControl
 		{
 			this._controlInfo.Text ~= s;
 		}
-	}
-
-	@property alias SubclassedControl.text text;
-
-	@property public override void text(string t)
-	{
-		this.setWindowTextNoNotify(t);
 	}
 
 	@property public final bool readOnly()
@@ -174,15 +166,9 @@ abstract class TextControl: SubclassedControl
 		return chrg.cpMax - chrg.cpMin;
 	}
 
-	protected void setWindowTextNoNotify(string t)
-	{
-		this._canNotify = false;
-		super.text = t;
-		this._canNotify = true;
-	}
-
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.Style |= WS_TABSTOP;
 		pcw.ExtendedStyle = WS_EX_CLIENTEDGE;
 		pcw.DefaultBackColor = SystemColors.colorWindow;
 
@@ -193,7 +179,7 @@ abstract class TextControl: SubclassedControl
 	{
 		if(msg == WM_COMMAND)
 		{
-			if(HIWORD(wParam) == EN_CHANGE && this._canNotify)
+			if(HIWORD(wParam) == EN_CHANGE)
 			{
 				this.onTextChanged(EventArgs.empty);
 			}
