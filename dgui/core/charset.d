@@ -55,14 +55,14 @@ public HICON extractAssociatedIcon(string s, WORD* pIcon)
 	return ExtractAssociatedIconW(getHInstance(), toUTF16z(s), pIcon);
 }
 
-public HANDLE loadImage(string s, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)
+public HANDLE loadImage(HINSTANCE hInstance, string s, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)
 {
-	return LoadImageW(getHInstance(), toUTF16z(s), uType, cxDesired, cyDesired, fuLoad);
+	return LoadImageW(hInstance, toUTF16z(s), uType, cxDesired, cyDesired, fuLoad);
 }
 
-public HANDLE loadImage(char* ch, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)
+public HANDLE loadImage(HINSTANCE hInstance, wchar* pResID, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)
 {
-	return LoadImageW(getHInstance(), cast(wchar*)ch, uType, cxDesired, cyDesired, fuLoad);
+	return LoadImageW(hInstance, pResID, uType, cxDesired, cyDesired, fuLoad);
 }
 
 public int drawTextEx(HDC hdc, string s, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams)
