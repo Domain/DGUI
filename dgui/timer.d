@@ -62,6 +62,18 @@ final class Timer: IDisposable
 	{
 		if(this._timerId)
 		{
+			if(!KillTimer(null, this._timerId))
+			{
+				debug
+				{
+					throw new Win32Exception("Cannot Dispose Timer", __FILE__, __LINE__);
+				}
+				else
+				{
+					throw new Win32Exception("Cannot Dispose Timer");
+				}
+			}
+
 			_timers.remove(this._timerId);
 			this._timerId = 0;
 		}
@@ -74,7 +86,7 @@ final class Timer: IDisposable
 
 	@property public void time(uint t)
 	{
-		this._time = t >= 0 ? t : t * (-1); //Se e' < 0 moltiplica per -1 cosi' torna positivo.
+		this._time = t >= 0 ? t : t * (-1); //Take the absolute value.
 	}
 
 	public void start()
