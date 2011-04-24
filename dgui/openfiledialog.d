@@ -17,12 +17,12 @@
 
 module dgui.openfiledialog;
 
-import std.conv;
+import std.utf;
 import std.string;
 import dgui.core.utils;
 public import dgui.core.commondialog;
 
-class OpenFileDialog: CommonDialog!(OPENFILENAMEA, string)
+class OpenFileDialog: CommonDialog!(OPENFILENAMEW, string)
 {
 	private string _filter;
 
@@ -38,20 +38,20 @@ class OpenFileDialog: CommonDialog!(OPENFILENAMEA, string)
 
 	public override bool showDialog()
 	{
-		char[MAX_PATH] buffer = void;
+		wchar[MAX_PATH] buffer = void;
 		buffer[] = '\0';
 
-		this._dlgStruct.lStructSize = OPENFILENAMEA.sizeof;
+		this._dlgStruct.lStructSize = OPENFILENAMEW.sizeof;
 		this._dlgStruct.hwndOwner = GetActiveWindow();
-		this._dlgStruct.lpstrFilter = toStringz(this._filter);
-		this._dlgStruct.lpstrTitle = toStringz(this._title);
+		this._dlgStruct.lpstrFilter = toUTF16z(this._filter);
+		this._dlgStruct.lpstrTitle = toUTF16z(this._title);
 		this._dlgStruct.lpstrFile = buffer.ptr;
 		this._dlgStruct.nMaxFile = MAX_PATH;
 		this._dlgStruct.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_CREATEPROMPT | OFN_OVERWRITEPROMPT;
 
-		if(GetOpenFileNameA(&this._dlgStruct))
+		if(GetOpenFileNameW(&this._dlgStruct))
 		{
-			this._dlgRes = to!(string)(buffer.ptr);
+			this._dlgRes = toUTF8(buffer);
 			return true;
 		}
 

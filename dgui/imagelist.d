@@ -17,6 +17,7 @@
 
 module dgui.imagelist;
 
+import dgui.core.charset;
 import dgui.core.winapi;
 import dgui.core.collection;
 import dgui.core.handle;
@@ -60,7 +61,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 	{
 		if(!imageList_Create)
 		{
-			HMODULE hModule = GetModuleHandleA("comctl32.dll");
+			HMODULE hModule = getModuleHandle("comctl32.dll");
 
 			/*
 			 * Problema Librerie Statiche, si risolve col binding dinamico: Abilita i Visual Styles, se supportati.

@@ -19,28 +19,29 @@ module dgui.folderbrowserdialog;
 
 pragma(lib, "shell32.lib");
 
+import std.utf;
 import std.conv;
 import std.string;
 public import dgui.core.commondialog;
 
-class FolderBrowserDialog: CommonDialog!(BROWSEINFOA, string)
+class FolderBrowserDialog: CommonDialog!(BROWSEINFOW, string)
 {
 	public override bool showDialog()
 	{
-		char[MAX_PATH] buffer = void;
+		wchar[MAX_PATH] buffer = void;
 		buffer[0] = '\0';
 
 		this._dlgStruct.hwndOwner = GetActiveWindow();
 		this._dlgStruct.pszDisplayName = buffer.ptr;
 		this._dlgStruct.ulFlags = BIF_RETURNONLYFSDIRS;
-		this._dlgStruct.lpszTitle = toStringz(this._title);
+		this._dlgStruct.lpszTitle = toUTF16z(this._title);
 
-		ITEMIDLIST* pidl = SHBrowseForFolderA(&this._dlgStruct);
+		ITEMIDLIST* pidl = SHBrowseForFolderW(&this._dlgStruct);
 
 		if(pidl)
 		{
-			SHGetPathFromIDListA(pidl, buffer.ptr); //Ricava il path intero.
-			this._dlgRes = to!(string)(buffer.ptr);
+			SHGetPathFromIDListW(pidl, buffer.ptr); //Get Full Path.
+			this._dlgRes = toUTF8(buffer);
 			return true;
 		}
 

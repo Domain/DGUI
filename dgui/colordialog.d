@@ -19,15 +19,15 @@ module dgui.colordialog;
 
 public import dgui.core.commondialog;
 
-class ColorDialog: CommonDialog!(CHOOSECOLORA, Color)
+class ColorDialog: CommonDialog!(CHOOSECOLORW, Color)
 {
 	public override bool showDialog()
 	{
-		this._dlgStruct.lStructSize = CHOOSECOLORA.sizeof;
+		this._dlgStruct.lStructSize = CHOOSECOLORW.sizeof;
 		this._dlgStruct.hwndOwner = GetActiveWindow();
 		this._dlgStruct.Flags = CC_FULLOPEN;
 
-		if(ChooseColorA(&this._dlgStruct))
+		if(ChooseColorW(&this._dlgStruct))
 		{
 			this._dlgRes = Color.fromCOLORREF(this._dlgStruct.rgbResult);
 			return true;

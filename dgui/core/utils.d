@@ -17,9 +17,9 @@
 
 module dgui.core.utils;
 
-import std.conv;
 import std.path;
 import dgui.core.winapi;
+import dgui.core.charset;
 
 T winCast(T)(Object o)
 {
@@ -37,7 +37,7 @@ HINSTANCE getHInstance()
 
 	if(!hInst)
 	{
-		hInst = GetModuleHandleA(null);
+		hInst = GetModuleHandleW(null);
 	}
 
 	return hInst;
@@ -49,10 +49,7 @@ string getExecutablePath()
 
 	if(!exePath.length)
 	{
-		char[] path = new char[MAX_PATH];
-
-		GetModuleFileNameA(null, path.ptr, path.length);
-		exePath = to!(string)(path.ptr);
+		exePath = getModuleFileName(null);
 	}
 
 	return exePath;
@@ -76,10 +73,7 @@ string getTempPath()
 
 	if(!tempPath.length)
 	{
-		char[] path = new char[MAX_PATH];
-
-		GetTempPathA(MAX_PATH, path.ptr);
-		tempPath = to!(string)(path.ptr);
+		dgui.core.charset.getTempPath(tempPath);
 	}
 
 	return tempPath;
@@ -99,11 +93,6 @@ string makeFilter(string userFilter)
 
 	newFilter ~= '\0';
 	return newFilter.idup;
-}
-
-string recalcString(char[] s)
-{
-	return to!(string)(s.ptr);
 }
 
 class ObjectContainer(T)

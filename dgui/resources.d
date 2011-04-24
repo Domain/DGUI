@@ -1,5 +1,6 @@
 ﻿module dgui.resources;
 
+import dgui.core.charset;
 import dgui.core.winapi;
 import dgui.core.geometry;
 import dgui.core.utils;
@@ -23,7 +24,7 @@ final class Resources
 
 	public Icon getIcon(ushort id, Size sz)
 	{
-		HICON hIcon = LoadImageA(getHInstance(), cast(char*)id, IMAGE_ICON, sz.width, sz.height, LR_LOADTRANSPARENT | (sz == NullSize ? LR_DEFAULTSIZE : 0));
+		HICON hIcon = loadImage(cast(char*)id, IMAGE_ICON, sz.width, sz.height, LR_LOADTRANSPARENT | (sz == NullSize ? LR_DEFAULTSIZE : 0));
 
 		if(!hIcon)
 		{
@@ -42,7 +43,7 @@ final class Resources
 
 	public Bitmap getBitmap(ushort id)
 	{
-		HBITMAP hBitmap = LoadImageA(getHInstance(), cast(char*)id, IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT | LR_DEFAULTSIZE);
+		HBITMAP hBitmap = loadImage(cast(char*)id, IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT | LR_DEFAULTSIZE);
 
 		if(!hBitmap)
 		{
@@ -61,7 +62,7 @@ final class Resources
 
 	public T* getRaw(T)(ushort id, char* rt)
 	{
-		HRSRC hRsrc = FindResourceA(null, MAKEINTRESOURCEA(id), rt);
+		HRSRC hRsrc = FindResourceW(null, MAKEINTRESOURCEW(id), rt);
 
 		if(!hRsrc)
 		{

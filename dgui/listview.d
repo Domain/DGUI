@@ -17,10 +17,11 @@
 
 module dgui.listview;
 
+import std.utf;
+import std.string;
 import dgui.core.utils;
 import dgui.control;
 import dgui.imagelist;
-import std.string;
 
 enum ColumnTextAlign: int
 {
@@ -106,14 +107,14 @@ class ListViewItem
 
 		if(this._owner && this._owner.created)
 		{
-			LVITEMA lvi;
+			LVITEMW lvi;
 
 			lvi.mask = LVIF_IMAGE;
 			lvi.iItem = this.index;
 			lvi.iSubItem = 0;
 			lvi.iImage = imgIdx;
 
-			this._owner.sendMessage(LVM_SETITEMA, 0, cast(LPARAM)&lvi);
+			this._owner.sendMessage(LVM_SETITEMW, 0, cast(LPARAM)&lvi);
 		}
 	}
 
@@ -128,14 +129,14 @@ class ListViewItem
 
 		if(this._owner && this._owner.created)
 		{
-			LVITEMA lvi;
+			LVITEMW lvi;
 
 			lvi.mask = LVIF_TEXT;
 			lvi.iItem = this.index;
 			lvi.iSubItem = !this._parentItem ? 0 : this.subitemIndex;
-			lvi.pszText = toStringz(s);
+			lvi.pszText = toUTF16z(s);
 
-			this._owner.sendMessage(LVM_SETITEMA, 0, cast(LPARAM)&lvi);
+			this._owner.sendMessage(LVM_SETITEMW, 0, cast(LPARAM)&lvi);
 		}
 	}
 
@@ -175,7 +176,7 @@ class ListViewItem
 
 		if(this._owner && this._owner.created)
 		{
-			LVITEMA lvi;
+			LVITEMW lvi;
 
 			lvi.mask = LVIF_STATE;
 			lvi.stateMask = LVIS_STATEIMAGEMASK;
@@ -541,16 +542,16 @@ class ListView: OwnerDrawControl
 		 */
 
 		int idx = item.index;
-		LVITEMA lvi;
+		LVITEMW lvi;
 
 		lvi.mask = LVIF_TEXT | (!subitem ? (LVIF_IMAGE | LVIF_STATE | LVIF_PARAM) : 0);
 		lvi.iImage = !subitem ? item.imageIndex : -1;
 		lvi.iItem = !subitem ? idx : item.parentItem.index;
 		lvi.iSubItem = !subitem ? 0 : item.subitemIndex; //Per windows il subitem inizia da 1 (lo 0 e' l'item principale).
-		lvi.pszText = toStringz(item.text);
+		lvi.pszText = toUTF16z(item.text);
 		lvi.lParam = winCast!(LPARAM)(item);
 
-		item.listView.sendMessage(!subitem ? LVM_INSERTITEMA : LVM_SETITEMA, 0, cast(LPARAM)&lvi);
+		item.listView.sendMessage(!subitem ? LVM_INSERTITEMW : LVM_SETITEMW, 0, cast(LPARAM)&lvi);
 
 		if(!subitem)
 		{
@@ -578,14 +579,14 @@ class ListView: OwnerDrawControl
 
 	private static void insertColumn(ListViewColumn col)
 	{
-		LVCOLUMNA lvc;
+		LVCOLUMNW lvc;
 
 		lvc.mask =  LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
 		lvc.cx = col.width;
 		lvc.fmt = col.textAlign;
-		lvc.pszText = toStringz(col.text);
+		lvc.pszText = toUTF16z(col.text);
 
-		col.listView.sendMessage(LVM_INSERTCOLUMNA, col.listView._columns.length, cast(LPARAM)&lvc);
+		col.listView.sendMessage(LVM_INSERTCOLUMNW, col.listView._columns.length, cast(LPARAM)&lvc);
 	}
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)

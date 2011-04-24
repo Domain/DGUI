@@ -17,38 +17,28 @@
 
 module dgui.core.windowclass;
 
+import std.utf;
 import std.string;
+import dgui.core.charset;
 import dgui.core.winapi;
 import dgui.core.exception;
 import dgui.core.utils;
 import dgui.core.enums;
 import dgui.canvas;
 
-private alias WNDPROC[string] ClassMap; //Tiene traccia delle window procedure originali: [OrgClassName | OrgWndProc]
+private alias WNDPROC[string] ClassMap; //Keeps original window procedure addresses: [OrgClassName | OrgWndProc]
 
 public void registerWindowClass(string className, ClassStyles classStyle, Cursor cursor, WNDPROC wndProc)
 {
-	static HINSTANCE hInst;
-	WNDCLASSEXA wc;
+	WNDCLASSEXW wc;
 
-	if(!hInst)
-	{
-		hInst = getHInstance();
-	}
-
-	bool found = cast(bool)GetClassInfoExA(hInst, toStringz(className), &wc);
+	wc.cbSize = WNDCLASSEXW.sizeof;
+	bool found = cast(bool)getClassInfoEx(className, &wc);
 
 	if(!found)
 	{
-		wc.cbSize = WNDCLASSEXA.sizeof;
-		wc.lpszClassName = toStringz(className);
-		wc.hCursor = cursor ? cursor.handle : SystemCursors.arrow.handle;
-		wc.hInstance = hInst;
-		wc.hbrBackground = SystemBrushes.brushBtnFace.handle;
-		wc.lpfnWndProc = wndProc;
-		wc.style = classStyle;
-
-		if(!RegisterClassExA(&wc))
+		if(!registerClassEx(className, cursor ? cursor.handle : SystemCursors.arrow.handle,
+						    SystemBrushes.brushBtnFace.handle, wndProc, classStyle))
 		{
 			debug
 			{
@@ -64,37 +54,31 @@ public void registerWindowClass(string className, ClassStyles classStyle, Cursor
 
 public WNDPROC superClassWindowClass(string oldClassName, string newClassName, WNDPROC newWndProc)
 {
-	static HINSTANCE hInst;
 	static ClassMap classMap;
-	WNDCLASSEXA oldWc = void, newWc = void; //Non serve inizializzarli
+	WNDCLASSEXW oldWc = void, newWc = void;
 
-	if(!hInst)
-	{
-		hInst = getHInstance();
-	}
+	oldWc.cbSize = WNDCLASSEXW.sizeof;
+	newWc.cbSize = WNDCLASSEXW.sizeof;
 
-	oldWc.cbSize = WNDCLASSEXA.sizeof;
-	newWc.cbSize = WNDCLASSEXA.sizeof;
+	//const(char)* pOldClassName = toUTF16z(oldClassName);
+	const(wchar)* pNewClassName = toUTF16z(newClassName);
 
-	immutable(char)* pOldClassName = toStringz(oldClassName);
-	immutable(char)* pNewClassName = toStringz(newClassName);
-
-	if(!GetClassInfoExA(hInst, pNewClassName, &newWc)) // IF Classe Non Trovata THEN
+	if(!getClassInfoEx(newClassName, &newWc)) // IF Class Non Found THEN
 	{
 		// Super Classing
-		GetClassInfoExA(hInst, pOldClassName, &oldWc);
+		getClassInfoEx(oldClassName, &oldWc);
 
-		//Salvo la window procedure originale nella ClassMap
+		//Keep the original window procedure in a map
 		classMap[oldClassName] = oldWc.lpfnWndProc;
 
 		newWc = oldWc;
 		newWc.style &= ClassStyles.PARENTDC | (~ClassStyles.GLOBALCLASS);
 		newWc.lpfnWndProc = newWndProc;
 		newWc.lpszClassName = pNewClassName;
-		newWc.hInstance = hInst;
-		//newWc.hbrBackground = null; //Lo disegno io (se serve).
+		newWc.hInstance = getHInstance();
+		//newWc.hbrBackground = null;
 
-		if(!RegisterClassExA(&newWc))
+		if(!RegisterClassExW(&newWc))
 		{
 			debug
 			{
@@ -107,5 +91,5 @@ public WNDPROC superClassWindowClass(string oldClassName, string newClassName, W
 		}
 	}
 
-	return classMap[oldClassName]; //Ritorno la Window Procedure Originale
+	return classMap[oldClassName]; //Back to the original window procedure
 }

@@ -1166,45 +1166,44 @@ extern(Windows)
 
 	enum: UINT
 	{
-		TV_FIRST = 0x1100,
+		TV_FIRST 			= 0x1100,
+		TVN_FIRST 			= cast(UINT)-400,
 
-		TVM_INSERTITEMA = TV_FIRST + 0,
-		TVM_DELETEITEM = TV_FIRST + 1,
-		TVM_EXPAND = TV_FIRST + 2,
-		TVM_GETITEMRECT = TV_FIRST + 4,
-		TVM_GETINDENT = TV_FIRST + 6,
-		TVM_SETINDENT = TV_FIRST + 7,
-		TVM_SETIMAGELIST = TV_FIRST + 9,
-		TVM_GETNEXTITEM = TV_FIRST + 10,
-		TVM_SELECTITEM = TV_FIRST + 11,
-		TVM_GETITEMA = TV_FIRST + 12,
-		TVM_SETITEMA = TV_FIRST + 13,
-		TVM_EDITLABELA = TV_FIRST + 14,
+		TVM_INSERTITEMA 	= TV_FIRST + 0,
+		TVM_DELETEITEM  	= TV_FIRST + 1,
+		TVM_EXPAND      	= TV_FIRST + 2,
+		TVM_GETITEMRECT 	= TV_FIRST + 4,
+		TVM_GETINDENT 		= TV_FIRST + 6,
+		TVM_SETINDENT 		= TV_FIRST + 7,
+		TVM_SETIMAGELIST	= TV_FIRST + 9,
+		TVM_GETNEXTITEM 	= TV_FIRST + 10,
+		TVM_SELECTITEM		= TV_FIRST + 11,
+		TVM_GETITEMA 		= TV_FIRST + 12,
+		TVM_SETITEMA 		= TV_FIRST + 13,
+		TVM_EDITLABELA 		= TV_FIRST + 14,
 		TVM_GETVISIBLECOUNT = TV_FIRST + 16,
-		TVM_HITTEST = TV_FIRST + 17,
-		TVM_ENSUREVISIBLE = TV_FIRST + 20,
-		TVM_SETITEMHEIGHT = TV_FIRST + 27, // IE4+
-		TVM_GETITEMHEIGHT = TV_FIRST + 28, // IE4+
-		TVM_INSERTITEMW = TV_FIRST + 50,
-		TVM_SETITEMW = TV_FIRST + 63,
+		TVM_HITTEST 		= TV_FIRST + 17,
+		TVM_ENSUREVISIBLE   = TV_FIRST + 20,
+		TVM_SETITEMHEIGHT 	= TV_FIRST + 27, // IE4+
+		TVM_GETITEMHEIGHT 	= TV_FIRST + 28, // IE4+
+		TVM_INSERTITEMW 	= TV_FIRST + 50,
+		TVM_SETITEMW 		= TV_FIRST + 63,
+		TVM_GETITEMW 		= TV_FIRST + 62,
 
-		TVN_FIRST = cast(UINT)-400,
-
-		TVN_SELCHANGINGA = TVN_FIRST - 1,
-		TVN_SELCHANGEDA = TVN_FIRST - 2,
-		TVN_GETDISPINFOA = TVN_FIRST - 3,
-		TVN_ITEMEXPANDINGA = TVN_FIRST - 5,
-		TVN_ITEMEXPANDEDA = TVN_FIRST - 6,
+		TVN_SELCHANGINGA 	= TVN_FIRST - 1,
+		TVN_SELCHANGEDA 	= TVN_FIRST - 2,
+		TVN_GETDISPINFOA	= TVN_FIRST - 3,
+		TVN_ITEMEXPANDINGA 	= TVN_FIRST - 5,
+		TVN_ITEMEXPANDEDA 	= TVN_FIRST - 6,
 		TVN_BEGINLABELEDITA = TVN_FIRST - 10,
-		TVN_ENDLABELEDITA = TVN_FIRST - 11,
-
-		TVN_SELCHANGINGW = TVN_FIRST - 50,
-		TVN_SELCHANGEDW = TVN_FIRST - 51,
-		TVN_GETDISPINFOW = TVN_FIRST - 52,
-		TVN_ITEMEXPANDINGW = TVN_FIRST - 54,
-		TVN_ITEMEXPANDEDW = TVN_FIRST - 55,
+		TVN_ENDLABELEDITA 	= TVN_FIRST - 11,
+		TVN_SELCHANGINGW	= TVN_FIRST - 50,
+		TVN_SELCHANGEDW 	= TVN_FIRST - 51,
+		TVN_GETDISPINFOW 	= TVN_FIRST - 52,
+		TVN_ITEMEXPANDINGW 	= TVN_FIRST - 54,
+		TVN_ITEMEXPANDEDW 	= TVN_FIRST - 55,
 		TVN_BEGINLABELEDITW = TVN_FIRST - 59,
-		TVN_ENDLABELEDITW = TVN_FIRST - 60,
+		TVN_ENDLABELEDITW 	= TVN_FIRST - 60,
 	}
 
 
@@ -1326,6 +1325,7 @@ extern(Windows)
 		LVM_SETBKCOLOR = LVM_FIRST + 1,
 		LVM_SETIMAGELIST = LVM_FIRST + 3,
 		LVM_SETITEMA = LVM_FIRST + 6,
+		LVM_SETITEMW = LVM_FIRST + 76,
 		LVM_INSERTITEMA = LVM_FIRST + 7,
 		LVM_DELETEITEM = LVM_FIRST + 8,
 		LVM_DELETEALLITEMS = LVM_FIRST + 9,
@@ -1917,6 +1917,22 @@ extern(Windows)
 		ILC_MASK = 0x0001,
 	}
 
+	struct WNDCLASSEXW
+	{
+		UINT cbSize;
+		UINT style;
+		WNDPROC lpfnWndProc;
+		int cbClsExtra;
+		int cbWndExtra;
+		HINSTANCE hInstance;
+		HICON hIcon;
+		HCURSOR hCursor;
+		HBRUSH hbrBackground;
+		LPCWSTR lpszMenuName;
+		LPCWSTR lpszClassName;
+		HICON hIconSm;
+	}
+
 	struct SIZE
 	{
 		LONG cx;
@@ -1932,26 +1948,26 @@ extern(Windows)
 		LPARAM dwHitInfo;
 	}
 
-	struct TC_ITEMHEADERA
+	struct TCITEMHEADERW
 	{
 		UINT mask;
 		UINT lpReserved1;
 		UINT lpReserved2;
-		LPCTSTR pszText;
+		LPCWSTR pszText;
 		int cchTextMax;
 		int iImage;
 	}
 
-	struct ACTCTXA
+	struct ACTCTXW
 	{
 		ULONG cbSize;
 		DWORD dwFlags;
-		LPCSTR lpSource;
+		LPCWSTR lpSource;
 		USHORT wProcessorArchitecture;
 		LANGID wLangId;
-		LPCSTR lpAssemblyDirectory;
-		LPCSTR lpResourceName;
-		LPCSTR lpApplicationName;
+		LPCWSTR lpAssemblyDirectory;
+		LPCWSTR lpResourceName;
+		LPCWSTR lpApplicationName;
 		HMODULE hModule;
 	}
 
@@ -1982,11 +1998,11 @@ extern(Windows)
 
 	const HWND HWND_MESSAGE = cast(HWND)-3; // Win2000/XP only.
 
-	struct COMBOBOXEXITEMA
+	struct COMBOBOXEXITEMW
 	{
 		UINT mask;
 		int iItem;
-		LPCSTR pszText;
+		LPCWSTR pszText;
 		int cchTextMax;
 		int iImage;
 		int iSelectedImage;
@@ -2019,12 +2035,12 @@ extern(Windows)
 		SHITEMID mkid;
 	}
 
-	struct BROWSEINFOA
+	struct BROWSEINFOW
 	{
 		HWND hwndOwner;
 		ITEMIDLIST* pidlRoot;
-		LPSTR pszDisplayName;
-		LPCSTR lpszTitle;
+		LPWSTR pszDisplayName;
+		LPCWSTR lpszTitle;
 		UINT ulFlags;
 		BFFCALLBACK lpfn;
 		LPARAM lParam;
@@ -2087,31 +2103,31 @@ extern(Windows)
 	}
 
 
-	struct LVITEMA
+	struct LVITEMW
 	{
 		UINT mask;
 		int iItem;
 		int iSubItem;
 		UINT state;
 		UINT stateMask;
-		LPCSTR pszText;
+		LPCWSTR pszText;
 		int cchTextMax;
 		int iImage;
 		LPARAM lParam;
 	}
 
-	struct LVDISPINFOA
+	struct LVDISPINFOW
 	{
 		NMHDR hdr;
-		LVITEMA item;
+		LVITEMW item;
 	}
 
-	struct LVCOLUMNA
+	struct LVCOLUMNW
 	{
 		UINT mask;
 		int fmt;
 		int cx;
-		LPCSTR pszText;
+		LPCWSTR pszText;
 		int cchTextMax;
 		int iSubItem;
 	}
@@ -2128,13 +2144,13 @@ extern(Windows)
 	}
 
 
-	struct NMTOOLBARA
+	struct NMTOOLBARW
 	{
 		NMHDR hdr;
 		int iItem;
 		TBBUTTON tbButton;
 		int cchText;
-		LPSTR pszText;
+		LPWSTR pszText;
 		RECT rcButton;
 	}
 
@@ -2197,8 +2213,8 @@ extern(Windows)
 	enum: UINT
 	{
 		TB_SETSTATE 		= WM_USER + 17,
-		TB_ADDBUTTONSA 		= WM_USER + 20,
-		TB_INSERTBUTTONA 	= WM_USER + 21,
+		//TB_ADDBUTTONSA 		= WM_USER + 20,
+		//TB_INSERTBUTTONA 	= WM_USER + 21,
 		TB_DELETEBUTTON		= WM_USER + 22,
 		TB_GETITEMRECT 		= WM_USER + 29,
 		TB_BUTTONSTRUCTSIZE = WM_USER + 30,
@@ -2208,8 +2224,10 @@ extern(Windows)
 		TB_INSERTBUTTONW 	= WM_USER + 67,
 		TB_ADDBUTTONSW 		= WM_USER + 68,
 		TB_SETPADDING 		= WM_USER + 87,
-		TB_GETBUTTONINFOA 	= WM_USER + 65,
-		TB_SETBUTTONINFOA 	= WM_USER + 66,
+		//TB_GETBUTTONINFOA 	= WM_USER + 65,
+		//TB_SETBUTTONINFOA 	= WM_USER + 66,
+		TB_GETBUTTONINFOW   = WM_USER + 63,
+		TB_SETBUTTONINFOW   = WM_USER + 64,
 		TB_HITTEST  		= WM_USER + 69,
 		TB_GETBUTTONSIZE  	= WM_USER + 58,
 		TB_SETEXTENDEDSTYLE = WM_USER + 84,
@@ -2222,28 +2240,13 @@ extern(Windows)
 		TBN_DROPDOWN = TBN_FIRST - 10,
 	}
 
-
-	struct TVITEMA
-	{
-		UINT mask;
-		HTREEITEM hItem;
-		UINT state;
-		UINT stateMask;
-		LPCTSTR pszText;
-		int cchTextMax;
-		int iImage;
-		int iSelectedImage;
-		int cChildren;
-		LPARAM lParam;
-	}
-
 	struct TVITEMW
 	{
 		UINT mask;
 		HTREEITEM hItem;
 		UINT state;
 		UINT stateMask;
-		LPWSTR pszText;
+		LPCWSTR pszText;
 		int cchTextMax;
 		int iImage;
 		int iSelectedImage;
@@ -2258,26 +2261,20 @@ extern(Windows)
 		HTREEITEM hItem;
 	}
 
-	struct TVINSERTSTRUCTA
+	struct TVINSERTSTRUCTW
 	{
 		HTREEITEM hParent;
 		HTREEITEM hInsertAfter;
-		TV_ITEMA item;
+		TVITEMW item;
 	}
 
-	struct NMTREEVIEWA
+	struct NMTREEVIEWW
 	{
 		NMHDR hdr;
 		UINT action;
-		TVITEMA itemOld;
-		TVITEMA itemNew;
+		TVITEMW itemOld;
+		TVITEMW itemNew;
 		POINT ptDrag;
-	}
-
-	struct NMTVDISPINFOA
-	{
-		NMHDR hdr;
-		TVITEMA item;
 	}
 
 	struct NMTVDISPINFOW
@@ -2286,38 +2283,7 @@ extern(Windows)
 		TVITEMW item;
 	}
 
-	struct REBARINFO
-	{
-		UINT cbSize;
-		UINT fMask;
-		HIMAGELIST himl;
-	}
-
-	struct REBARBANDINFOA
-	{
-		UINT cbSize;
-		UINT fMask;
-		UINT fStyle;
-		COLORREF clrFore;
-		COLORREF clrBack;
-		LPSTR lpText;
-		UINT cch;
-		int iImage;
-		HWND hwndChild;
-		UINT cxMinChild;
-		UINT cyMinChild;
-		UINT cx;
-		HBITMAP hbmBack;
-		UINT wID;
-		UINT cyChild;
-		UINT cyMaxChild;
-		UINT cyIntegral;
-		UINT cxIdeal;
-		LPARAM lParam;
-		UINT cxHeader;
-	}
-
-	struct TCITEMA
+	struct TCITEMW
 	{
 		UINT mask;
 		UINT lpReserved1;
@@ -2352,7 +2318,7 @@ extern(Windows)
 	}
 
 
-	struct MENUITEMINFOA
+	struct MENUITEMINFOW
 	{
 		UINT cbSize;
 		UINT fMask;
@@ -2363,7 +2329,7 @@ extern(Windows)
 		HBITMAP hbmpChecked;
 		HBITMAP hbmpUnchecked;
 		DWORD dwItemData;
-		LPCSTR dwTypeData;
+		LPCWSTR dwTypeData;
 		UINT cch;
 		//HBITMAP hbmpItem;
 	}
@@ -2379,7 +2345,7 @@ extern(Windows)
 		int nTrackPos;
 	}
 
-	struct TBBUTTONINFOA
+	struct TBBUTTONINFOW
 	{
 		UINT cbSize;
 		DWORD dwMask;
@@ -2389,7 +2355,7 @@ extern(Windows)
 		BYTE fsStyle;
 		WORD cx;
 		DWORD lParam;
-		LPSTR pszText;
+		LPWSTR pszText;
 		int cchText;
 	}
 
@@ -2407,7 +2373,7 @@ extern(Windows)
 	}
 
 
-	struct CHOOSECOLORA
+	struct CHOOSECOLORW
 	{
 		DWORD lStructSize;
 		HWND hwndOwner;
@@ -2417,10 +2383,28 @@ extern(Windows)
 		DWORD Flags;
 		LPARAM lCustData;
 		LPCCHOOKPROC lpfnHook;
-		LPCSTR lpTemplateName;
+		LPCWSTR lpTemplateName;
 	}
 
-	struct NONCLIENTMETRICSA
+	struct LOGFONTW
+	{
+		LONG lfHeight;
+		LONG lfWidth;
+		LONG lfEscapement;
+		LONG lfOrientation;
+		LONG lfWeight;
+		BYTE lfItalic;
+		BYTE lfUnderline;
+		BYTE lfStrikeOut;
+		BYTE lfCharSet;
+		BYTE lfOutPrecision;
+		BYTE lfClipPrecision;
+		BYTE lfQuality;
+		BYTE lfPitchAndFamily;
+		WCHAR[LF_FACESIZE] lfFaceName;
+	}
+
+	struct NONCLIENTMETRICSW
 	{
 		UINT cbSize;
 		int iBorderWidth;
@@ -2428,32 +2412,32 @@ extern(Windows)
 		int iScrollHeight;
 		int iCaptionWidth;
 		int iCaptionHeight;
-		LOGFONTA lfCaptionFont;
+		LOGFONTW lfCaptionFont;
 		int iSmCaptionWidth;
 		int iSmCaptionHeight;
-		LOGFONTA lfSmCaptionFont;
+		LOGFONTW lfSmCaptionFont;
 		int iMenuWidth;
 		int iMenuHeight;
-		LOGFONTA lfMenuFont;
-		LOGFONTA lfStatusFont;
-		LOGFONTA lfMessageFont;
+		LOGFONTW lfMenuFont;
+		LOGFONTW lfStatusFont;
+		LOGFONTW lfMessageFont;
 	}
 
-	struct CHOOSEFONTA
+	struct CHOOSEFONTW
 	{
 		align(1):
 		DWORD lStructSize;
 		HWND hwndOwner;
 		HDC hDC;
-		LPLOGFONTA lpLogFont;
+		LOGFONTW* lpLogFont;
 		INT iPointSize;
 		DWORD Flags;
 		DWORD rgbColors;
 		LPARAM lCustData;
 		LPCFHOOKPROC lpfnHook;
-		LPCSTR lpTemplateName;
+		LPCWSTR lpTemplateName;
 		HINSTANCE hInstance;
-		LPSTR lpszStyle;
+		LPWSTR lpszStyle;
 		WORD nFontType;
 		WORD ___MISSING_ALIGNMENT__;
 		INT nSizeMin;
@@ -2487,7 +2471,7 @@ extern(Windows)
 		WINDOWPOS* lppos;
 	}
 
-	struct CREATESTRUCTA
+	struct CREATESTRUCTW
 	{
 		LPVOID lpCreateParams;
 		HINSTANCE hInstance;
@@ -2498,8 +2482,8 @@ extern(Windows)
 		int y;
 		int x;
 		LONG style;
-		LPCSTR lpszName;
-		LPCSTR lpszClass;
+		LPCWSTR lpszName;
+		LPCWSTR lpszClass;
 		DWORD dwExStyle;
 	}
 
@@ -2588,20 +2572,12 @@ extern(Windows)
 	alias UINT function(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam) LPCFHOOKPROC;
 	alias BOOL function(HDC hdc, LPARAM lpData, int cchData) GRAYSTRINGPROC;
 
-	alias TVINSERTSTRUCTA TV_INSERTSTRUCTA;
-	alias NMTVDISPINFOA TV_DISPINFOA;
-	alias LVDISPINFOA LV_DISPINFOA;
-	alias NMTREEVIEWA NM_TREEVIEW;
-	alias LVCOLUMNA LV_COLUMNA;
 	alias MAKELONG MAKELRESULT;
 	alias MAKELONG MAKELPARAM;
 	alias MAKELONG MAKEWPARAM;
 	alias TBBUTTON TB_BUTTON;
-	alias TVITEMA TV_ITEMA;
-	alias LVITEMA LV_ITEMA;
 	alias size_t ULONG_PTR;
 	alias HANDLE HTREEITEM;
-	alias TCITEMA TC_ITEMA;
 	alias WORD CLIPFORMAT;
 	alias ulong DWORDLONG;
 	alias long LONGLONG;
@@ -2612,18 +2588,21 @@ extern(Windows)
 	typedef HANDLE HIMAGELIST;
 
 	/* *** Shell32.lib *** */
-	ITEMIDLIST* SHBrowseForFolderA(BROWSEINFOA* lpbi);
-	BOOL SHGetPathFromIDListA(ITEMIDLIST* pidl, char* pszPath);
-	HICON ExtractAssociatedIconA(HINSTANCE hInst, LPCTSTR lpIconPath, WORD* lpiIcon);
+	ITEMIDLIST* SHBrowseForFolderW(BROWSEINFOW* lpbi);
+	BOOL SHGetPathFromIDListW(ITEMIDLIST* pidl, wchar* pszPath);
+	HICON ExtractAssociatedIconW(HINSTANCE hInst, LPCWSTR lpIconPath, WORD* lpiIcon);
 
 	/* *** Comdlg32 *** */
-	BOOL ChooseColorA(CHOOSECOLORA* lpcc);
-	BOOL ChooseFontA(CHOOSEFONTA* lpcf);
+	BOOL ChooseColorW(CHOOSECOLORW* lpcc);
+	BOOL ChooseFontW(CHOOSEFONTW* lpcf);
 
 	/* *** Kernel32.dll *** */
-	HRSRC FindResourceExA(HMODULE hModule, LPCSTR lpType, LPCSTR lpName, WORD wLanguage);
-	HRSRC FindResourceA(HMODULE hModule, LPCTSTR lpName, LPCTSTR lpType);
-	DWORD GetTempPathA(DWORD nBufferLength, LPSTR lpBuffer);
+	HMODULE LoadLibraryW(LPCWSTR lpFileName);
+	HMODULE GetModuleHandleW(LPCWSTR lpModuleName);
+	DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
+	HRSRC FindResourceExW(HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, WORD wLanguage);
+	HRSRC FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+	DWORD GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
 	HGLOBAL LoadResource(HMODULE hModule, HRSRC hResInfo);
 	DWORD SizeofResource(HMODULE hModule, HRSRC hResInfo);
 	BOOL TerminateProcess(HANDLE, UINT);
@@ -2631,42 +2610,46 @@ extern(Windows)
 	int MulDiv(int nNumber, int nNumerator, int nDenominator);
 
 	/* *** User32.dll *** */
+	int MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+	BOOL GetMessageW(MSG* lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
+	LRESULT DispatchMessageW(MSG* lpmsg);
+	HWND CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
 	HDWP DeferWindowPos(HDWP hWinPosInfo, HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT uFlags);
-	HANDLE LoadImageA(HINSTANCE hinst, LPCSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad);
+	HANDLE LoadImageW(HINSTANCE hinst, LPCWSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad);
 	LRESULT CallWindowProcA(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
 	BOOL GetTextExtentPoint32A(HDC hdc, char* lpString, int c, SIZE* lpSize);
-	BOOL SetMenuItemInfoA(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOA* lpmii);
-	BOOL InsertMenuItemA(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOA* lpmii);
-	BOOL SystemParametersInfoA(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
+	BOOL SetMenuItemInfoW(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOW* lpmii);
+	BOOL InsertMenuItemW(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOW* lpmii);
+	BOOL SystemParametersInfoW(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
 	UINT SetTimer(HWND hWnd, UINT nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc);
-	BOOL GetClassInfoExA(HINSTANCE hinst, LPCTSTR lpszClass, WNDCLASSEXA* lpwcx);
+	BOOL GetClassInfoExW(HINSTANCE hinst, LPCWSTR lpszClass, WNDCLASSEXW* lpwcx);
 	LRESULT DefWindowProcW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	int SetScrollInfo(HWND hwnd, int fnBar, SCROLLINFO* lpsi, BOOL fRedraw);
 	BOOL EnableMenuItem(HMENU hMenu, UINT uIDEnableItem, UINT uEnable);
-	int GetWindowTextA(HWND hWnd, LPSTR lpString, int nMaxCount);
+	int GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
 	BOOL GetScrollInfo(HWND hwnd, int fnBar, SCROLLINFO* lpsi);
-	LONG SetWindowLongA(HWND hWnd, int nIndex, LONG dwNewLong);
-	DWORD SetClassLongA(HWND hWnd, int nIndex, LONG lNewLong);
-	BOOL GetMenuItemInfoA(HMENU, UINT, BOOL, MENUITEMINFOA*);
+	LONG SetWindowLongW(HWND hWnd, int nIndex, LONG dwNewLong);
+	DWORD SetClassLongW(HWND hWnd, int nIndex, LONG lNewLong);
+	BOOL GetMenuItemInfoW(HMENU, UINT, BOOL, MENUITEMINFOW*);
 	BOOL TrackMouseEvent(TRACKMOUSEEVENT* lpEventTrack);
 	HWND SetParent(HWND hWndChild, HWND hWndNewParent);
-	BOOL SetWindowTextA(HWND hWnd, LPCSTR lpString);
+	BOOL SetWindowTextW(HWND hWnd, LPCWSTR lpString);
 	BOOL GetWindowInfo(HWND hwnd, WINDOWINFO* pwi);
-	BOOL IsDialogMessageA(HWND hDlg, LPMSG lpMsg);
+	BOOL IsDialogMessageW(HWND hDlg, LPMSG lpMsg);
 	HMENU GetSystemMenu(HWND hWnd, BOOL bRevert);
-	LONG GetWindowLongA(HWND hWnd, int nIndex);
+	LONG GetWindowLongW(HWND hWnd, int nIndex);
 	BOOL EnableWindow(HWND hWnd, BOOL bEnable);
-	DWORD GetClassLongA(HWND hWnd, int nIndex);
-	ATOM RegisterClassExA(WNDCLASSEXA* lpwcx);
+	DWORD GetClassLongW(HWND hWnd, int nIndex);
+	ATOM RegisterClassExW(WNDCLASSEXW* lpwcx);
 	HDWP BeginDeferWindowPos(int nNumWindows);
 	BOOL EndDeferWindowPos(HDWP hWinPosInfo);
 	BOOL KillTimer(HWND hWnd, UINT uIDEvent);
 	BOOL DrawFocusRect(HDC hDC, RECT* lprc);
 	BOOL OpenClipboard(HWND hWndNewOwner);
 	BOOL SetMenu(HWND hWnd, HMENU hMenu);
-	int GetWindowTextLengthA(HWND hWnd);
+	int GetWindowTextLengthW(HWND hWnd);
 	BOOL SetMenuInfo(HMENU, MENUINFO*);
 	BOOL DeleteMenu(HMENU, UINT, UINT);
 	SHORT GetAsyncKeyState(int vKey);
@@ -2708,13 +2691,15 @@ extern(Windows)
 	BOOL ImageList_Destroy(HIMAGELIST himl);
 
 	/* *** Gdi32.dll *** */
+	int GetObjectW(HGDIOBJ hgdiobj, int cbBuffer, void* lpvObject);
 	COLORREF GetTextColor(HDC hdc);
+	HFONT CreateFontIndirectW(LOGFONTW* lplf);
 	int GetDIBits(HDC hdc, HBITMAP hbmp, UINT uStartScan, UINT cScanLines, void* lpvBits, BITMAPINFO* lpbi, UINT uUsage);
 	BOOL DrawIconEx(HDC hdc, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, UINT diFlags);
 	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
-	int DrawTextExA(HDC hdc, LPCTSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
-	BOOL ExtTextOutA(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, uint cbCount, int* lpDx);
+	int DrawTextExW(HDC hdc, LPCWSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
+	BOOL ExtTextOutW(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCWSTR lpString, uint cbCount, int* lpDx);
 	BOOL BitBlt(HDC hdcDest, int nXDest,int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 	BOOL PlgBlt(HDC hdcDest, POINT *lpPoint, HDC hdcSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HBITMAP hbmMask, int xMask, int yMask);
 	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, const(void*) lpvBits);
@@ -2729,7 +2714,15 @@ extern(Windows)
 	BOOL DestroyIcon(HICON hIcon);
 
 	/* *** Advapi32.dll *** */
-	LONG RegQueryValueExA(HKEY hKey, LPCTSTR lpValueName, DWORD* lpReserved, DWORD* lpType, BYTE* lpData, DWORD* lpcbData);
+	LONG RegCreateKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD Reserved, LPTSTR lpClass, DWORD dwOptions, REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition);
+	LONG RegOpenKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult);
+	LONG RegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, DWORD* lpReserved, DWORD* lpType, BYTE* lpData, DWORD* lpcbData);
+	LONG RegSetValueExW(HKEY hKey, LPCWSTR lpValueName, DWORD Reserved,DWORD dwType, const BYTE *lpData, DWORD cbData);
+	LONG RegQueryInfoKeyW(HKEY hKey, LPWSTR lpClass, LPDWORD lpcClass, LPDWORD lpReserved, LPDWORD lpcSubKeys, LPDWORD lpcMaxSubKeyLen, LPDWORD lpcMaxClassLen, LPDWORD lpcValues, LPDWORD lpcMaxValueNameLen, LPDWORD lpcMaxValueLen, LPDWORD lpcbSecurityDescriptor, PFILETIME lpftLastWriteTime);
+	LONG RegEnumKeyExW(HKEY hKey, DWORD dwIndex, LPWSTR lpName, LPDWORD lpcName, LPDWORD lpReserved, LPWSTR lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime);
+	LONG RegEnumValueW(HKEY hKey, DWORD dwIndex, LPWSTR lpValueName, LPDWORD lpcchValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
+	LONG RegDeleteValueW(HKEY hKey, LPCWSTR lpValueName);
+	LONG RegDeleteKeyW(HKEY hKey, LPCWSTR lpSubKey);
 
 	/* *** Ole32.dll *** */
 	HRESULT CLSIDFromString(wchar* lpsz, CLSID* pclsid);

@@ -17,8 +17,9 @@
 
 module dgui.statusbar;
 
-import dgui.control;
+import std.utf;
 import std.string;
+import dgui.control;
 
 final class StatusPart
 {
@@ -44,7 +45,7 @@ final class StatusPart
 
 		if(this._owner && this._owner.created)
 		{
-			this._owner.sendMessage(SB_SETTEXTA, MAKEWPARAM(this.index, 0), cast(LPARAM)toStringz(s));
+			this._owner.sendMessage(SB_SETTEXTW, MAKEWPARAM(this.index, 0), cast(LPARAM)toUTF16z(s));
 		}
 	}
 
@@ -154,7 +155,7 @@ class StatusBar: SubclassedControl
 
 		foreach(int i, StatusPart sp; sparts)
 		{
-			owner.sendMessage(SB_SETTEXTA, MAKEWPARAM(i, 0), cast(LPARAM)toStringz(sp.text));
+			owner.sendMessage(SB_SETTEXTW, MAKEWPARAM(i, 0), cast(LPARAM)toUTF16z(sp.text));
 		}
 	}
 
@@ -171,7 +172,6 @@ class StatusBar: SubclassedControl
 
 	protected override void onHandleCreated(EventArgs e)
 	{
-
 		if(this._parts)
 		{
 			foreach(StatusPart sp; this._parts)

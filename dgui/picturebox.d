@@ -42,7 +42,7 @@ class PictureBox: Control
 		super.dispose();
 	}
 
-	alias @property  Control.bounds bounds;
+	alias @property Control.bounds bounds;
 
 	@property public override void bounds(Rect r)
 	{

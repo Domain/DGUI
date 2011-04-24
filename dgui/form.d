@@ -163,12 +163,12 @@ class Form: ContainerControl, IDialogResult
 	{
 		MSG m = void;
 
-		while(GetMessageA(&m, null, 0, 0))
+		while(GetMessageW(&m, null, 0, 0))
 		{
-			if(!IsDialogMessageA(this._handle, &m))
+			if(!IsDialogMessageW(this._handle, &m))
 			{
 				TranslateMessage(&m);
-				DispatchMessageA(&m);
+				DispatchMessageW(&m);
 			}
 		}
 	}

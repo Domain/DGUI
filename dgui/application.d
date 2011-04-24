@@ -21,6 +21,7 @@ pragma(lib, "gdi32.lib");
 pragma(lib, "comdlg32.lib");
 
 public import dgui.resources;
+import dgui.core.charset;
 import dgui.core.winapi;
 import dgui.core.utils;
 import dgui.richtextbox;
@@ -28,6 +29,7 @@ import dgui.control;
 import dgui.form;
 import dgui.button;
 import dgui.label;
+import std.utf;
 import std.file;
 import std.conv;
 import std.string;
@@ -94,7 +96,7 @@ private const string XP_MANIFEST =  `<?xml version="1.0" encoding="UTF-8" standa
 */
 
 private alias extern(Windows) BOOL function(HANDLE hActCtx, ULONG_PTR* lpCookie) ActivateActCtxProc;
-private alias extern(Windows) HANDLE function(ACTCTXA* pActCtx) CreateActCtxAProc;
+private alias extern(Windows) HANDLE function(ACTCTXW* pActCtx) CreateActCtxWProc;
 private alias extern(Windows) bool function(INITCOMMONCONTROLSEX*) InitCommonControlsExProc;
 
 class Application
@@ -185,27 +187,26 @@ class Application
 
 	private static void enableManifest()
 	{
-		HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+		HMODULE hKernel32 = getModuleHandle("kernel32.dll");
 
 		if(hKernel32)
 		{
-			CreateActCtxAProc createActCtx = cast(CreateActCtxAProc)GetProcAddress(hKernel32, "CreateActCtxA");
+			CreateActCtxWProc createActCtx = cast(CreateActCtxWProc)GetProcAddress(hKernel32, "CreateActCtxW");
 
-			if(createActCtx) // Esiste da WinXP in su, per non perdere la compatibilita' con Win2k faccio un check
+			if(createActCtx) // Don't break Win2k compatibility
 			{
-				char[MAX_PATH] tempPath;
+				string temp;
 
 				ActivateActCtxProc activateActCtx = cast(ActivateActCtxProc)GetProcAddress(hKernel32, "ActivateActCtx");
+				getTempPath(temp);
+				temp = std.path.join(temp, XP_MANIFEST_FILE);
+				std.file.write(temp, XP_MANIFEST);
 
-				GetTempPathA(MAX_PATH, tempPath.ptr);
-				string path = std.path.join(to!(string)(tempPath.ptr), XP_MANIFEST_FILE);
-				std.file.write(path, XP_MANIFEST);
+				ACTCTXW actx;
 
-				ACTCTXA actx;
-
-				actx.cbSize = ACTCTXA.sizeof;
+				actx.cbSize = ACTCTXW.sizeof;
 				actx.dwFlags = 0;
-				actx.lpSource = toStringz(path);
+				actx.lpSource = toUTF16z(temp);
 
 				HANDLE hActx = createActCtx(&actx);
 
@@ -215,7 +216,10 @@ class Application
 					activateActCtx(hActx, &cookie);
 				}
 
-				std.file.remove(path);
+				if(std.file.exists(temp))
+				{
+					std.file.remove(temp);
+				}
 			}
 		}
 
@@ -229,7 +233,7 @@ class Application
 		icc.dwSize = INITCOMMONCONTROLSEX.sizeof;
 		icc.dwICC = 0xFFFFFFFF;
 
-		HMODULE hComCtl32 = LoadLibraryA("comctl32.dll");
+		HMODULE hComCtl32 = loadLibrary("comctl32.dll");
 
 		if(hComCtl32)
 		{

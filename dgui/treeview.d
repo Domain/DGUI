@@ -17,6 +17,7 @@
 
 module dgui.treeview;
 
+import std.utf;
 import dgui.core.utils;
 import dgui.control;
 import dgui.imagelist;
@@ -129,13 +130,13 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 	{
 		if(this._owner && this._owner.created)
 		{
-			TVITEMA tvi = void;
+			TVITEMW tvi = void;
 
 			tvi.mask = TVIF_STATE | TVIF_HANDLE;
 			tvi.hItem = this._handle;
 			tvi.stateMask = TVIS_SELECTED;
 
-			this._owner.sendMessage(TVM_GETITEMA, 0, cast(LPARAM)&tvi);
+			this._owner.sendMessage(TVM_GETITEMW, 0, cast(LPARAM)&tvi);
 			return (tvi.state & TVIS_SELECTED) ? true : false;
 		}
 
@@ -163,12 +164,12 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 		if(this._owner && this._owner.created)
 		{
-			TVITEMA tvi = void;
+			TVITEMW tvi = void;
 
 			tvi.mask = TVIF_TEXT | TVIF_HANDLE;
 			tvi.hItem = this._handle;
-			tvi.pszText = std.string.toStringz(txt);
-			this._owner.sendMessage(TVM_SETITEMA, 0, cast(LPARAM)&tvi);
+			tvi.pszText = toUTF16z(txt);
+			this._owner.sendMessage(TVM_SETITEMW, 0, cast(LPARAM)&tvi);
 		}
 	}
 
@@ -183,11 +184,11 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 		if(this._owner && this._owner.created)
 		{
-			TVITEMA tvi = void;
+			TVITEMW tvi = void;
 
 			tvi.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_HANDLE;
 			tvi.hItem = this._handle;
-			this._owner.sendMessage(TVM_GETITEMA, 0, cast(LPARAM)&tvi);
+			this._owner.sendMessage(TVM_GETITEMW, 0, cast(LPARAM)&tvi);
 
 			if(tvi.iSelectedImage == tvi.iImage) //Non e' mai stata assegnata veramente, quindi SelectedImage = Image.
 			{
@@ -195,7 +196,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 			}
 
 			tvi.iImage = idx;
-			this._owner.sendMessage(TVM_SETITEMA, 0, cast(LPARAM)&tvi);
+			this._owner.sendMessage(TVM_SETITEMW, 0, cast(LPARAM)&tvi);
 		}
 	}
 
@@ -210,14 +211,14 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 		if(this._owner && this._owner.created)
 		{
-			TVITEMA tvi = void;
+			TVITEMW tvi = void;
 
 			tvi.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_HANDLE;
 			tvi.hItem = this._handle;
-			this._owner.sendMessage(TVM_GETITEMA, 0, cast(LPARAM)&tvi);
+			this._owner.sendMessage(TVM_GETITEMW, 0, cast(LPARAM)&tvi);
 
 			idx == -1 ? (tvi.iSelectedImage = tvi.iImage) : (tvi.iSelectedImage = idx);
-			this._owner.sendMessage(TVM_SETITEMA, 0, cast(LPARAM)&tvi);
+			this._owner.sendMessage(TVM_SETITEMW, 0, cast(LPARAM)&tvi);
 		}
 	}
 
@@ -414,18 +415,18 @@ class TreeView: SubclassedControl
 
 	package static void createTreeNode(TreeNode node)
 	{
-		TVINSERTSTRUCTA tvis;
+		TVINSERTSTRUCTW tvis;
 
 		tvis.hParent = node.parentNode ? node.parentNode.handle : cast(HTREEITEM)TVI_ROOT;
 		tvis.hInsertAfter = cast(HTREEITEM)TVI_LAST;
 		tvis.item.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_TEXT | TVIF_PARAM;
 		tvis.item.iImage = node.imageIndex;
 		tvis.item.iSelectedImage = node.selectedImageIndex;
-		tvis.item.pszText  = std.string.toStringz(node.text);
+		tvis.item.pszText  = toUTF16z(node.text);
 		tvis.item.lParam = winCast!(LPARAM)(node);
 
 		TreeView tvw = node.treeView;
-		node.handle = cast(HTREEITEM)tvw.sendMessage(TVM_INSERTITEMA, 0, cast(LPARAM)&tvis);
+		node.handle = cast(HTREEITEM)tvw.sendMessage(TVM_INSERTITEMW, 0, cast(LPARAM)&tvis);
 
 		if(node.hasNodes)
 		{
@@ -475,18 +476,18 @@ class TreeView: SubclassedControl
 	{
 		if(msg == WM_NOTIFY)
 		{
-			NMTREEVIEWA* pNotifyTreeView = cast(NMTREEVIEWA*)lParam;
+			NMTREEVIEWW* pNotifyTreeView = cast(NMTREEVIEWW*)lParam;
 
 			switch(pNotifyTreeView.hdr.code)
 			{
-				case TVN_SELCHANGINGA:
+				case TVN_SELCHANGINGW:
 				{
 					scope CancelEventArgs e = new CancelEventArgs();
 					this.onSelectedNodeChanging(e);
 					return e.cancel;
 				}
 
-				case TVN_SELCHANGEDA:
+				case TVN_SELCHANGEDW:
 				{
 					TreeNode oldNode = winCast!(TreeNode)(pNotifyTreeView.itemOld.lParam);
 					TreeNode newNode = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);

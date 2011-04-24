@@ -77,13 +77,13 @@ class ToolButton
 
 		if(this._owner && this._owner.created)
 		{
-			 TBBUTTONINFOA tbinfo = void;
+			 TBBUTTONINFOW tbinfo = void;
 
-			 tbinfo.cbSize = TBBUTTONINFOA.sizeof;
+			 tbinfo.cbSize = TBBUTTONINFOW.sizeof;
 			 tbinfo.dwMask = TBIF_BYINDEX | TBIF_STYLE;
 			 tbinfo.fsStyle = tbs;
 
-			 this._owner.sendMessage(TB_SETBUTTONINFOA, this.index, cast(LPARAM)&tbinfo);
+			 this._owner.sendMessage(TB_SETBUTTONINFOW, this.index, cast(LPARAM)&tbinfo);
 		}
 	}
 
@@ -98,13 +98,13 @@ class ToolButton
 
 		if(this._owner && this._owner.created)
 		{
-			 TBBUTTONINFOA tbinfo = void;
+			 TBBUTTONINFOW tbinfo = void;
 
-			 tbinfo.cbSize = TBBUTTONINFOA.sizeof;
+			 tbinfo.cbSize = TBBUTTONINFOW.sizeof;
 			 tbinfo.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
 			 tbinfo.iImage = idx;
 
-			 this._owner.sendMessage(TB_SETBUTTONINFOA, this.index, cast(LPARAM)&tbinfo);
+			 this._owner.sendMessage(TB_SETBUTTONINFOW, this.index, cast(LPARAM)&tbinfo);
 		}
 	}
 
@@ -119,14 +119,14 @@ class ToolButton
 
 		if(this._owner && this._owner.created)
 		{
-			 TBBUTTONINFOA tbinfo = void;
+			 TBBUTTONINFOW tbinfo = void;
 
-			 tbinfo.cbSize = TBBUTTONINFOA.sizeof;
+			 tbinfo.cbSize = TBBUTTONINFOW.sizeof;
 			 tbinfo.dwMask = TBIF_BYINDEX | TBIF_STATE;
-			 this._owner.sendMessage(TB_GETBUTTONINFOA, this.index, cast(LPARAM)&tbinfo); //Ricavo i dati completi.
+			 this._owner.sendMessage(TB_GETBUTTONINFOW, this.index, cast(LPARAM)&tbinfo); //Ricavo i dati completi.
 
 			 b ? (tbinfo.fsState |= TBSTATE_ENABLED) : (tbinfo.fsState &= ~TBSTATE_ENABLED);
-			 this._owner.sendMessage(TB_SETBUTTONINFOA, this.index, cast(LPARAM)&tbinfo);
+			 this._owner.sendMessage(TB_SETBUTTONINFOW, this.index, cast(LPARAM)&tbinfo);
 		}
 	}
 
@@ -277,7 +277,7 @@ class ToolBar: SubclassedControl
 			tbtn.fsState |= TBSTATE_WRAP;
 		}
 
-		tb.toolBar.sendMessage(TB_INSERTBUTTONA, tb.index, cast(LPARAM)&tbtn);
+		tb.toolBar.sendMessage(TB_INSERTBUTTONW, tb.index, cast(LPARAM)&tbtn);
 	}
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
@@ -346,7 +346,7 @@ class ToolBar: SubclassedControl
 
 					case TBN_DROPDOWN:
 					{
-						NMTOOLBARA* pNmToolbar = cast(NMTOOLBARA*)lParam;
+						NMTOOLBARW* pNmToolbar = cast(NMTOOLBARW*)lParam;
 
 						Point pt = Cursor.location;
 						convertPoint(pt, null, this);

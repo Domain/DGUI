@@ -17,6 +17,7 @@
 
 module dgui.messagebox;
 
+import std.utf;
 import std.string;
 import dgui.core.enums;
 import dgui.core.winapi;
@@ -49,7 +50,7 @@ final class MsgBox
 
 	public static DialogResult show(string text, string title, MsgBoxButtons button, MsgBoxIcons icon)
 	{
-		return cast(DialogResult)MessageBoxA(GetActiveWindow(), toStringz(text), toStringz(title), button | icon);
+		return cast(DialogResult)MessageBoxW(GetActiveWindow(), toUTF16z(text), toUTF16z(title), button | icon);
 	}
 
 	public static DialogResult show(string text, string title, MsgBoxButtons button)

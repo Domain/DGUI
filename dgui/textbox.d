@@ -139,7 +139,12 @@ abstract class TextControl: SubclassedControl
 
 	@property public int textLength()
 	{
-		return this.sendMessage(WM_GETTEXTLENGTH, 0, 0);
+		if(this.created)
+		{
+			return getWindowTextLength(this._handle);
+		}
+
+		return this._controlInfo.Text.length;
 	}
 
 	@property public final string selectedText()

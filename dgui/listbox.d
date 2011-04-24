@@ -17,9 +17,10 @@
 
 module dgui.listbox;
 
+import std.utf;
+import std.string;
 import dgui.core.utils;
 import dgui.control;
-import std.string;
 
 struct ListBoxInfo
 {
@@ -121,7 +122,7 @@ class ListBox: OwnerDrawControl
 
 	private static int insertItem(ListBox lb, Object obj)
 	{
-		return lb.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toStringz(obj.toString()));
+		return lb.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTF16z(obj.toString()));
 	}
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)

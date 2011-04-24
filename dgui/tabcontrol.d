@@ -17,13 +17,14 @@
 
 module dgui.tabcontrol;
 
+import std.utf;
+import std.string;
 import dgui.imagelist;
 import dgui.control;
-import std.string;
 
 private struct TcItem
 {
-	TC_ITEMHEADERA Header;
+	TCITEMHEADERW Header;
 	TabPage Page;
 }
 
@@ -92,9 +93,9 @@ class TabPage: ContainerControl
 			TcItem tci = void;
 
 			tci.Header.mask = TCIF_TEXT;
-			tci.Header.pszText = std.string.toStringz(txt);
+			tci.Header.pszText = toUTF16z(txt);
 
-			this._owner.sendMessage(TCM_SETITEMA, this.index, cast(LPARAM)&tci);
+			this._owner.sendMessage(TCM_SETITEMW, this.index, cast(LPARAM)&tci);
 			this.redraw();
 		}
 	}
@@ -115,7 +116,7 @@ class TabPage: ContainerControl
 			tci.Header.mask = TCIF_IMAGE;
 			tci.Header.iImage = idx;
 
-			this._owner.sendMessage(TCM_SETITEMA, this.index, cast(LPARAM)&tci);
+			this._owner.sendMessage(TCM_SETITEMW, this.index, cast(LPARAM)&tci);
 		}
 	}
 
@@ -278,13 +279,13 @@ class TabControl: OwnerDrawControl, IContainerControl
 		TcItem tci;
 		tci.Header.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
 		tci.Header.iImage = tp.imageIndex;
-		tci.Header.pszText = std.string.toStringz(tp.text);
+		tci.Header.pszText = toUTF16z(tp.text);
 		tci.Page = tp;
 
 		tp.create();
 
 		int idx = tp.index;
-		this.sendMessage(TCM_INSERTITEMA, idx, cast(LPARAM)&tci);
+		this.sendMessage(TCM_INSERTITEMW, idx, cast(LPARAM)&tci);
 
 		if(adding) //Il componente e' stato creato in precedentemente, verra' selezionato l'ultimo TabPage.
 		{

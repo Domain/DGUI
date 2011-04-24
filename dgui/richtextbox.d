@@ -78,7 +78,7 @@ class RichTextBox: TextControl
 
 		if(!_hRichDll)
 		{
-			_hRichDll = LoadLibraryA("riched20.dll"); // Load the standard version
+			_hRichDll = loadLibrary("riched20.dll"); // Load the standard version
 		}
 
 		pcw.Style |= ES_MULTILINE | ES_WANTRETURN;

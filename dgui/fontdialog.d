@@ -19,20 +19,20 @@ module dgui.fontdialog;
 
 public import dgui.core.commondialog;
 
-class FontDialog: CommonDialog!(CHOOSEFONTA, Font)
+class FontDialog: CommonDialog!(CHOOSEFONTW, Font)
 {
 	public override bool showDialog()
 	{
-		LOGFONTA lf = void;
+		LOGFONTW lf = void;
 
-		this._dlgStruct.lStructSize = CHOOSEFONTA.sizeof;
+		this._dlgStruct.lStructSize = CHOOSEFONTW.sizeof;
 		this._dlgStruct.hwndOwner = GetActiveWindow();
 		this._dlgStruct.Flags = CF_INITTOLOGFONTSTRUCT | CF_EFFECTS | CF_SCREENFONTS;
 		this._dlgStruct.lpLogFont = &lf;
 
-		if(ChooseFontA(&this._dlgStruct))
+		if(ChooseFontW(&this._dlgStruct))
 		{
-			this._dlgRes = Font.fromHFONT(CreateFontIndirectA(&lf));
+			this._dlgRes = Font.fromHFONT(createFontIndirect(&lf));
 			return true;
 		}
 

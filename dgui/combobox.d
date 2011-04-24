@@ -17,10 +17,11 @@
 
 module dgui.combobox;
 
-public import dgui.imagelist;
-import dgui.core.utils;
-import dgui.control;
+import std.utf;
 import std.string;
+import dgui.control;
+import dgui.core.utils;
+public import dgui.imagelist;
 
 enum DropDownStyles: uint
 {
@@ -81,13 +82,13 @@ class ComboBoxItem
 
 		if(this._owner && this._owner.created)
 		{
-			COMBOBOXEXITEMA cbei;
+			COMBOBOXEXITEMW cbei;
 
 			cbei.mask = CBEIF_IMAGE;
 			cbei.iImage = idx;
 			cbei.iItem = this._idx;
 
-			this._owner.sendMessage(CBEM_SETITEMA, 0, cast(LPARAM)&cbei);
+			this._owner.sendMessage(CBEM_SETITEMW, 0, cast(LPARAM)&cbei);
 		}
 	}
 
@@ -102,13 +103,13 @@ class ComboBoxItem
 
 		if(this._owner && this._owner.created)
 		{
-			COMBOBOXEXITEMA cbei;
+			COMBOBOXEXITEMW cbei;
 
 			cbei.mask = CBEIF_TEXT;
-			cbei.pszText = toStringz(txt);
+			cbei.pszText = toUTF16z(txt);
 			cbei.iItem = this._idx;
 
-			this._owner.sendMessage(CBEM_SETITEMA, 0, cast(LPARAM)&cbei);
+			this._owner.sendMessage(CBEM_SETITEMW, 0, cast(LPARAM)&cbei);
 		}
 	}
 
@@ -256,16 +257,16 @@ class ComboBox: SubclassedControl
 
 	private ComboBoxItem insertItem(ComboBoxItem cbi)
 	{
-		COMBOBOXEXITEMA cbei;
+		COMBOBOXEXITEMW cbei;
 
 		cbei.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_LPARAM;
 		cbei.iItem = -1;
 		cbei.iImage = cbi.imageIndex;
 		cbei.iSelectedImage = cbi.imageIndex;
-		cbei.pszText = toStringz(cbi.text);
+		cbei.pszText = toUTF16z(cbi.text);
 		cbei.lParam = winCast!(LPARAM)(cbi);
 
-		cbi.index = this.sendMessage(CBEM_INSERTITEMA, 0, cast(LPARAM)&cbei);
+		cbi.index = this.sendMessage(CBEM_INSERTITEMW, 0, cast(LPARAM)&cbei);
 		cbi.comboBox = this;
 		return cbi;
 	}

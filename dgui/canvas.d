@@ -21,6 +21,7 @@ import std.path;
 import std.string;
 import std.c.string;
 import core.memory;
+import dgui.core.charset;
 import dgui.core.winapi;
 import dgui.core.idisposable;
 import dgui.core.exception;
@@ -218,7 +219,7 @@ class Canvas: Handle!(HDC), IDisposable
 	public void copyTo(Canvas c)
 	{
 		BITMAP bmp;
-		GetObjectA(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
+		GetObjectW(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
 
 		BitBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, SRCCOPY);
 	}
@@ -374,9 +375,9 @@ class Canvas: Handle!(HDC), IDisposable
 		COLORREF oldColorRef = SetTextColor(this._handle, foreColor.colorref);
 		int oldBkMode = SetBkMode(this._handle, TRANSPARENT);
 
-		DrawTextExA(this._handle, toStringz(text), text.length, &r.rect,
-				       DT_EXPANDTABS | DT_TABSTOP | textFormat.formatFlags | textFormat.alignment | textFormat.trimming,
-				       &dtp);
+		drawTextEx(this._handle, text, &r.rect,
+				   DT_EXPANDTABS | DT_TABSTOP | textFormat.formatFlags | textFormat.alignment | textFormat.trimming,
+				   &dtp);
 
 		SetBkMode(this._handle, oldBkMode);
 		SetTextColor(this._handle, oldColorRef);
@@ -517,7 +518,7 @@ class Canvas: Handle!(HDC), IDisposable
 		{
 			BITMAP bmp;
 
-			GetObjectA(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
+			GetObjectW(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
 			hBitmap = CreateCompatibleBitmap(this._handle, bmp.bmWidth, bmp.bmHeight);
 			c._hBitmap = hBitmap;
 			SelectObject(hdc, hBitmap);  // La seleziona e la distrugge quando ha finito.
@@ -568,7 +569,7 @@ abstract class GraphicObject: Handle!(HGDIOBJ), IDisposable
 
 	protected static int getInfo(T)(HGDIOBJ hGdiObj, ref T t)
 	{
-		return GetObjectA(hGdiObj, T.sizeof, &t);
+		return GetObjectW(hGdiObj, T.sizeof, &t);
 	}
 
 	public void dispose()
@@ -626,7 +627,7 @@ class Bitmap: Image
 
 	protected this(string fileName)
 	{
-		HBITMAP hBitmap = LoadImageA(null, toStringz(fileName), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		HBITMAP hBitmap = loadImage(fileName, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
 
 		if(!hBitmap)
 		{
@@ -653,7 +654,7 @@ class Bitmap: Image
 		HBITMAP hOldBitmap = SelectObject(hcdc, hBitmap);
 
 		COLORREF oldColor = SetBkColor(hcdc, backColor);
-		ExtTextOutA(hcdc, 0, 0, ETO_OPAQUE, &r.rect, "", 0, null);
+		extTextOut(hcdc, 0, 0, ETO_OPAQUE, &r.rect, "", 0, null);
 		SetBkColor(hcdc, oldColor);
 
 		SelectObject(hcdc, hOldBitmap);
@@ -768,12 +769,12 @@ class Icon: Image
 
 		if(!icmp(getExt(fileName), "ico"))
 		{
-			hIcon = LoadImageA(null, toStringz(fileName), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+			hIcon = loadImage(fileName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		}
 		else
 		{
 			ushort dummy = 0;
-			hIcon = ExtractAssociatedIconA(null, toStringz(fileName), &dummy);
+			hIcon = extractAssociatedIcon(fileName, &dummy);
 		}
 
 		if(!hIcon)
@@ -920,26 +921,25 @@ final class Font: GraphicObject
 		this._height = MulDiv(cast(int)(h * 100), GetDeviceCaps(hdc, LOGPIXELSY), 72 * 100);
 		this._style = style;
 
-		LOGFONTA lf;
+		LOGFONTW lf;
 		lf.lfHeight = this._height;
 
 		doStyle(style, lf);
-		strcpy(lf.lfFaceName.ptr, toStringz(name));
-		this._handle = CreateFontIndirectA(&lf);
+		this._handle = createFontIndirect(name, &lf);
 
 		ReleaseDC(null, hdc);
 	}
 
 	public this(Font f, FontStyle fs)
 	{
-		LOGFONTA lf;
+		LOGFONTW lf;
 
-		getInfo!(LOGFONTA)(f.handle, lf);
+		getInfo!(LOGFONTW)(f.handle, lf);
 		doStyle(fs, lf);
-		this._handle = CreateFontIndirectA(&lf);
+		this._handle = createFontIndirect(&lf);
 	}
 
-	private static void doStyle(FontStyle style, ref LOGFONTA lf)
+	private static void doStyle(FontStyle style, ref LOGFONTW lf)
 	{
 		lf.lfCharSet = DEFAULT_CHARSET;
 		lf.lfWeight = FW_NORMAL;
@@ -1137,7 +1137,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = LoadImageA(null, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1150,7 +1150,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = LoadImageA(null, IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1163,7 +1163,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = LoadImageA(null, IDI_ERROR, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(IDI_ERROR, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1176,7 +1176,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = LoadImageA(null, IDI_QUESTION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(IDI_QUESTION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1189,7 +1189,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = LoadImageA(null, IDI_WARNING, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(IDI_WARNING, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1363,12 +1363,12 @@ final class SystemFonts
 
 		if(!f)
 		{
-			NONCLIENTMETRICSA ncm = void; //La inizializza sotto.
-			ncm.cbSize = NONCLIENTMETRICSA.sizeof;
+			NONCLIENTMETRICSW ncm = void; //La inizializza sotto.
+			ncm.cbSize = NONCLIENTMETRICSW.sizeof;
 
-			if(SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, NONCLIENTMETRICSA.sizeof, &ncm, 0))
+			if(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, NONCLIENTMETRICSW.sizeof, &ncm, 0))
 			{
-				f = Font.fromHFONT(CreateFontIndirectA(&ncm.lfMessageFont));
+				f = Font.fromHFONT(createFontIndirect(&ncm.lfMessageFont));
 			}
 			else
 			{
@@ -1460,7 +1460,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			 c = Cursor.fromHCURSOR(LoadImageA(null, IDC_APPSTARTING, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			 c = Cursor.fromHCURSOR(loadImage(IDC_APPSTARTING, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1472,7 +1472,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1484,7 +1484,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_CROSS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_CROSS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1496,7 +1496,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_IBEAM, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_IBEAM, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1508,7 +1508,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_ICON, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_ICON, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1520,7 +1520,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_NO, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_NO, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1532,7 +1532,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_SIZEALL, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_SIZEALL, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1544,7 +1544,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_SIZENESW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_SIZENESW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1556,7 +1556,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_SIZENS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_SIZENS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1568,7 +1568,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_SIZENWSE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_SIZENWSE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1580,7 +1580,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_SIZEWE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_SIZEWE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1592,7 +1592,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_UPARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_UPARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1604,7 +1604,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(LoadImageA(null, IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1926,7 +1926,7 @@ final class Screen
 	{
 		Rect r = void; //Inizializzata sotto
 
-		SystemParametersInfoA(SPI_GETWORKAREA, 0, &r.rect, 0);
+		SystemParametersInfoW(SPI_GETWORKAREA, 0, &r.rect, 0);
 		return r;
 	}
 

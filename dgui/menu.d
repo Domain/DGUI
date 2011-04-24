@@ -17,6 +17,7 @@
 
 module dgui.menu;
 
+import std.utf;
 import std.string;
 import dgui.core.winapi;
 import dgui.core.geometry;
@@ -117,9 +118,9 @@ abstract class Menu: Handle!(HMENU), IDisposable
 
 	private static void createItem(Menu parent, MenuItem m)
 	{
-		MENUITEMINFOA minfo;
+		MENUITEMINFOW minfo;
 
-		minfo.cbSize = MENUITEMINFOA.sizeof;
+		minfo.cbSize = MENUITEMINFOW.sizeof;
 		minfo.fMask = MIIM_FTYPE;
 		minfo.dwItemData = winCast!(uint)(m);
 
@@ -127,7 +128,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		{
 			minfo.fMask |= MIIM_DATA | MIIM_STRING | MIIM_STATE;
 			minfo.fState = (m.enabled ? MFS_ENABLED : MFS_DISABLED) | (m.checked ? MFS_CHECKED : 0);
-			minfo.dwTypeData = toStringz(m._menuInfo.Text);
+			minfo.dwTypeData = toUTF16z(m._menuInfo.Text);
 		}
 		else if(m.style is MenuStyle.SEPARATOR)
 		{
@@ -142,7 +143,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 			minfo.hSubMenu = hMenu;
 		}
 
-		InsertMenuItemA(parent.handle, -1, TRUE, &minfo);
+		InsertMenuItemW(parent.handle, -1, TRUE, &minfo);
 	}
 
 	public void dispose()
@@ -167,13 +168,13 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		{
 			int idx = this.index;
 
-			MENUITEMINFOA minfo;
+			MENUITEMINFOW minfo;
 
-			minfo.cbSize = MENUITEMINFOA.sizeof;
+			minfo.cbSize = MENUITEMINFOW.sizeof;
 			minfo.fMask = MIIM_STRING;
-			minfo.dwTypeData = toStringz(s);
+			minfo.dwTypeData = toUTF16z(s);
 
-			SetMenuItemInfoA(this._menuInfo.Parent.handle, idx, true, &minfo);
+			SetMenuItemInfoW(this._menuInfo.Parent.handle, idx, true, &minfo);
 		}
 	}
 
@@ -302,13 +303,13 @@ class MenuItem: Menu
 		{
 			int idx = this.index;
 
-			MENUITEMINFOA minfo;
+			MENUITEMINFOW minfo;
 
-			minfo.cbSize = MENUITEMINFOA.sizeof;
+			minfo.cbSize = MENUITEMINFOW.sizeof;
 			minfo.fMask = MIIM_STATE;
 			minfo.fState = b ? MFS_ENABLED : MFS_DISABLED;
 
-			SetMenuItemInfoA(this._menuInfo.Parent.handle, idx, true, &minfo);
+			SetMenuItemInfoW(this._menuInfo.Parent.handle, idx, true, &minfo);
 		}
 	}
 
@@ -325,9 +326,9 @@ class MenuItem: Menu
 		{
 			int idx = this.index;
 
-			MENUITEMINFOA minfo;
+			MENUITEMINFOW minfo;
 
-			minfo.cbSize = MENUITEMINFOA.sizeof;
+			minfo.cbSize = MENUITEMINFOW.sizeof;
 			minfo.fMask = MIIM_STATE;
 
 			if(b)
@@ -339,7 +340,7 @@ class MenuItem: Menu
 				minfo.fState &= ~MFS_CHECKED;
 			}
 
-			SetMenuItemInfoA(this._menuInfo.Parent.handle, idx, true, &minfo);
+			SetMenuItemInfoW(this._menuInfo.Parent.handle, idx, true, &minfo);
 		}
 	}
 

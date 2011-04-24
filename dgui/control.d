@@ -17,6 +17,7 @@
 
 module dgui.control;
 
+public import dgui.core.charset;
 public import dgui.core.winapi;
 public import dgui.core.exception;
 public import dgui.core.enums;
@@ -325,11 +326,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		if(this.created)
 		{
-			int len = this.sendMessage(WM_GETTEXTLENGTH, 0, 0) + char.sizeof;
-
-			char[] buffer = new char[len];
-			this.sendMessage(WM_GETTEXT, len, cast(LPARAM)buffer.ptr);
-			return recalcString(buffer);
+			return getWindowText(this._handle);
 		}
 
 		return this._controlInfo.Text;
@@ -341,7 +338,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			this.sendMessage(WM_SETTEXT, 0, cast(LPARAM)toStringz(s));
+			setWindowText(this._handle, s);
 		}
 	}
 
@@ -462,7 +459,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		if(this.created)
 		{
-			return Cursor.fromHCURSOR(cast(HCURSOR)GetClassLongA(this._handle, GCL_HCURSOR), false);
+			return Cursor.fromHCURSOR(cast(HCURSOR)GetClassLongW(this._handle, GCL_HCURSOR), false);
 		}
 
 		return this._controlInfo.DefaultCursor;
@@ -714,16 +711,16 @@ abstract class Control: Handle!(HWND), IDisposable
 			 * Inizializzazione Componente
 			 */
 
-			CREATESTRUCTA* pCreateStruct = cast(CREATESTRUCTA*)lParam;
+			CREATESTRUCTW* pCreateStruct = cast(CREATESTRUCTW*)lParam;
 			LPARAM param = cast(LPARAM)pCreateStruct.lpCreateParams;
-			SetWindowLongA(hWnd, GWL_USERDATA, param);
-			SetWindowLongA(hWnd, GWL_ID, cast(uint)hWnd);
+			SetWindowLongW(hWnd, GWL_USERDATA, param);
+			SetWindowLongW(hWnd, GWL_ID, cast(uint)hWnd);
 
 			Control theThis = winCast!(Control)(param);
-			theThis._handle = hWnd;	//Assegno l'handle.
+			theThis._handle = hWnd;	//Assign handle.
 		}
 
-		Control theThis = winCast!(Control)(GetWindowLongA(hWnd, GWL_USERDATA));
+		Control theThis = winCast!(Control)(GetWindowLongW(hWnd, GWL_USERDATA));
 
 		if(theThis)
 		{
@@ -735,12 +732,12 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	private void onMenuCommand(WPARAM wParam, LPARAM lParam)
 	{
-		MENUITEMINFOA minfo;
+		MENUITEMINFOW minfo;
 
-		minfo.cbSize = MENUITEMINFOA.sizeof;
+		minfo.cbSize = MENUITEMINFOW.sizeof;
 		minfo.fMask = MIIM_DATA;
 
-		if(GetMenuItemInfoA(cast(HMENU)lParam, cast(UINT)wParam, TRUE, &minfo))
+		if(GetMenuItemInfoW(cast(HMENU)lParam, cast(UINT)wParam, TRUE, &minfo))
 		{
 			MenuItem sender = winCast!(MenuItem)(minfo.dwItemData);
 			sender.performClick();
@@ -749,13 +746,8 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	package final void create(bool modal = false)
 	{
-		static HINSTANCE hInst;
 		PreCreateWindow pcw;
-
-		if(!hInst)
-		{
-			hInst = getHInstance();
-		}
+		HINSTANCE hInst = getHInstance();
 
 		pcw.Style = this._controlInfo.Style;				 //Copio Style Attuale
 		pcw.ExtendedStyle = this._controlInfo.ExtendedStyle; //Copio ExtendedStyle Attuale
@@ -807,18 +799,16 @@ abstract class Control: Handle!(HWND), IDisposable
 			hParent = GetActiveWindow();
 		}
 
-		CreateWindowExA(pcw.ExtendedStyle,
-						toStringz(pcw.ClassName),
-						toStringz(this._controlInfo.Text),
-						style,
-						this._controlInfo.Bounds.x,
-						this._controlInfo.Bounds.y,
-						this._controlInfo.Bounds.width,
-						this._controlInfo.Bounds.height,
-						hParent,
-						null,
-						hInst,
-						winCast!(void*)(this));
+		createWindowEx(pcw.ExtendedStyle,
+					   pcw.ClassName,
+					   this._controlInfo.Text,
+					   style,
+					   this._controlInfo.Bounds.x,
+					   this._controlInfo.Bounds.y,
+					   this._controlInfo.Bounds.width,
+					   this._controlInfo.Bounds.height,
+					   hParent,
+					   winCast!(void*)(this));
 
 		if(!this._handle)
 		{
@@ -922,7 +912,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		if(this.created)
 		{
-			return GetWindowLongA(this._handle, GWL_STYLE);
+			return GetWindowLongW(this._handle, GWL_STYLE);
 		}
 
 		return this._controlInfo.Style;
@@ -935,7 +925,7 @@ abstract class Control: Handle!(HWND), IDisposable
 			uint style = this.getStyle();
 			set ? (style |= cstyle) : (style &= ~cstyle);
 
-			SetWindowLongA(this._handle, GWL_STYLE, style);
+			SetWindowLongW(this._handle, GWL_STYLE, style);
 			this.redraw();
 			this._controlInfo.Style = style;
 		}
@@ -954,7 +944,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		if(this.created)
 		{
-			return GetWindowLongA(this._handle, GWL_EXSTYLE);
+			return GetWindowLongW(this._handle, GWL_EXSTYLE);
 		}
 
 		return this._controlInfo.ExtendedStyle;
@@ -967,7 +957,7 @@ abstract class Control: Handle!(HWND), IDisposable
 			uint exStyle = this.getExStyle();
 			set ? (exStyle |= cstyle) : (exStyle &= ~cstyle);
 
-			SetWindowLongA(this._handle, GWL_EXSTYLE, exStyle);
+			SetWindowLongW(this._handle, GWL_EXSTYLE, exStyle);
 			this.redraw();
 			this._controlInfo.ExtendedStyle = exStyle;
 		}
@@ -1104,7 +1094,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		RECT r = void;
 		GetClientRect(this._handle, &r);
-		ExtTextOutA(hdc, 0, 0, ETO_OPAQUE, &r, toStringz(""), 0, null);
+		extTextOut(hdc, 0, 0, ETO_OPAQUE, &r, "", 0, null);
 	}
 
 	protected int wndProc(uint msg, WPARAM wParam, LPARAM lParam)
@@ -1358,9 +1348,9 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			case WM_SETCURSOR:
 			{
-				if(this._controlInfo.DefaultCursor && cast(LONG)this._controlInfo.DefaultCursor.handle != GetClassLongA(this._handle, GCL_HCURSOR))
+				if(this._controlInfo.DefaultCursor && cast(LONG)this._controlInfo.DefaultCursor.handle != GetClassLongW(this._handle, GCL_HCURSOR))
 				{
-					SetClassLongA(this._handle, GCL_HCURSOR, cast(LONG)this._controlInfo.DefaultCursor.handle);
+					SetClassLongW(this._handle, GCL_HCURSOR, cast(LONG)this._controlInfo.DefaultCursor.handle);
 				}
 
 				return this.originalWndProc(msg, wParam, lParam); //Continuo selezione cursore
