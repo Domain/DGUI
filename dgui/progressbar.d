@@ -91,7 +91,7 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	@property public void increment()
+	public void increment()
 	{
 		if(this.created)
 		{
