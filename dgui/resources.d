@@ -24,7 +24,7 @@ final class Resources
 
 	public Icon getIcon(ushort id, Size sz)
 	{
-		HICON hIcon = loadImage(cast(char*)id, IMAGE_ICON, sz.width, sz.height, LR_LOADTRANSPARENT | (sz == NullSize ? LR_DEFAULTSIZE : 0));
+		HICON hIcon = loadImage(getHInstance(), cast(wchar*)id, IMAGE_ICON, sz.width, sz.height, LR_LOADTRANSPARENT | (sz == NullSize ? LR_DEFAULTSIZE : 0));
 
 		if(!hIcon)
 		{
@@ -43,7 +43,7 @@ final class Resources
 
 	public Bitmap getBitmap(ushort id)
 	{
-		HBITMAP hBitmap = loadImage(cast(char*)id, IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT | LR_DEFAULTSIZE);
+		HBITMAP hBitmap = loadImage(getHInstance(), cast(wchar*)id, IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT | LR_DEFAULTSIZE);
 
 		if(!hBitmap)
 		{

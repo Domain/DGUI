@@ -627,7 +627,7 @@ class Bitmap: Image
 
 	protected this(string fileName)
 	{
-		HBITMAP hBitmap = loadImage(fileName, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		HBITMAP hBitmap = loadImage(null, fileName, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
 
 		if(!hBitmap)
 		{
@@ -769,7 +769,7 @@ class Icon: Image
 
 		if(!icmp(getExt(fileName), "ico"))
 		{
-			hIcon = loadImage(fileName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+			hIcon = loadImage(null, fileName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		}
 		else
 		{
@@ -1137,7 +1137,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, cast(wchar*)IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1150,7 +1150,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1163,7 +1163,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(IDI_ERROR, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_ERROR, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1176,7 +1176,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(IDI_QUESTION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_QUESTION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1189,7 +1189,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(IDI_WARNING, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_WARNING, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1460,7 +1460,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			 c = Cursor.fromHCURSOR(loadImage(IDC_APPSTARTING, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			 c = Cursor.fromHCURSOR(loadImage(getHInstance(), IDC_APPSTARTING, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1472,7 +1472,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1484,7 +1484,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_CROSS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, cast(wchar*)IDC_CROSS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1496,7 +1496,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_IBEAM, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_IBEAM, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1508,7 +1508,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_ICON, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_ICON, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1520,7 +1520,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_NO, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_NO, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1532,7 +1532,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_SIZEALL, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_SIZEALL, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1544,7 +1544,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_SIZENESW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_SIZENESW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1556,7 +1556,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_SIZENS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_SIZENS, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1568,7 +1568,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_SIZENWSE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_SIZENWSE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1580,7 +1580,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_SIZEWE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_SIZEWE, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1592,7 +1592,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_UPARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_UPARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
@@ -1604,7 +1604,7 @@ final class SystemCursors
 
 		if(!c)
 		{
-			c = Cursor.fromHCURSOR(loadImage(IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
+			c = Cursor.fromHCURSOR(loadImage(null, IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_SHARED), false);
 		}
 
 		return c;
