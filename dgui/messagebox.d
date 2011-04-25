@@ -18,7 +18,6 @@
 module dgui.messagebox;
 
 import std.utf;
-import std.string;
 import dgui.core.enums;
 import dgui.core.winapi;
 

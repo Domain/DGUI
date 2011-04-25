@@ -19,9 +19,8 @@
 
 module dgui.core.charset;
 
-import std.utf;
-import std.c.wcharh;
-import std.c.string;
+import std.utf: toUTF16z, toUTF8;
+import std.c.wcharh: wcscpy;
 import dgui.core.winapi;
 import dgui.core.utils;
 

@@ -19,9 +19,8 @@ module dgui.folderbrowserdialog;
 
 pragma(lib, "shell32.lib");
 
-import std.utf;
+import std.utf: toUTF16z, toUTF8;
 import std.conv;
-import std.string;
 public import dgui.core.commondialog;
 
 class FolderBrowserDialog: CommonDialog!(BROWSEINFOW, string)

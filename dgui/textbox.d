@@ -17,7 +17,7 @@
 
 module dgui.textbox;
 
-import std.string;
+import std.utf: toUTF16z;
 import dgui.control;
 
 enum CharacterCasing
@@ -40,7 +40,7 @@ abstract class TextControl: SubclassedControl
 	{
 		if(this.created)
 		{
-			this.sendMessage(EM_REPLACESEL, true, cast(LPARAM)toStringz(s));
+			this.sendMessage(EM_REPLACESEL, true, cast(LPARAM)toUTF16z(s));
 		}
 		else
 		{

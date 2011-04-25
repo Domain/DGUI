@@ -17,7 +17,7 @@
 
 module dgui.treeview;
 
-import std.utf;
+import std.utf: toUTF16z;
 import dgui.core.utils;
 import dgui.control;
 import dgui.imagelist;

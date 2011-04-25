@@ -17,8 +17,7 @@
 
 module dgui.menu;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF16z;
 import dgui.core.winapi;
 import dgui.core.geometry;
 import dgui.core.collection;

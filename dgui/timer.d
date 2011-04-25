@@ -17,7 +17,6 @@
 
 module dgui.timer;
 
-import std.string;
 import dgui.core.winapi;
 import dgui.core.idisposable;
 import dgui.core.signal;
@@ -47,14 +46,7 @@ final class Timer: IDisposable
 		}
 		else
 		{
-			debug
-			{
-				throw new Win32Exception(format("Unknown Timer: %08X", idEvent), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Unknown Timer: %08X", idEvent));
-			}
+			throwException!(Win32Exception)("Unknown Timer: '%08X'", idEvent);
 		}
 	}
 
@@ -64,14 +56,7 @@ final class Timer: IDisposable
 		{
 			if(!KillTimer(null, this._timerId))
 			{
-				debug
-				{
-					throw new Win32Exception("Cannot Dispose Timer", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new Win32Exception("Cannot Dispose Timer");
-				}
+				throwException!(Win32Exception)("Cannot Dispose Timer");
 			}
 
 			_timers.remove(this._timerId);
@@ -97,14 +82,7 @@ final class Timer: IDisposable
 
 			if(!this._timerId)
 			{
-				debug
-				{
-					throw new Win32Exception("Cannot Start Timer", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new Win32Exception("Cannot Start Timer");
-				}
+				throwException!(Win32Exception)("Cannot Start Timer");
 			}
 
 			this._timers[this._timerId] = this;

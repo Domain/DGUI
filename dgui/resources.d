@@ -6,7 +6,6 @@ import dgui.core.geometry;
 import dgui.core.utils;
 import dgui.core.exception;
 import dgui.canvas;
-import std.string;
 
 final class Resources
 {
@@ -28,14 +27,7 @@ final class Resources
 
 		if(!hIcon)
 		{
-			debug
-			{
-				throw new Win32Exception(format("Cannot load Icon: '%d'", id), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Cannot load Icon: '%d'", id));
-			}
+			throwException!(GdiException)("Cannot load Icon: '%d'", id);
 		}
 
 		return Icon.fromHICON(hIcon);
@@ -47,14 +39,7 @@ final class Resources
 
 		if(!hBitmap)
 		{
-			debug
-			{
-				throw new GdiException(format("Cannot load Bitmap: '%d'", id), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new GdiException(format("Cannot load Bitmap: '%d'", id));
-			}
+			throwException!(GdiException)("Cannot load Bitmap: '%d'", id);
 		}
 
 		return Bitmap.fromHBITMAP(hBitmap);
@@ -66,14 +51,7 @@ final class Resources
 
 		if(!hRsrc)
 		{
-			debug
-			{
-				throw new GdiException(format("Cannot load Custom Resource: '%d'", id), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new GdiException(format("Cannot load Custom Resource: '%d'", id));
-			}
+			throwException!(GdiException)("Cannot load Custom Resource: '%d'", id);
 		}
 
 		return cast(T*)LockResource(LoadResource(null, hRsrc));

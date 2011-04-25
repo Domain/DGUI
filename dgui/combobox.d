@@ -17,8 +17,7 @@
 
 module dgui.combobox;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF16z;
 import dgui.control;
 import dgui.core.utils;
 public import dgui.imagelist;

@@ -17,8 +17,7 @@
 
 module dgui.core.windowclass;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF16z;
 import dgui.core.charset;
 import dgui.core.winapi;
 import dgui.core.exception;
@@ -40,14 +39,7 @@ public void registerWindowClass(string className, ClassStyles classStyle, Cursor
 		if(!registerClassEx(className, cursor ? cursor.handle : SystemCursors.arrow.handle,
 						    SystemBrushes.brushBtnFace.handle, wndProc, classStyle))
 		{
-			debug
-			{
-				throw new Win32Exception(format("Windows Class \"%s\" not created", className), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Windows Class \"%s\" not created", className));
-			}
+			throwException!(Win32Exception)("Windows Class \"%s\" not created", className);
 		}
 	}
 }
@@ -80,14 +72,7 @@ public WNDPROC superClassWindowClass(string oldClassName, string newClassName, W
 
 		if(!RegisterClassExW(&newWc))
 		{
-			debug
-			{
-				throw new Win32Exception(format("Windows Class \"%s\" not created", newClassName), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Windows Class \"%s\" not created", newClassName));
-			}
+			throwException!(Win32Exception)("Windows Class \"%s\" not created", newClassName);
 		}
 	}
 

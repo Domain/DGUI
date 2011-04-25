@@ -99,14 +99,7 @@ class ProgressBar: SubclassedControl
 		}
 		else
 		{
-			debug
-			{
-				throw new DGuiException("Cannot increment the progress bar", __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new DGuiException("Cannot increment the progress bar");
-			}
+			throwException!(DGuiException)("Cannot increment the progress bar");
 		}
 	}
 

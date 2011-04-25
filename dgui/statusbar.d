@@ -17,8 +17,7 @@
 
 module dgui.statusbar;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF16z;
 import dgui.control;
 
 final class StatusPart

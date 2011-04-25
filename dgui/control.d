@@ -31,7 +31,6 @@ public import dgui.canvas;
 public import dgui.menu;
 import dgui.core.windowclass;
 import dgui.core.utils;
-import std.string;
 
 final void convertRect(ref Rect rect, Control from, Control to)
 {
@@ -812,16 +811,8 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(!this._handle)
 		{
-			debug
-			{
-				throw new Win32Exception(format("Control Creation failed.\nClassName: \"%s\", Text: \"%s\"",
-										 pcw.ClassName, this._controlInfo.Text), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Control Creation failed.\nClassName: \"%s\", Text: \"%s\"",
-										 pcw.ClassName, this._controlInfo.Text));
-			}
+			throwException!(Win32Exception)("Control Creation failed: (ClassName: '%s', Text: '%s')",
+											 pcw.ClassName, this._controlInfo.Text);
 		}
 	}
 

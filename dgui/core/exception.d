@@ -17,81 +17,46 @@
 
 module dgui.core.exception;
 
-import dgui.core.winapi;
+import std.string: format;
 import std.windows.syserror;
-import std.string;
+import dgui.core.winapi: GetLastError;
 
-class DGuiException: Exception
+mixin template ExceptionBody()
 {
-	debug
+	public this(string msg)
 	{
-		public this(string msg, string fileName, int line)
-		{
-			string err = format("File: %s(%d)\n%s", fileName, line, msg);
-			super(err);
-		}
-	}
-	else
-	{
-		public this(string msg)
-		{
-			super(msg);
-		}
+		super(msg);
 	}
 }
 
-class Win32Exception: Exception
+final class DGuiException: Exception
 {
-	debug
-	{
-		public this(string msg, string fileName, int line)
-		{
-			string err = format("File: %s(%d)\n%s\n\nWindows Error Message: %s", fileName, line, msg, sysErrorString(GetLastError()));
-			super(err);
-		}
-	}
-	else
-	{
-		public this(string m)
-		{
-			string err = format("%s\n\nWindows Error Message:\n%s", m, sysErrorString(GetLastError()));
-			super(err);
-		}
-	}
+	mixin ExceptionBody;
 }
 
-class RegistryException: Win32Exception
+final class Win32Exception: Exception
 {
-	debug
-	{
-		public this(string msg, string fileName, int line)
-		{
-			super(msg, fileName, line);
-		}
-	}
-	else
-	{
-		public this(string m)
-		{
-			super(m);
-		}
-	}
+	mixin ExceptionBody;
 }
 
-class GdiException: Win32Exception
+final class RegistryException: Exception
 {
-	debug
+	mixin ExceptionBody;
+}
+
+final class GdiException: Exception
+{
+	mixin ExceptionBody;
+}
+
+void throwException(T1, T2...)(string fmt, T2 args)
+{
+	static if(is(T1: Win32Exception))
 	{
-		public this(string msg, string fileName, int line)
-		{
-			super(msg, fileName, line);
-		}
+		throw new T1(format(fmt ~ "\nWindows Message: '%s'", args, sysErrorString(GetLastError())));
 	}
 	else
 	{
-		public this(string m)
-		{
-			super(m);
-		}
+		throw new T1(format(fmt, args));
 	}
 }

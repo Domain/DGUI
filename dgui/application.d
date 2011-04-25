@@ -29,10 +29,9 @@ import dgui.control;
 import dgui.form;
 import dgui.button;
 import dgui.label;
-import std.utf;
+import std.utf: toUTF16z;
 import std.file;
 import std.conv;
-import std.string;
 
 enum
 {

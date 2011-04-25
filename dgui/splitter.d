@@ -301,14 +301,7 @@ class Splitter: Control
 				break;
 
 			default:
-				debug
-				{
-					throw new DGuiException("DockStyle not valid!", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new DGuiException("DockStyle not valid!");
-				}
+				throwException!(DGuiException)("Invalid DockSyle");
 		}
 
 		super.onHandleCreated(e);

@@ -17,8 +17,7 @@
 
 module dgui.tabcontrol;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF16z;
 import dgui.imagelist;
 import dgui.control;
 

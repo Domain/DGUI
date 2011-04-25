@@ -631,14 +631,7 @@ class Bitmap: Image
 
 		if(!hBitmap)
 		{
-			debug
-			{
-				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Cannot load Bitmap From File: '%s'", fileName));
-			}
+			throwException!(Win32Exception)("Cannot load Bitmap From File: '%s'", fileName);
 		}
 
 		super(hBitmap, true);
@@ -779,14 +772,7 @@ class Icon: Image
 
 		if(!hIcon)
 		{
-			debug
-			{
-				throw new Win32Exception(format("Cannot load Icon From File: '%s'", fileName), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception(format("Cannot load Icon From File: '%s'", fileName));
-			}
+			throwException!(Win32Exception)("Cannot load Icon From File: '%s'", fileName);
 		}
 
 		super(hIcon, true);
@@ -805,28 +791,14 @@ class Icon: Image
 
 		if(!GetIconInfo(this._handle, &ii))
 		{
-			debug
-			{
-				throw new Win32Exception("Unable to get information from Icon", __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new Win32Exception("Unable to get information from Icon");
-			}
+			throwException!(Win32Exception)("Unable to get information from Icon");
 		}
 
 		if(ii.hbmColor) //Exists: Icon Color Bitmap
 		{
 			if(!getInfo!(BITMAP)(ii.hbmColor, bmp))
 			{
-				debug
-				{
-					throw new Win32Exception("Unable to get Icon Color Bitmap", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new Win32Exception("Unable to get Icon Color Bitmap");
-				}
+				throwException!(Win32Exception)("Unable to get Icon Color Bitmap");
 			}
 
 			sz.width = bmp.bmWidth;
@@ -837,14 +809,7 @@ class Icon: Image
 		{
 			if(!getInfo!(BITMAP)(ii.hbmMask, bmp))
 			{
-				debug
-				{
-					throw new Win32Exception("Unable to get Icon Mask", __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new Win32Exception("Unable to get Icon Mask");
-				}
+				throwException!(Win32Exception)("Unable to get Icon Mask");
 			}
 
 			sz.width = bmp.bmWidth;

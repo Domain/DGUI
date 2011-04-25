@@ -17,8 +17,7 @@
 
 module dgui.savefiledialog;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF16z, toUTF8;
 import dgui.core.utils;
 public import dgui.core.commondialog;
 

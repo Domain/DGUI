@@ -19,9 +19,9 @@ module dgui.registry;
 
 pragma(lib, "advapi32.lib");
 
-import std.utf;
+import std.utf: toUTF16z, toUTF8;
+import std.string: format;
 import std.conv;
-import std.string;
 import dgui.core.winapi;
 import dgui.core.idisposable;
 import dgui.core.exception;
@@ -83,14 +83,7 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 
 		if(res != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name));
-			}
+			throwException!(RegistryException)("RegSetValueEx failed, Key '%s'", name);
 		}
 	}
 }
@@ -118,14 +111,7 @@ final class RegistryValueString: RegistryValue!(string)
 
 		if(res != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name));
-			}
+			throwException!(RegistryException)("RegSetValueEx failed, Key '%s'", name);
 		}
 	}
 }
@@ -153,14 +139,7 @@ final class RegistryValueDword: RegistryValue!(uint)
 
 		if(res != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name));
-			}
+			throwException!(RegistryException)("RegSetValueEx failed, Key '%s'", name);
 		}
 	}
 }
@@ -188,14 +167,7 @@ final class RegistryValueQword: RegistryValue!(ulong)
 
 		if(res != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("RegSetValueEx failed, Key \"%s\"", name));
-			}
+			throwException!(RegistryException)("RegSetValueEx failed, Key '%s'", name);
 		}
 	}
 }
@@ -236,26 +208,12 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 
 		if(RegOpenKeyExW(hKey, toUTF16z(name), 0, KEY_ALL_ACCESS, &hDelKey) != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("Cannot open Key %s", to!(string)(name.ptr)), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("Cannot open Key %s", to!(string)(name.ptr)));
-			}
+			throwException!(RegistryException)("Cannot open Key '%s'", to!(string)(name.ptr));
 		}
 
 		if(RegQueryInfoKeyW(hDelKey, null, null, null, &subKeysCount, null, null, &valuesCount, null, null, null, null) != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("Cannot query Key %s", to!(string)(name.ptr)), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("Cannot query Key %s", to!(string)(name.ptr)));
-			}
+			throwException!(RegistryException)("Cannot query Key '%s'", to!(string)(name.ptr));
 		}
 
 		for(int i = 0; i < subKeysCount; i++)
@@ -272,26 +230,12 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 
 			if(RegEnumValueW(hDelKey, 0, valName.ptr, &size, null, null, null, null) != ERROR_SUCCESS)
 			{
-				debug
-				{
-					throw new RegistryException(format("Cannot enumate values from key %s", name), __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new RegistryException(format("Cannot enumate values from key %s", name));
-				}
+				throwException!(RegistryException)("Cannot enumerate values from key '%s'", name);
 			}
 
 			if(RegDeleteValueW(hDelKey, valName.ptr) != ERROR_SUCCESS)
 			{
-				debug
-				{
-					throw new RegistryException(format("Cannot delete Value %s", toUTF8(valName)), __FILE__, __LINE__);
-				}
-				else
-				{
-					throw new RegistryException(format("Cannot delete Value %s", toUTF8(valName)));
-				}
+				throwException!(RegistryException)("Cannot delete Value '%s'", toUTF8(valName));
 			}
 		}
 
@@ -299,14 +243,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 
 		if(RegDeleteKeyW(hKey, toUTF16z(name)) != ERROR_SUCCESS)
 		{
-			debug
-			{
-				throw new RegistryException(format("Cannot delete Key %s", to!(string)(name.ptr)), __FILE__, __LINE__);
-			}
-			else
-			{
-				throw new RegistryException(format("Cannot delete Key %s", to!(string)(name.ptr)));
-			}
+			throwException!(RegistryException)("Cannot delete Key '%s'", to!(string)(name.ptr));
 		}
 	}
 
@@ -323,11 +260,10 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 				return new RegistryKey(hKey);
 
 			default:
-				debug
-					throw new RegistryException(format("Cannot create Key \"%s\"", name), __FILE__, __LINE__);
-				else
-					throw new RegistryException(format("Cannot create Key \"%s\"", name));
+				throwException!(RegistryException)("Cannot create Key '%s'", name);
 		}
+
+		return null;
 	}
 
 	public void deleteSubKey(string name)
@@ -347,11 +283,10 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 				return new RegistryKey(hKey);
 
 			default:
-				debug
-					throw new RegistryException(format("Cannot retrieve Key \"%s\"", name), __FILE__, __LINE__);
-				else
-					throw new RegistryException(format("Cannot retrieve Key \"%s\"", name));
+				throwException!(RegistryException)("Cannot retrieve Key '%s'", name);
 		}
+
+		return null;
 	}
 
 	public void setValue(string name, IRegistryValue val)
@@ -399,10 +334,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 				break;
 
 			default:
-				debug
-					throw new RegistryException("Unsupported Format", __FILE__, __LINE__);
-				else
-					throw new RegistryException("Unsupported Format");
+				throwException!(RegistryException)("Unsupported Format");
 		}
 
 		return ival;

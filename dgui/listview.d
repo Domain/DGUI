@@ -17,8 +17,7 @@
 
 module dgui.listview;
 
-import std.utf;
-import std.string;
+import std.utf: toUTF8;
 import dgui.core.utils;
 import dgui.control;
 import dgui.imagelist;
