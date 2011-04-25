@@ -89,12 +89,12 @@ public void getTempPath(ref string s)
 
 public int getWindowTextLength(HWND hWnd)
 {
-	return GetWindowTextLengthW(hWnd) + wchar.sizeof;
+	return GetWindowTextLengthW(hWnd);
 }
 
 public string getWindowText(HWND hWnd)
 {
-	int len = getWindowTextLength(hWnd);
+	int len = getWindowTextLength(hWnd) + wchar.sizeof;
 	wchar[] t = new wchar[len];
 
 	GetWindowTextW(hWnd, t.ptr, len);

@@ -184,7 +184,7 @@ abstract class TextControl: SubclassedControl
 	{
 		if(msg == WM_COMMAND)
 		{
-			if(HIWORD(wParam) == EN_CHANGE)
+			if(HIWORD(wParam) == EN_CHANGE && this._controlInfo.CanNotify)
 			{
 				this.onTextChanged(EventArgs.empty);
 			}

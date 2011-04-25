@@ -337,7 +337,9 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
+			this._controlInfo.CanNotify = false; //Do not trigger TextChanged Event
 			setWindowText(this._handle, s);
+			this._controlInfo.CanNotify = true;
 		}
 	}
 
