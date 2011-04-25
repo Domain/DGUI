@@ -28,6 +28,7 @@ private struct FormInfo
 	DialogResult Result = DialogResult.CANCEL;
 	FormBorderStyle FrameBorder = FormBorderStyle.SIZEABLE;
 	HWND hActiveWnd;
+	bool ModalCompleted = false;
 	bool IsModal = false;
 	bool MaximizeBox = true;
 	bool MinimizeBox = true;
@@ -66,6 +67,7 @@ class Form: ContainerControl, IDialogResult
 	@property public final void dialogResult(DialogResult dr)
 	{
 		this._formInfo.Result = dr;
+		this._formInfo.ModalCompleted =  true;
 
 		ShowWindow(this._handle, SW_HIDE); // Hide this window (it waits to be destroyed)
 		EnableWindow(this._formInfo.hActiveWnd, true);
@@ -159,13 +161,17 @@ class Form: ContainerControl, IDialogResult
 		this._formInfo.StartPosition = fsp;
 	}
 
-	private void doEvents()
+	private void doEvents(bool isModal)
 	{
 		MSG m = void;
 
 		while(GetMessageW(&m, null, 0, 0))
 		{
-			if(!IsDialogMessageW(this._handle, &m))
+			if(isModal && this._formInfo.ModalCompleted)
+			{
+				break;
+			}
+			else if(!IsDialogMessageW(this._handle, &m))
 			{
 				TranslateMessage(&m);
 				DispatchMessageW(&m);
@@ -188,8 +194,9 @@ class Form: ContainerControl, IDialogResult
 				}
 
 				this.create(isModal);
-				this.doEvents();
 			}
+
+			this.doEvents(isModal);
 		}
 		catch(Exception e)
 		{
