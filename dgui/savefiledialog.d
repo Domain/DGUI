@@ -48,7 +48,7 @@ class SaveFileDialog: CommonDialog!(OPENFILENAMEW, string)
 		this._dlgStruct.nMaxFile = MAX_PATH;
 		this._dlgStruct.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_CREATEPROMPT | OFN_OVERWRITEPROMPT;
 
-		if(GetOpenFileNameW(&this._dlgStruct))
+		if(GetSaveFileNameW(&this._dlgStruct))
 		{
 			this._dlgRes = toUTF8(buffer);
 			return true;
