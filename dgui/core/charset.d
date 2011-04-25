@@ -94,7 +94,7 @@ public int getWindowTextLength(HWND hWnd)
 
 public string getWindowText(HWND hWnd)
 {
-	int len = getWindowTextLength(hWnd) + wchar.sizeof;
+	int len = getWindowTextLength(hWnd) + 1;
 	wchar[] t = new wchar[len];
 
 	GetWindowTextW(hWnd, t.ptr, len);
