@@ -47,23 +47,23 @@ final class MsgBox
 
 	}
 
-	public static DialogResult show(string text, string title, MsgBoxButtons button, MsgBoxIcons icon)
+	public static DialogResult show(string title, string text, MsgBoxButtons button, MsgBoxIcons icon)
 	{
 		return cast(DialogResult)MessageBoxW(GetActiveWindow(), toUTF16z(text), toUTF16z(title), button | icon);
 	}
 
-	public static DialogResult show(string text, string title, MsgBoxButtons button)
+	public static DialogResult show(string title, string text, MsgBoxButtons button)
 	{
-		return MsgBox.show(text, title, button, MsgBoxIcons.NONE);
+		return MsgBox.show(title, text, button, MsgBoxIcons.NONE);
 	}
 
-	public static DialogResult show(string text, string title, MsgBoxIcons icon)
+	public static DialogResult show(string title, string text, MsgBoxIcons icon)
 	{
-		return MsgBox.show(text, title, MsgBoxButtons.OK, icon);
+		return MsgBox.show(title, text, MsgBoxButtons.OK, icon);
 	}
 
-	public static DialogResult show(string text, string title)
+	public static DialogResult show(string title, string text)
 	{
-		return MsgBox.show(text, title, MsgBoxButtons.OK, MsgBoxIcons.NONE);
+		return MsgBox.show(title, text, MsgBoxButtons.OK, MsgBoxIcons.NONE);
 	}
 }
