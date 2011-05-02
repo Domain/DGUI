@@ -102,10 +102,10 @@ class Application
 {
 	private static class ExceptionForm: Form
 	{
-		public this(Object e)
+		public this(Throwable e)
 		{
 			this.text = "An Exception was thrown...";
-			this.size = Size(400, 250);
+			this.size = Size(400, 192);
 			this.controlBox = false;
 			this.startPosition = FormStartPosition.CENTER_PARENT;
 			this.formBorderStyle = FormBorderStyle.FIXED_DIALOG;
@@ -121,7 +121,7 @@ class Application
 			this._lblInfo = new Label();
 			this._lblInfo.alignment = TextAlignment.MIDDLE | TextAlignment.LEFT;
 			this._lblInfo.dock = DockStyle.TOP;
-			this._lblInfo.height = 50;
+			this._lblInfo.height = 20;
 			this._lblInfo.text = INFO;
 			this._lblInfo.parent = this;
 
@@ -131,17 +131,17 @@ class Application
 			this._rtfText.backColor = SystemColors.colorBtnFace;
 			this._rtfText.scrollBars = true;
 			this._rtfText.readOnly = true;
-			this._rtfText.text = e.toString();
+			this._rtfText.text = e.msg;
 			this._rtfText.parent = this;
 
 			this._btnQuit = new Button();
-			this._btnQuit.bounds = Rect(306, 194, 80, 23);
+			this._btnQuit.bounds = Rect(315, 164, 80, 23);
 			this._btnQuit.dialogResult = DialogResult.ABORT;
 			this._btnQuit.text = "Quit";
 			this._btnQuit.parent = this;
 
 			this._btnIgnore = new Button();
-			this._btnIgnore.bounds = Rect(216, 194, 80, 23);
+			this._btnIgnore.bounds = Rect(230, 164, 80, 23);
 			this._btnIgnore.dialogResult = DialogResult.IGNORE;
 			this._btnIgnore.text = "Ignore";
 			this._btnIgnore.parent = this;
@@ -258,7 +258,7 @@ class Application
 		ExitProcess(exitCode);
 	}
 
-	package static DialogResult showExceptionForm(Exception e)
+	package static DialogResult showExceptionForm(Throwable e)
 	{
 		ExceptionForm ef = new ExceptionForm(e);
 		return ef.showDialog();

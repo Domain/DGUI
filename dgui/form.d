@@ -198,7 +198,7 @@ class Form: ContainerControl, IDialogResult
 
 			this.doEvents(isModal);
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			switch(Application.showExceptionForm(e))
 			{
