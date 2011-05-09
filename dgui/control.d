@@ -29,6 +29,7 @@ public import dgui.core.handle;
 public import dgui.core.idisposable;
 public import dgui.canvas;
 public import dgui.menu;
+public import std.variant;
 import dgui.core.windowclass;
 import dgui.core.utils;
 
@@ -76,6 +77,30 @@ private struct ControlInfo
 	bool CanNotify = true;
 }
 
+mixin template TagProperty()
+{
+	private Variant _tt;
+
+	/*
+	 *	DMD 2052 BUG: Cannot differentiate var(T)() and var(T)(T t)
+	 *	template functions, use variadic template with length check.
+	 */
+	@property public T[0] var(T...)()
+	in
+	{
+		assert(T.length == 1);
+	}
+	body
+	{
+		return this._tt.get!(T[0]);
+	}
+
+	@property public void var(T)(T t)
+	{
+		this._tt = t;
+	}
+}
+
 interface IDialogResult
 {
 	void dialogResult(DialogResult result);
@@ -109,6 +134,8 @@ abstract class Control: Handle!(HWND), IDisposable
 	public Signal!(Control, EventArgs) resize;
 	public Signal!(Control, EventArgs) visibleChanged;
 
+	mixin TagProperty; // Insert tag() property in Control
+
 	public this()
 	{
 		this.setStyle(WS_VISIBLE, true);
@@ -134,14 +161,14 @@ abstract class Control: Handle!(HWND), IDisposable
 		if(this._handle)
 		{
 			/* From MSDN: Destroys the specified window.
-			    The function sends WM_DESTROY and WM_NCDESTROY messages to the window
-			    to deactivate it and remove the keyboard focus from it.
-			    The function also destroys the window's menu, flushes the thread message queue,
-			    destroys timers, removes clipboard ownership, and breaks the clipboard viewer chain
-			    (if the window is at the top of the viewer chain).If the specified window is a parent
-			    or owner window, DestroyWindow automatically destroys the associated child or owned
-			    windows when it destroys the parent or owner window. The function first destroys child
-			    or owned windows, and then it destroys the parent or owner window
+			   The function sends WM_DESTROY and WM_NCDESTROY messages to the window
+			   to deactivate it and remove the keyboard focus from it.
+			   The function also destroys the window's menu, flushes the thread message queue,
+			   destroys timers, removes clipboard ownership, and breaks the clipboard viewer chain
+			   (if the window is at the top of the viewer chain).If the specified window is a parent
+			   or owner window, DestroyWindow automatically destroys the associated child or owned
+			   windows when it destroys the parent or owner window. The function first destroys child
+			   or owned windows, and then it destroys the parent or owner window
 			*/
 
 			DestroyWindow(this._handle);
@@ -158,16 +185,6 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 
 		return null;
-	}
-
-	@property public final Object tag()
-	{
-		return this._tag;
-	}
-
-	@property public final void tag(Object o)
-	{
-		this._tag = o;
 	}
 
 	@property public final Rect bounds()

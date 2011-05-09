@@ -95,6 +95,7 @@ string makeFilter(string userFilter)
 	return newFilter.idup;
 }
 
+/*
 class ObjectContainer(T)
 {
 	private T _t;
@@ -117,3 +118,4 @@ class ObjectContainer(T)
 		}
 	}
 }
+*/

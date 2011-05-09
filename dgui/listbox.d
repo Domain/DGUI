@@ -21,14 +21,29 @@ import std.utf: toUTF16z;
 import dgui.core.utils;
 import dgui.control;
 
-struct ListBoxInfo
-{
-	int SelectedIndex;
-	Object SelectedItem;
-}
-
 class ListBox: OwnerDrawControl
 {
+	private static struct ListBoxInfo
+	{
+		int SelectedIndex;
+		Object SelectedItem;
+	}
+
+	private static class StringItem
+	{
+		private string _str;
+
+		public this(string s)
+		{
+			this._str = s;
+		}
+
+		public override string toString()
+		{
+			return this._str;
+		}
+	}
+
 	private Collection!(Object) _items;
 	private ListBoxInfo _lbxInfo;
 
@@ -41,7 +56,7 @@ class ListBox: OwnerDrawControl
 
 	public final int addItem(string s)
 	{
-		return this.addItem(new ObjectContainer!(string)(s));
+		return this.addItem(new StringItem(s));
 	}
 
 	public final int addItem(Object obj)
@@ -55,10 +70,11 @@ class ListBox: OwnerDrawControl
 
 		if(this.created)
 		{
-			return ListBox.insertItem(this, obj);
+			return this.insertItem(obj);
 		}
 
 		return this._items.length - 1;
+
 	}
 
 	public final void removeItem(int idx)
@@ -119,9 +135,9 @@ class ListBox: OwnerDrawControl
 		return null;
 	}
 
-	private static int insertItem(ListBox lb, Object obj)
+	private int insertItem(Object obj)
 	{
-		return lb.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTF16z(obj.toString()));
+		return this.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTF16z(obj.toString()));
 	}
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
@@ -139,7 +155,7 @@ class ListBox: OwnerDrawControl
 		{
 			foreach(Object obj; this._items)
 			{
-				ListBox.insertItem(this, obj);
+				this.insertItem(obj);
 			}
 		}
 

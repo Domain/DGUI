@@ -54,7 +54,8 @@ class ListViewItem
 	private ListView _owner;
 	private string _text;
 	private int _imgIdx;
-	private Object _tag;
+
+	mixin TagProperty;
 
 	package this(ListView owner, string txt, int imgIdx, bool check)
 	{
@@ -74,16 +75,12 @@ class ListViewItem
 	{
 		if(this._owner)
 		{
-			int i = 0;
-
-			foreach(ListViewItem lvi; this._owner.items)
+			foreach(int i, ListViewItem lvi; this._owner.items)
 			{
 				if(lvi is (this._parentItem ? this._parentItem : this))
 				{
 					return i;
 				}
-
-				i++;
 			}
 		}
 
@@ -139,17 +136,7 @@ class ListViewItem
 		}
 	}
 
-	@property public final Object tag()
-	{
-		return this._tag;
-	}
-
-	@property public final void tag(Object obj)
-	{
-		this._tag = obj;
-	}
-
-	package bool internalChecked() //HACK: Restituisce il flag interno
+	@property package bool internalChecked()
 	{
 		return this._checked;
 	}
@@ -590,6 +577,7 @@ class ListView: OwnerDrawControl
 
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
+		pcw.Style |= LVS_ALIGNLEFT;
 		pcw.OldClassName = WC_LISTVIEW;
 		pcw.ClassName = WC_DLISTVIEW;
 		pcw.DefaultBackColor = SystemColors.colorWindow;
