@@ -2001,23 +2001,43 @@ extern(Windows)
 		BYTE[8] Data4;
 	}
 
-	alias GUID CLSID;
-
-	extern(C) COLORREF RGB(int r, int g, int b)
+	/* *** Win32 Macros *** */
+	COLORREF RGB(int r, int g, int b)
 	{
 		return cast(COLORREF)(cast(ubyte)r | (cast(ubyte)g << 8) | (cast(ubyte)b << 16));
 	}
 
-	extern(C) DWORD MAKELONG(int wLow, int wHigh)
+	DWORD MAKELONG(int wLow, int wHigh)
 	{
 		return cast(DWORD)cast(WORD)wLow | (cast(DWORD)cast(WORD)wHigh << 16);
 	}
 
-	extern(C) LPWSTR MAKEINTRESOURCEW(ushort id)
+	LPWSTR MAKEINTRESOURCEW(ushort id)
 	{
 		return (cast(LPWSTR)(cast(ULONG_PTR)((cast(WORD)(id)))));
 	}
 
+	BYTE GetRValue(COLORREF c)
+	{
+		return cast(BYTE)c;
+	}
+
+	BYTE GetGValue(COLORREF c)
+	{
+		return cast(BYTE)(c >> 8);
+	}
+
+	BYTE GetBValue(COLORREF c)
+	{
+		return cast(BYTE)(c >> 16);
+	}
+
+	short GetWheelDelta(WPARAM wParam)
+	{
+		return cast(short)HIWORD(wParam);
+	}
+
+	alias GUID CLSID;
 	alias DWORD function(/+ DWORD_PTR +/ DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG* pcb) EDITSTREAMCALLBACK; // Rich edit.
 	alias int function(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) BFFCALLBACK;
 	alias UINT function(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam) LPCCHOOKPROC;
@@ -2036,8 +2056,7 @@ extern(Windows)
 	alias WORD LANGID;
 	alias DWORD LCID;
 	alias DWORD HDWP;
-
-	typedef HANDLE HIMAGELIST;
+	alias HANDLE HIMAGELIST;
 
 	/* *** Shell32.lib *** */
 	ITEMIDLIST* SHBrowseForFolderW(BROWSEINFOW* lpbi);
@@ -2053,7 +2072,7 @@ extern(Windows)
 	HMODULE GetModuleHandleW(LPCWSTR lpModuleName);
 	DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 	HRSRC FindResourceExW(HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, WORD wLanguage);
-	HRSRC FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+	//HRSRC FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
 	DWORD GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
 	HGLOBAL LoadResource(HMODULE hModule, HRSRC hResInfo);
 	DWORD SizeofResource(HMODULE hModule, HRSRC hResInfo);
@@ -2105,7 +2124,7 @@ extern(Windows)
 	BOOL SetMenuInfo(HMENU, MENUINFO*);
 	BOOL DeleteMenu(HMENU, UINT, UINT);
 	SHORT GetAsyncKeyState(int vKey);
-	BOOL BringWindowToTop(HWND hWnd);
+	//BOOL BringWindowToTop(HWND hWnd);
 	BOOL IsWindowVisible(HWND hWnd);
 	BOOL IsWindowEnabled(HWND hWnd);
 	BOOL IsWindowUnicode(HWND hWnd);
@@ -2178,26 +2197,4 @@ extern(Windows)
 
 	/* *** Ole32.dll *** */
 	HRESULT CLSIDFromString(wchar* lpsz, CLSID* pclsid);
-}
-
-/* *** Win32 Macros *** */
-
-BYTE GetRValue(COLORREF c)
-{
-	return cast(BYTE)c;
-}
-
-BYTE GetGValue(COLORREF c)
-{
-	return cast(BYTE)(c >> 8);
-}
-
-BYTE GetBValue(COLORREF c)
-{
-	return cast(BYTE)(c >> 16);
-}
-
-short GetWheelDelta(WPARAM wParam)
-{
-	return cast(short)HIWORD(wParam);
 }
