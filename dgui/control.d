@@ -85,7 +85,7 @@ mixin template TagProperty()
 	 *	DMD 2052 BUG: Cannot differentiate var(T)() and var(T)(T t)
 	 *	template functions, use variadic template with length check.
 	 */
-	@property public T[0] var(T...)()
+	@property public T[0] tag(T...)()
 	in
 	{
 		assert(T.length == 1);
@@ -95,7 +95,7 @@ mixin template TagProperty()
 		return this._tt.get!(T[0]);
 	}
 
-	@property public void var(T)(T t)
+	@property public void tag(T)(T t)
 	{
 		this._tt = t;
 	}
@@ -134,7 +134,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	public Signal!(Control, EventArgs) resize;
 	public Signal!(Control, EventArgs) visibleChanged;
 
-	mixin TagProperty; // Insert tag() property in Control
+    mixin TagProperty; // Insert tag() property in Control
 
 	public this()
 	{
