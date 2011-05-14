@@ -86,12 +86,8 @@ mixin template TagProperty()
 	 *	template functions, use variadic template with length check.
 	 */
 	@property public T[0] tag(T...)()
-	in
 	{
-		assert(T.length == 1);
-	}
-	body
-	{
+		static assert(T.length == 1, "Multiple parameters not allowed");
 		return this._tt.get!(T[0]);
 	}
 
