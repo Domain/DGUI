@@ -128,12 +128,47 @@ enum TextTrimming: uint
 	ELLIPSIS_PATH = DT_PATH_ELLIPSIS,
 }
 
+enum BitmapCopyMode
+{
+	NORMAL 	= SRCCOPY,
+	INVERT	= SRCINVERT,
+	AND   	= SRCAND,
+	OR      = SRCPAINT,
+}
+
+struct BitmapBit
+{
+	union
+	{
+		ubyte rgbBlue;
+		ubyte Blue;
+	}
+
+	union
+	{
+		ubyte rgbGreen;
+		ubyte Green;
+	}
+
+	union
+	{
+		ubyte rgbRed;
+		ubyte Red;
+	}
+
+	union
+	{
+		ubyte rgbReserved;
+		ubyte Alpha;
+	}
+}
+
 struct BitmapData
 {
 	BITMAPINFO* Info;
 	uint ImageSize;
 	uint BitsCount;
-	RGBQUAD* Bits;
+	BitmapBit* Bits;
 }
 
 struct Color
@@ -172,6 +207,7 @@ struct Color
 		color.alpha = a;
 		color.red = r;
 		color.green = g;
+		color.blue = b;
 		color.blue = b;
 
 		return color;
@@ -216,12 +252,26 @@ class Canvas: Handle!(HDC), IDisposable
 		}
 	}
 
-	public void copyTo(Canvas c)
+	public void copyTo(Canvas c, BitmapCopyMode bcm)
 	{
 		BITMAP bmp;
 		GetObjectW(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
 
-		BitBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, SRCCOPY);
+		BitBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, bcm);
+	}
+
+	public void copyTo(Canvas c)
+	{
+		this.copyTo(c, BitmapCopyMode.NORMAL);
+	}
+
+	public void copyTransparent(Canvas c, Color transpColor)
+	{
+		BITMAP bmp;
+		HBITMAP hBitmap = GetCurrentObject(this._handle, OBJ_BITMAP);
+
+		GetObjectW(hBitmap, BITMAP.sizeof, &bmp);
+		GdiTransparentBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, bmp.bmWidth, bmp.bmHeight, transpColor.colorref);
 	}
 
 	public void dispose()
@@ -240,6 +290,38 @@ class Canvas: Handle!(HDC), IDisposable
 			default:
 				break;
 		}
+	}
+
+	public static Size measureString(string s, Canvas c, Font f)
+	{
+		Size sz;
+
+		HFONT hOldFont = f ? SelectObject(c.handle, f.handle) : null;
+		GetTextExtentPoint32W(c.handle, toUTF16z(s), s.length, &sz.size);
+
+		if(f)
+		{
+			SelectObject(c.handle, hOldFont);
+		}
+
+		return sz;
+	}
+
+	public static Size measureString(string s, Canvas c)
+	{
+		return Canvas.measureString(s, c, null);
+	}
+
+	public static Size measureString(string s, Font f)
+	{
+		scope Canvas c = Screen.canvas;
+		return Canvas.measureString(s, c, f);
+	}
+
+	public static Size measureString(string s)
+	{
+		scope Canvas c = Screen.canvas;
+		return Canvas.measureString(s, c, SystemFonts.windowsFont);
 	}
 
 	/* From: http://www.winapizone.net/tutorials/winapi/functions/gradientfill.php */
@@ -641,7 +723,7 @@ class Bitmap: Image
 	{
 		Rect r = Rect(0, 0, w, h);
 
-		HDC hdc = GetDC(null);
+		HDC hdc = GetWindowDC(null);
 		HDC hcdc = CreateCompatibleDC(hdc);
 		HBITMAP hBitmap = CreateCompatibleBitmap(hdc, w, h);
 		HBITMAP hOldBitmap = SelectObject(hcdc, hBitmap);
@@ -657,10 +739,54 @@ class Bitmap: Image
 		return hBitmap;
 	}
 
+	public Bitmap alphaBlend(ubyte alpha)
+	{
+		BITMAP b;
+		getInfo!(BITMAP)(this._handle, b);
+
+		HDC hdc = GetWindowDC(null);
+		HDC hdc1 = CreateCompatibleDC(hdc);
+		HDC hdc2 = CreateCompatibleDC(hdc);
+		HBITMAP hBitmap = CreateCompatibleBitmap(hdc, b.bmWidth, b.bmHeight);
+		HBITMAP hOldBitmap1 = SelectObject(hdc1, hBitmap);
+		HBITMAP hOldBitmap2 = SelectObject(hdc2, this._handle);
+
+		BLENDFUNCTION bf;
+		bf.BlendOp = 0; // AC_SRC_OVER
+		bf.SourceConstantAlpha = alpha;
+
+		if(b.bmBitsPixel == 32) // Premultiply bits if Bitmap's bpp = 32bpp
+		{
+			BitmapData bd;
+			Bitmap.getData(hBitmap, bd);
+
+			for(int i = 0; i < bd.BitsCount; i++)
+			{
+				bd.Bits[i].Red = cast(ubyte)(bd.Bits[i].Red * (alpha / 0xFF));
+				bd.Bits[i].Green = cast(ubyte)(bd.Bits[i].Green * (alpha / 0xFF));
+				bd.Bits[i].Blue = cast(ubyte)(bd.Bits[i].Blue * (alpha / 0xFF));
+			}
+
+			Bitmap.setData(hBitmap, bd);
+
+			bf.AlphaFormat = 1; // AC_SRC_ALPHA
+		}
+
+		GdiAlphaBlend(hdc1, 0, 0, b.bmWidth, b.bmHeight, hdc2, 0, 0, b.bmWidth, b.bmHeight, bf);
+
+		SelectObject(hdc2, hOldBitmap2);
+		SelectObject(hdc1, hOldBitmap1);
+		DeleteDC(hdc2);
+		DeleteDC(hdc1);
+		ReleaseDC(null, hdc);
+
+		return Bitmap.fromHBITMAP(hBitmap);
+	}
+
 	public Bitmap clone()
 	{
 		BITMAP b;
-		this.getInfo!(BITMAP)(this._handle, b);
+		getInfo!(BITMAP)(this._handle, b);
 
 		HDC hdc = GetDC(null);
 		HDC hcdc1 = CreateCompatibleDC(hdc); // Contains this bitmap
@@ -682,45 +808,61 @@ class Bitmap: Image
 		return bmp;
 	}
 
-	public void getData(ref BitmapData bd)
+	public static void getData(HBITMAP hBitmap, ref BitmapData bd)
 	{
 		BITMAPINFO bi;
 		bi.bmiHeader.biSize = BITMAPINFOHEADER.sizeof;
-		bi.bmiHeader.biBitCount = 0; //Don't get the color table.
+		bi.bmiHeader.biBitCount = 0;
 
-		HDC hdc = GetDC(null);
-		GetDIBits(hdc, this._handle, 0, 0, null, &bi, DIB_RGB_COLORS);
+		HDC hdc = GetWindowDC(null);
+		GetDIBits(hdc, hBitmap, 0, 0, null, &bi, DIB_RGB_COLORS); // Get Bitmap Info
 
 		bd.ImageSize = bi.bmiHeader.biSizeImage;
 		bd.BitsCount = bi.bmiHeader.biSizeImage / RGBQUAD.sizeof;
-		bd.Bits = cast(RGBQUAD*)GC.malloc(bi.bmiHeader.biSizeImage);
+		bd.Bits = cast(BitmapBit*)GC.malloc(bi.bmiHeader.biSizeImage);
 
 		switch(bi.bmiHeader.biBitCount) // Calculate color table size (if needed)
 		{
 			case 24:
-				bd.Info = cast(BITMAPINFO*)GC.malloc(BITMAPINFOHEADER.sizeof);
+				bd.Info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize);
 				break;
 
 			case 16, 32:
-				bd.Info = cast(BITMAPINFO*)GC.malloc(BITMAPINFOHEADER.sizeof + uint.sizeof * 3); // Needs Investigation
+				bd.Info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize + uint.sizeof * 3); // Needs Investigation
 				break;
 
 			default:
-				bd.Info = cast(BITMAPINFO*)GC.malloc(BITMAPINFOHEADER.sizeof + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
+				bd.Info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
 				break;
 		}
 
 		bd.Info.bmiHeader = bi.bmiHeader;
-		GetDIBits(hdc, this._handle, 0, bd.Info.bmiHeader.biHeight, bd.Bits, bd.Info, DIB_RGB_COLORS);
+		GetDIBits(hdc, hBitmap, 0, bd.Info.bmiHeader.biHeight, cast(RGBQUAD*)bd.Bits, bd.Info, DIB_RGB_COLORS);
 		ReleaseDC(null, hdc);
+	}
+
+
+	public void getData(ref BitmapData bd)
+	{
+		return Bitmap.getData(this._handle, bd);
+	}
+
+	private static void setData(HBITMAP hBitmap, ref BitmapData bd)
+	{
+		HDC hdc = GetWindowDC(null);
+		SetDIBits(hdc, hBitmap, 0, bd.Info.bmiHeader.biHeight, cast(RGBQUAD*)bd.Bits, bd.Info, DIB_RGB_COLORS);
+
+		ReleaseDC(null, hdc);
+		Bitmap.freeData(bd);
 	}
 
 	public void setData(ref BitmapData bd)
 	{
-		HDC hdc = GetDC(null);
-		SetDIBits(hdc, this._handle, 0, bd.Info.bmiHeader.biHeight, bd.Bits, bd.Info, DIB_RGB_COLORS);
+		Bitmap.setData(this._handle, bd);
+	}
 
-		ReleaseDC(null, hdc);
+	public static void freeData(ref BitmapData bd)
+	{
 		GC.free(bd.Bits);
 		GC.free(bd.Info);
 	}
@@ -823,6 +965,33 @@ class Icon: Image
 	@property public override ImageType type()
 	{
 		return ImageType.ICON_OR_CURSOR;
+	}
+
+	public Bitmap toBitmap(Size sz)
+	{
+		HDC hwdc = GetWindowDC(null);
+		HDC hdc1 = CreateCompatibleDC(hwdc);
+
+		HBITMAP hBitmap = CreateCompatibleBitmap(hwdc, sz.width, sz.height);
+		HBITMAP hOldBitmap = SelectObject(hdc1, hBitmap);
+
+		Rect r = Rect(0, 0, sz.width, sz.height);
+
+		SetBkColor(hdc1, RGB(255, 255, 255));
+		extTextOut(hdc1, 0, 0, ETO_OPAQUE,  &r.rect, null, 0, null);
+
+		DrawIconEx(hdc1, 0, 0, this._handle, sz.width, sz.height, 0, null, DI_NORMAL);
+		SelectObject(hdc1, hOldBitmap);
+		DeleteDC(hdc1);
+		ReleaseDC(null, hwdc);
+
+		return Bitmap.fromHBITMAP(hBitmap);
+	}
+
+	public Bitmap toBitmap()
+	{
+		Size sz = this.size;
+		return this.toBitmap(sz);
 	}
 
 	public static Icon fromHICON(HICON hIcon, bool owned = true)
@@ -1611,6 +1780,11 @@ final class SystemColors
 	@property public static Color magenta()
 	{
 		return Color(0xFF, 0x00, 0xFF);
+	}
+
+	@property public static Color magicPink()
+	{
+		return SystemColors.magenta; //Is 'Magic Pink'
 	}
 
 	@property public static Color cyan()

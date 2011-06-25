@@ -691,21 +691,53 @@ abstract class Control: Handle!(HWND), IDisposable
 				break;
 
 			case WM_MEASUREITEM:
+			{
 				MEASUREITEMSTRUCT* pMeasureItem = cast(MEASUREITEMSTRUCT*)lParam;
-				hFrom = cast(HWND)pMeasureItem.CtlID;
-				break;
+
+				switch(pMeasureItem.CtlType)
+				{
+					case ODT_COMBOBOX:
+						hFrom = GetParent(cast(HWND)pMeasureItem.CtlID);
+						break;
+
+					case ODT_MENU:
+						hFrom = this._handle; // Set the owner of the menu (this window)
+						break;
+
+					default:
+						hFrom = cast(HWND)pMeasureItem.CtlID;
+						break;
+				}
+			}
+			break;
 
 			case WM_DRAWITEM:
+			{
 				DRAWITEMSTRUCT* pDrawItem = cast(DRAWITEMSTRUCT*)lParam;
-				hFrom = pDrawItem.CtlType != ODT_COMBOBOX ? pDrawItem.hwndItem : GetParent(pDrawItem.hwndItem);
-				break;
+
+				switch(pDrawItem.CtlType)
+				{
+					case ODT_COMBOBOX:
+						hFrom = GetParent(pDrawItem.hwndItem);
+						break;
+
+					case ODT_MENU:
+						hFrom = this._handle; // Set the owner of the menu (this window)
+						break;
+
+					default:
+						hFrom = cast(HWND)pDrawItem.hwndItem;
+						break;
+				}
+			}
+			break;
 
 			default: // WM_COMMAND
 				hFrom = cast(HWND)lParam;
 				break;
 		}
 
-		Control c = this.getChildControl(hFrom);
+		Control c = hFrom != this._handle ? this.getChildControl(hFrom) : this; //Checks if 'hFrom' is this window (useful for menus)
 
 		if(c)
 		{

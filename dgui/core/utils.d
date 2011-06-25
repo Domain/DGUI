@@ -20,6 +20,7 @@ module dgui.core.utils;
 import std.path;
 import dgui.core.winapi;
 import dgui.core.charset;
+public import dgui.core.enums;
 
 T winCast(T)(Object o)
 {
@@ -95,27 +96,38 @@ string makeFilter(string userFilter)
 	return newFilter.idup;
 }
 
-/*
-class ObjectContainer(T)
+public WindowsVersion getWindowsVersion()
 {
-	private T _t;
+	static WindowsVersion ver = WindowsVersion.UNKNOWN;
+	static WindowsVersion[uint][uint] versions;
 
-	public this(T t)
+	if(ver is WindowsVersion.UNKNOWN)
 	{
-		this._t = t;
-	}
-
-	public final T get()
-	{
-		return this._t;
-	}
-
-	static if(is(T: string))
-	{
-		public override string toString()
+		if(!versions.length)
 		{
-			return this._t;
+			versions[5][0] = WindowsVersion.WINDOWS_2000;
+			versions[5][1] = WindowsVersion.WINDOWS_XP;
+			versions[6][0] = WindowsVersion.WINDOWS_VISTA;
+			versions[6][1] = WindowsVersion.WINDOWS_7;
+		}
+
+		OSVERSIONINFOW ovi;
+		ovi.dwOSVersionInfoSize = OSVERSIONINFOW.sizeof;
+
+		GetVersionExW(&ovi);
+
+		WindowsVersion[uint]* pMajVer = (ovi.dwMajorVersion in versions);
+
+		if(pMajVer)
+		{
+			WindowsVersion* pMinVer = (ovi.dwMinorVersion in *pMajVer);
+
+			if(pMinVer)
+			{
+				ver = versions[ovi.dwMajorVersion][ovi.dwMinorVersion];
+			}
 		}
 	}
+
+	return ver;
 }
-*/

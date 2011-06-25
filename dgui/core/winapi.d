@@ -327,6 +327,8 @@ extern(Windows)
 		EN_LINK 			 = 0x070B,
 	}
 
+	const HBMMENU_CALLBACK = cast(HBITMAP)-1;
+
 	/+
 	/* Rich Edit Text Styles */
 	enum: uint
@@ -589,7 +591,9 @@ extern(Windows)
 		MIIM_STATE		 = 0x00000001,
 		MIIM_ID 		 = 0x00000002,
 		MIIM_SUBMENU	 = 0x00000004,
+		MIIM_CHECKMARKS  = 0x00000008,
 		MIIM_TYPE		 = 0x00000010,
+		MIIM_BITMAP      = 0x00000080,
 	}
 
 	/*
@@ -1545,6 +1549,16 @@ extern(Windows)
 		HMODULE hModule;
 	}
 
+	struct OSVERSIONINFOW
+	{
+		DWORD dwOSVersionInfoSize;
+		DWORD dwMajorVersion;
+		DWORD dwMinorVersion;
+		DWORD dwBuildNumber;
+		DWORD dwPlatformId;
+		wchar[128] szCSDVersion;
+	}
+
 	struct WINDOWPOS
 	{
 		HWND hwnd;
@@ -1581,6 +1595,14 @@ extern(Windows)
 		int iOverlay;
 		int iIndent;
 		LPARAM lParam;
+	}
+
+	struct BLENDFUNCTION
+	{
+		BYTE BlendOp;
+		BYTE BlendFlags;
+		BYTE SourceConstantAlpha;
+		BYTE AlphaFormat;
 	}
 
 	struct NOTIFYICONDATA
@@ -1810,7 +1832,7 @@ extern(Windows)
 		DWORD dwItemData;
 		LPCWSTR dwTypeData;
 		UINT cch;
-		//HBITMAP hbmpItem;
+		HBITMAP hbmpItem;
 	}
 
 	struct SCROLLINFO
@@ -2048,6 +2070,7 @@ extern(Windows)
 	alias MAKELONG MAKELPARAM;
 	alias MAKELONG MAKEWPARAM;
 	alias TBBUTTON TB_BUTTON;
+	alias HANDLE HIMAGELIST;
 	alias size_t ULONG_PTR;
 	alias HANDLE HTREEITEM;
 	alias WORD CLIPFORMAT;
@@ -2056,7 +2079,7 @@ extern(Windows)
 	alias WORD LANGID;
 	alias DWORD LCID;
 	alias DWORD HDWP;
-	alias HANDLE HIMAGELIST;
+	alias DWORD ARGB;
 
 	/* *** Shell32.lib *** */
 	ITEMIDLIST* SHBrowseForFolderW(BROWSEINFOW* lpbi);
@@ -2072,7 +2095,7 @@ extern(Windows)
 	HMODULE GetModuleHandleW(LPCWSTR lpModuleName);
 	DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
 	HRSRC FindResourceExW(HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, WORD wLanguage);
-	//HRSRC FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+	BOOL GetVersionExW(OSVERSIONINFOW* lpVersionInfo);
 	DWORD GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
 	HGLOBAL LoadResource(HMODULE hModule, HRSRC hResInfo);
 	DWORD SizeofResource(HMODULE hModule, HRSRC hResInfo);
@@ -2090,7 +2113,7 @@ extern(Windows)
 	LRESULT CallWindowProcA(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
-	BOOL GetTextExtentPoint32A(HDC hdc, char* lpString, int c, SIZE* lpSize);
+	BOOL GetTextExtentPoint32W(HDC hdc, LPCWSTR lpString, int c, SIZE* lpSize);
 	BOOL SetMenuItemInfoW(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOW* lpmii);
 	BOOL InsertMenuItemW(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOW* lpmii);
 	BOOL SystemParametersInfoW(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
@@ -2162,27 +2185,30 @@ extern(Windows)
 	BOOL ImageList_Destroy(HIMAGELIST himl);
 
 	/* *** Gdi32.dll *** */
-	int GetObjectW(HGDIOBJ hgdiobj, int cbBuffer, void* lpvObject);
-	COLORREF GetTextColor(HDC hdc);
-	HFONT CreateFontIndirectW(LOGFONTW* lplf);
-	int GetDIBits(HDC hdc, HBITMAP hbmp, UINT uStartScan, UINT cScanLines, void* lpvBits, BITMAPINFO* lpbi, UINT uUsage);
+	BOOL GdiTransparentBlt(HDC hdcDest, int xoriginDest, int yoriginDest,int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
+	BOOL GdiAlphaBlend(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, BLENDFUNCTION ftn);
 	BOOL DrawIconEx(HDC hdc, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, UINT diFlags);
-	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
-	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+	BOOL PlgBlt(HDC hdcDest, POINT *lpPoint, HDC hdcSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HBITMAP hbmMask, int xMask, int yMask);
+	BOOL BitBlt(HDC hdcDest, int nXDest,int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+	int GetDIBits(HDC hdc, HBITMAP hbmp, UINT uStartScan, UINT cScanLines, void* lpvBits, BITMAPINFO* lpbi, UINT uUsage);
+	HBITMAP CreateDIBSection(HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset);
 	int DrawTextExW(HDC hdc, LPCWSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
 	BOOL ExtTextOutW(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCWSTR lpString, uint cbCount, int* lpDx);
-	BOOL BitBlt(HDC hdcDest, int nXDest,int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
-	BOOL PlgBlt(HDC hdcDest, POINT *lpPoint, HDC hdcSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HBITMAP hbmMask, int xMask, int yMask);
 	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, const(void*) lpvBits);
+	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 	BOOL PatBlt(HDC hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, DWORD dwRop);
 	HBITMAP CreateCompatibleBitmap(HDC hdc, int nWidth, int nHeight);
 	BOOL SetBrushOrgEx(HDC hdc, int nXOrg, int nYOrg, LPPOINT lppt);
+	int GetObjectW(HGDIOBJ hgdiobj, int cbBuffer, void* lpvObject);
 	BOOL GetIconInfo(HICON hIcon, ICONINFO* iconinfo);
-	HBRUSH CreateSolidBrush(COLORREF crColor);
 	HBRUSH CreateHatchBrush(int ht, COLORREF crColor);
+	HBRUSH CreateSolidBrush(COLORREF crColor);
+	HFONT CreateFontIndirectW(LOGFONTW* lplf);
 	BOOL DrawEdge(HDC, LPRECT, UINT, UINT);
 	BOOL DestroyCursor(HCURSOR hCursor);
 	BOOL DestroyIcon(HICON hIcon);
+	COLORREF GetTextColor(HDC hdc);
 
 	/* *** Advapi32.dll *** */
 	LONG RegCreateKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD Reserved, LPTSTR lpClass, DWORD dwOptions, REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition);

@@ -17,6 +17,7 @@
 
 module dgui.form;
 
+import dgui.core.utils;
 import dgui.application;
 import dgui.control;
 
@@ -316,6 +317,18 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
+	private void drawMenuItemImage(DRAWITEMSTRUCT* pDrawItem)
+	{
+		MenuItem mi = winCast!(MenuItem)(pDrawItem.itemData);
+
+		if(mi)
+		{
+			scope Canvas c = Canvas.fromHDC(pDrawItem.hDC, false); //HDC Not Owned by Canvas Object
+			int icoSize = GetSystemMetrics(SM_CYMENU);
+			c.drawImage(mi.rootMenu.imageList.images[mi.imageIndex], Rect(0, 0, icoSize, icoSize));
+		}
+	}
+
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
 	{
 		pcw.ClassName = WC_FORM;
@@ -357,6 +370,45 @@ class Form: ContainerControl, IDialogResult
 		}
 
 		super.onHandleCreated(e); //Per ultimo: Prima deve creare il menu se no i componenti si dispongono male.
+	}
+
+	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	{
+		if(msg == WM_MEASUREITEM)
+		{
+			MEASUREITEMSTRUCT* pMeasureItem = cast(MEASUREITEMSTRUCT*)lParam;
+
+			if(pMeasureItem.CtlType == ODT_MENU)
+			{
+				MenuItem mi = winCast!(MenuItem)(pMeasureItem.itemData);
+
+				if(mi)
+				{
+					if(mi.parent is this._formInfo.Menu) // Check if parent of 'mi' is the menu bar
+					{
+						Size sz = Canvas.measureString(" ");
+						int icoSize = GetSystemMetrics(SM_CYMENU);
+
+						pMeasureItem.itemWidth = icoSize + sz.width;
+					}
+					else
+					{
+						pMeasureItem.itemWidth = 10;
+					}
+				}
+			}
+		}
+		else if(msg == WM_DRAWITEM)
+		{
+			DRAWITEMSTRUCT* pDrawItem = cast(DRAWITEMSTRUCT*)lParam;
+
+			if(pDrawItem.CtlType == ODT_MENU)
+			{
+				this.drawMenuItemImage(pDrawItem);
+			}
+		}
+
+		return super.onReflectedMessage(msg, wParam, lParam);
 	}
 
 	protected override int wndProc(uint msg, WPARAM wParam, LPARAM lParam)

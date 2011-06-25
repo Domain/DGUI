@@ -64,9 +64,8 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 			HMODULE hModule = getModuleHandle("comctl32.dll");
 
 			/*
-			 * Problema Librerie Statiche, si risolve col binding dinamico: Abilita i Visual Styles, se supportati.
-			 * (Vedi ToolBar con Manifest per i risultati)
-			 */
+			  * Static Library Issue: Use Dynamic Binding so Visual Styles are enabled (if supported)
+			  */
 
 			imageList_Create = cast(ImageList_CreateProc)GetProcAddress(hModule, "ImageList_Create");
 			imageList_Remove = cast(ImageList_RemoveProc)GetProcAddress(hModule, "ImageList_Remove");
@@ -87,6 +86,11 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 
 	public void dispose()
 	{
+		foreach(Icon i; this._images)
+		{
+			i.dispose(); //Dispose Icons before delete the ImageList.
+		}
+
 		imageList_Destroy(this._handle);
 	}
 

@@ -49,6 +49,11 @@ final class GdiException: Exception
 	mixin ExceptionBody;
 }
 
+final class WindowsNotSupportedException: Exception
+{
+	mixin ExceptionBody;
+}
+
 void throwException(T1, T2...)(string fmt, T2 args)
 {
 	static if(is(T1: Win32Exception))

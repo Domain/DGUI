@@ -402,10 +402,19 @@ enum Keys: uint // docmain
 
 enum DrawItemState: uint
 {
-	DEFAULT = ODS_DEFAULT,
-	CHECKED = ODS_CHECKED,
+	DEFAULT  = ODS_DEFAULT,
+	CHECKED  = ODS_CHECKED,
 	DISABLED = ODS_DISABLED,
-	FOCUSED = ODS_FOCUS,
-	GRAYED = ODS_GRAYED,
+	FOCUSED  = ODS_FOCUS,
+	GRAYED   = ODS_GRAYED,
 	SELECTED = ODS_SELECTED,
+}
+
+enum WindowsVersion
+{
+	UNKNOWN       = 0,
+	WINDOWS_2000  = 1,
+	WINDOWS_XP    = 2,
+	WINDOWS_VISTA = 4,
+	WINDOWS_7     = 8,
 }

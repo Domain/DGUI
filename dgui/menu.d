@@ -18,6 +18,8 @@
 module dgui.menu;
 
 import std.utf: toUTF16z;
+import dgui.canvas;
+import dgui.imagelist;
 import dgui.core.winapi;
 import dgui.core.geometry;
 import dgui.core.collection;
@@ -26,6 +28,7 @@ import dgui.core.events;
 import dgui.core.signal;
 import dgui.core.handle;
 import dgui.core.utils;
+import dgui.core.wincomp;
 
 enum: uint
 {
@@ -56,6 +59,7 @@ enum MenuStyle: ubyte
 struct MenuInfo
 {
 	MenuStyle Style = MenuStyle.NORMAL;
+	int ImageIndex = -1;
 	int Index = -1;
 	Menu Parent;
 	string Text;
@@ -94,13 +98,13 @@ abstract class Menu: Handle!(HMENU), IDisposable
 
 		mi.cbSize = MENUINFO.sizeof;
 		mi.fMask  = MIM_MENUDATA | MIM_APPLYTOSUBMENUS | MIM_STYLE;
-		mi.dwStyle = MNS_NOTIFYBYPOS;
+		mi.dwStyle = MNS_NOTIFYBYPOS | MNS_CHECKORBMP;
 		mi.dwMenuData = winCast!(uint)(this);
 
 		SetMenuInfo(this.handle, &mi);
 	}
 
-	protected static HMENU doMenu(Menu menu)
+	protected static HMENU doMenu(RootMenu root, Menu menu)
 	{
 		menu.makeMenu();
 
@@ -108,14 +112,14 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		{
 			foreach(MenuItem mi; menu._items)
 			{
-				createItem(menu, mi);
+				createItem(root, menu, mi);
 			}
 		}
 
 		return menu.handle;
 	}
 
-	private static void createItem(Menu parent, MenuItem m)
+	private static void createItem(RootMenu root, Menu parent, MenuItem m)
 	{
 		MENUITEMINFOW minfo;
 
@@ -123,11 +127,32 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		minfo.fMask = MIIM_FTYPE;
 		minfo.dwItemData = winCast!(uint)(m);
 
+		m.rootMenu = root; //Save the root menu
+
 		if(m.style is MenuStyle.NORMAL)
 		{
+			WindowsVersion ver = getWindowsVersion();
+
 			minfo.fMask |= MIIM_DATA | MIIM_STRING | MIIM_STATE;
 			minfo.fState = (m.enabled ? MFS_ENABLED : MFS_DISABLED) | (m.checked ? MFS_CHECKED : 0);
 			minfo.dwTypeData = toUTF16z(m._menuInfo.Text);
+
+			if(root.imageList && m.imageIndex != -1)
+			{
+				minfo.fMask |= MIIM_BITMAP;
+
+				if(ver > WindowsVersion.WINDOWS_XP) // Is Vista or 7
+				{
+					HBITMAP hBitmap = iconToBitmapPARGB32(root.imageList.images[m.imageIndex].handle);
+					root.bitmaps.add(hBitmap);
+
+					minfo.hbmpItem = hBitmap;
+				}
+				else // Is 2000 or XP
+				{
+					minfo.hbmpItem = HBMMENU_CALLBACK;
+				}
+			}
 		}
 		else if(m.style is MenuStyle.SEPARATOR)
 		{
@@ -136,7 +161,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 
 		if(m._items)
 		{
-			HMENU hMenu = doMenu(m);
+			HMENU hMenu = doMenu(root, m);
 
 			minfo.fMask |= MIIM_SUBMENU;
 			minfo.hSubMenu = hMenu;
@@ -147,7 +172,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 
 	public void dispose()
 	{
-		//From MSDN: DestroyMenu is recursive, that is, it will destroy the menu and all its submenus.
+		//From MSDN: DestroyMenu is recursive, it will destroy the menu and its submenus.
 		if(this.created)
 		{
 			DestroyMenu(this._handle);
@@ -207,7 +232,22 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		return -1;
 	}
 
-	public final MenuItem addItem(string t, bool enabled = true)
+	public final MenuItem addItem(string t)
+	{
+		return this.addItem(t, -1, true);
+	}
+
+	public final MenuItem addItem(string t, bool enabled)
+	{
+		return this.addItem(t, -1, enabled);
+	}
+
+	public final MenuItem addItem(string t, int imgIdx)
+	{
+		return this.addItem(t, imgIdx, true);
+	}
+
+	public final MenuItem addItem(string t, int imgIdx, bool enabled)
 	{
 		if(!this._items)
 		{
@@ -215,11 +255,14 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		}
 
 		MenuItem item = new MenuItem(this, MenuStyle.NORMAL, t, enabled);
+		item.imageIndex = imgIdx;
+
 		this._items.add(item);
 
 		if(this.created)
 		{
-			createItem(this, item);
+			RootMenu rm = (!this._menuInfo.Parent ? cast(RootMenu)this : (cast(MenuItem)this).rootMenu);
+			createItem(rm, this, item);
 		}
 
 		return item;
@@ -237,7 +280,8 @@ abstract class Menu: Handle!(HMENU), IDisposable
 
 		if(this.created)
 		{
-			createItem(this, item);
+			RootMenu rm = (!this._menuInfo.Parent ? cast(RootMenu)this : (cast(MenuItem)this).rootMenu);
+			createItem(rm, this, item);
 		}
 
 		return item;
@@ -256,11 +300,6 @@ abstract class Menu: Handle!(HMENU), IDisposable
 		}
 	}
 
-	public final void create()
-	{
-		doMenu(this);
-	}
-
 	package void onPopup(EventArgs e)
 	{
 		this.popup(this, e);
@@ -270,6 +309,7 @@ abstract class Menu: Handle!(HMENU), IDisposable
 class MenuItem: Menu
 {
 	public Signal!(MenuItem, EventArgs) click;
+	private RootMenu _rootMenu;
 
 	protected this(Menu parent, MenuStyle mt, string t, bool e)
 	{
@@ -287,6 +327,46 @@ class MenuItem: Menu
 	@property public final MenuStyle style()
 	{
 		return this._menuInfo.Style;
+	}
+
+	@property public Menu parent()
+	{
+		return this._menuInfo.Parent;
+	}
+
+	@property public RootMenu rootMenu()
+	{
+		return this._rootMenu;
+	}
+
+	@property package void rootMenu(RootMenu rm)
+	{
+		this._rootMenu = rm;
+	}
+
+	@property public int imageIndex()
+	{
+		return this._menuInfo.ImageIndex;
+	}
+
+	@property public void imageIndex(int imgIdx)
+	{
+		this._menuInfo.ImageIndex = imgIdx;
+
+		if(this._menuInfo.Parent && this._menuInfo.Parent.created)
+		{
+			int idx = this.index;
+			HBITMAP hBitmap = iconToBitmapPARGB32(this._rootMenu.imageList.images[imgIdx].handle);
+			this._rootMenu.bitmaps.add(hBitmap);
+
+			MENUITEMINFOW minfo;
+
+			minfo.cbSize = MENUITEMINFOW.sizeof;
+			minfo.fMask = MIIM_BITMAP;
+			minfo.hbmpItem = hBitmap;
+
+			SetMenuItemInfoW(this._menuInfo.Parent.handle, idx, true, &minfo);
+		}
 	}
 
 	@property public final bool enabled()
@@ -354,7 +434,56 @@ class MenuItem: Menu
 	}
 }
 
-class MenuBar: Menu
+class RootMenu: Menu
+{
+	protected Collection!(HBITMAP) _bitmaps;
+	protected ImageList _imgList;
+
+	public override void dispose()
+	{
+		if(this._bitmaps)
+		{
+			foreach(HBITMAP hBitmap; this._bitmaps)
+			{
+				DeleteObject(hBitmap);
+			}
+		}
+
+		if(this._imgList)
+		{
+			this._imgList.dispose();
+		}
+
+		super.dispose();
+	}
+
+	@property package Collection!(HBITMAP) bitmaps()
+	{
+		return this._bitmaps;
+	}
+
+	@property public ImageList imageList()
+	{
+		return this._imgList;
+	}
+
+	@property public void imageList(ImageList imgList)
+	{
+		this._imgList = imgList;
+
+		if(!this._bitmaps)
+		{
+			this._bitmaps = new Collection!(HBITMAP)();
+		}
+	}
+
+	public final void create()
+	{
+		doMenu(this, this);
+	}
+}
+
+class MenuBar: RootMenu
 {
 	protected override void makeMenu()
 	{
@@ -363,7 +492,7 @@ class MenuBar: Menu
 	}
 }
 
-class ContextMenu: Menu
+class ContextMenu: RootMenu
 {
 	public void popupMenu(HWND hWnd, Point pt)
 	{
