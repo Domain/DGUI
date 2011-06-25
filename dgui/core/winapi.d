@@ -1536,6 +1536,29 @@ extern(Windows)
 		int iImage;
 	}
 
+	struct TRIVERTEX
+	{
+		LONG x;
+		LONG y;
+		ushort Red;
+		ushort Green;
+		ushort Blue;
+		ushort Alpha;
+	}
+
+	struct GRADIENT_TRIANGLE
+	{
+		ULONG Vertex1;
+		ULONG Vertex2;
+		ULONG Vertex3;
+	}
+
+	struct GRADIENT_RECT
+	{
+		ULONG UpperLeft;
+		ULONG LowerRight;
+	}
+
 	struct ACTCTXW
 	{
 		ULONG cbSize;
@@ -2194,6 +2217,7 @@ extern(Windows)
 	HBITMAP CreateDIBSection(HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset);
 	int DrawTextExW(HDC hdc, LPCWSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
 	BOOL ExtTextOutW(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCWSTR lpString, uint cbCount, int* lpDx);
+	BOOL GdiGradientFill(HDC hdc, TRIVERTEX* pVertex, ULONG dwNumVertex, void* pMesh, ULONG dwNumMesh, ULONG dwMode);
 	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, const(void*) lpvBits);
 	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);

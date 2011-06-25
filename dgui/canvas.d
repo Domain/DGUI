@@ -44,10 +44,10 @@ enum ImageType
 	ICON_OR_CURSOR = 1,
 }
 
-enum GradientFillMode
+enum GradientFillRectMode
 {
-	VERTICAL,
-	HORIZONTAL,
+	HORIZONTAL = 0,
+	VERTICAL   = 1,
 }
 
 enum EdgeType: uint
@@ -173,16 +173,16 @@ struct BitmapData
 
 struct Color
 {
-	private bool _valid = false; //Controlla se e' stato assegnato un colore
+	private bool _valid = false; // Check if it was assigned a value
 
 	public union
 	{
 		align(1) struct
 		{
-			ubyte red   = 0xFF;
-			ubyte green = 0xFF;
-			ubyte blue  = 0xFF;
-			ubyte alpha = 0x00; //0x00: Transparent, 0xFF: Opaque (?)
+			ubyte red   = 0x00;
+			ubyte green = 0x00;
+			ubyte blue  = 0x00;
+			ubyte alpha = 0xFF; //0x00: Transparent, 0xFF: Opaque
 		}
 
 		COLORREF colorref;
@@ -195,7 +195,7 @@ struct Color
 
 	public static Color opCall(ubyte r, ubyte g, ubyte b)
 	{
-		return Color(0x00, r, g, b);
+		return Color(0xFF, r, g, b);
 	}
 
 	public static Color opCall(ubyte a, ubyte r, ubyte g, ubyte b)
@@ -324,51 +324,60 @@ class Canvas: Handle!(HDC), IDisposable
 		return Canvas.measureString(s, c, SystemFonts.windowsFont);
 	}
 
-	/* From: http://www.winapizone.net/tutorials/winapi/functions/gradientfill.php */
-	void gradientFill(Rect r, Color firstColor, Color secondColor, GradientFillMode gfm)
+	public final void fillRectGradient(Rect r, Color startColor, Color endColor, GradientFillRectMode gfrm)
 	{
-		ubyte startRed = firstColor.red;
-		ubyte startGreen = firstColor.green;
-		ubyte startBlue = firstColor.blue;
+		TRIVERTEX[2] tv;
+		static GRADIENT_RECT gr = {UpperLeft: 0, LowerRight: 1};
 
-		ubyte endRed = secondColor.red;
-		ubyte endGreen = secondColor.green;
-		ubyte endBlue = secondColor.blue;
+		tv[0].x = r.left;
+		tv[0].y = r.top;
+		tv[0].Red = startColor.red << 8;
+		tv[0].Green = startColor.green << 8;
+		tv[0].Blue = startColor.blue << 8;
+		tv[0].Alpha = startColor.alpha << 8;
 
-		scope SolidBrush endColor = new SolidBrush(secondColor);
-		this.fillRectangle(endColor, r);
+		tv[1].x = r.right;
+		tv[1].y = r.bottom;
+		tv[1].Red = endColor.red << 8;
+		tv[1].Green = endColor.green  << 8;
+		tv[1].Blue =  endColor.blue << 8;
+		tv[1].Alpha = endColor.alpha << 8;
 
-		//Gradient line width/height
-		int dy = 2;
-		int length = (gfm is GradientFillMode.VERTICAL ? r.height : r.width) - dy;
+		GdiGradientFill(this._handle, tv.ptr, 2, &gr, 1, gfrm);
+	}
 
-		for(int dn = 0; dn <= length; dn += dy)
-		{
-			ubyte currentRed = cast(ubyte)(MulDiv(endRed - startRed, dn, length) + startRed);
-			ubyte currentGreen = cast(ubyte)(MulDiv(endGreen - startGreen, dn, length) + startGreen);
-			ubyte currentBlue = cast(ubyte)(MulDiv(endBlue - startBlue, dn, length) + startBlue);
+	public final void fillTriangleGradient(int x1, int y1, int x2, int y2, int x3, int y3, Color color1, Color color2, Color color3)
+	{
+		this.fillTriangleGradient(Point(x1, y1), Point(x2, y2), Point(x3, y3), color1, color2, color3);
+	}
 
-			Rect currentRect;
+	public final void fillTriangleGradient(Point pt1, Point pt2, Point pt3, Color color1, Color color2, Color color3)
+	{
+		TRIVERTEX[3] tv;
+		static GRADIENT_TRIANGLE gt = {Vertex1: 0, Vertex2: 1, Vertex3: 2};
 
-			if(gfm is GradientFillMode.VERTICAL)
-			{
-				currentRect.left = r.left;
-				currentRect.top = r.top + dn;
-				//currentRect.right = currentRect.left + rcGradient.right - rcGradient.left;
-				currentRect.right = currentRect.left + r.width;
-				currentRect.bottom = currentRect.top + dy;
-			}
-			else
-			{
-				currentRect.left = r.left + dn;
-				currentRect.top = r.top;
-				currentRect.right = currentRect.left + dy;
-				//currentRect.bottom = currentRect.top + rcGradient->bottom - rcGradient->top;
-			}
+		tv[0].x = pt1.x;
+		tv[0].y = pt1.y;
+		tv[0].Red = color1.red << 8;
+		tv[0].Green = color1.green << 8;
+		tv[0].Blue = color1.blue << 8;
+		tv[0].Alpha = color1.alpha << 8;
 
-			scope SolidBrush currentColor = new SolidBrush(Color(currentRed, currentGreen, currentBlue));
-			this.fillRectangle(currentColor, currentRect);
-		}
+		tv[1].x = pt2.x;
+		tv[1].y = pt2.y;
+		tv[1].Red = color2.red << 8;
+		tv[1].Green = color2.green  << 8;
+		tv[1].Blue = color2.blue << 8;
+		tv[1].Alpha = color2.alpha << 8;
+
+		tv[2].x = pt3.x;
+		tv[2].y = pt3.y;
+		tv[2].Red = color3.red << 8;
+		tv[2].Green = color3.green  << 8;
+		tv[2].Blue = color3.blue << 8;
+		tv[2].Alpha = color3.alpha << 8;
+
+		GdiGradientFill(this._handle, tv.ptr, 3, &gt, 1, 2 /* GRADIENT_FILL_TRIANGLE */);
 	}
 
 	public final void drawImage(Image img, Point upLeft, Point upRight, Point lowLeft)
