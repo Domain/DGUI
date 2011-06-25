@@ -19,3 +19,8 @@ class MainForm: Form
 		super.onPaint(e);
 	}
 }
+
+int main(string[] args)
+{
+	return Application.run(new MainForm()); // Start the application
+}

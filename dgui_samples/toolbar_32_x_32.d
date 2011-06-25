@@ -31,3 +31,8 @@ class MainForm: Form
 		this._tbrToolbar.addButton(1, false);
 	}
 }
+
+int main(string[] args)
+{
+	return Application.run(new MainForm()); // Start the application
+}
