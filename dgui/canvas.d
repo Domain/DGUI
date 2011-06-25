@@ -1280,7 +1280,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(null, cast(wchar*)IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, cast(wchar*)IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_SHARED | LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1293,7 +1293,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(null, IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_ASTERISK, IMAGE_ICON, 0, 0, LR_SHARED | LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1306,7 +1306,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(null, IDI_ERROR, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_ERROR, IMAGE_ICON, 0, 0, LR_SHARED | LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1319,7 +1319,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(null, IDI_QUESTION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_QUESTION, IMAGE_ICON, 0, 0, LR_SHARED | LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
@@ -1332,7 +1332,7 @@ final class SystemIcons
 
 		if(!ico)
 		{
-			HICON hIco = loadImage(null, IDI_WARNING, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
+			HICON hIco = loadImage(null, IDI_WARNING, IMAGE_ICON, 0, 0, LR_SHARED | LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
 			ico = Icon.fromHICON(hIco);
 		}
 
