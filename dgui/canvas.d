@@ -1082,6 +1082,22 @@ final class Font: GraphicObject
 		this._handle = createFontIndirect(&lf);
 	}
 
+	public string name()
+	{
+		LOGFONTW lf;
+
+		getInfo!(LOGFONTW)(this._handle, lf);
+		return toUTF8(lf.lfFaceName);
+	}
+
+	public int height()
+	{
+		LOGFONTW lf;
+
+		getInfo!(LOGFONTW)(this._handle, lf);
+		return lf.lfHeight;
+	}
+
 	private static void doStyle(FontStyle style, ref LOGFONTW lf)
 	{
 		lf.lfCharSet = DEFAULT_CHARSET;
