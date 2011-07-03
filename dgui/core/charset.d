@@ -19,10 +19,18 @@
 
 module dgui.core.charset;
 
+import std.string: toStringz;
+import std.conv: to;
 import std.utf: toUTF16z, toUTF8;
-import std.c.wcharh: wcscpy;
+import std.c.wcharh: wcscpy, wcslen;
 import dgui.core.winapi;
 import dgui.core.utils;
+
+public immutable(char)* wcharToChar(wchar* pWChar)
+{
+	int len = wcslen(pWChar);
+	return toStringz(to!(string)(pWChar[0..len]));
+}
 
 /**
   * $(B) Unicode Wrapper of CreateWindowEx API $(B)
