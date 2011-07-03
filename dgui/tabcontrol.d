@@ -46,9 +46,14 @@ class TabPage: ContainerControl
 	private int _imgIndex;
 	private TabControl _owner;
 
-	private this()
+	package this()
 	{
+		this.initTabPage();
+	}
 
+	protected void initTabPage()
+	{
+		//Does Nothing
 	}
 
 	@property public final int index()

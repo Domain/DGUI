@@ -41,7 +41,7 @@ public import dgui.textbox;
 
 class RichTextBox: TextControl
 {
-	private static _refCount = 0;
+	private static int _refCount = 0;
 	private static HMODULE _hRichDll;
 
 	public this()

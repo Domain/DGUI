@@ -19,13 +19,17 @@ module dgui.button;
 
 import dgui.control;
 
+/**
+  Enums that contain the check state of a _CheckBox or similar component
+  */
 enum CheckState: uint
 {
-	CHECKED = BST_CHECKED,
-	UNCHECKED = BST_UNCHECKED,
-	INDETERMINATE = BST_INDETERMINATE,
+	CHECKED = BST_CHECKED, 				///Checked State
+	UNCHECKED = BST_UNCHECKED,			///Unchecked State
+	INDETERMINATE = BST_INDETERMINATE,	///Indeterminate State
 }
 
+/// Abstract class of a _Button/_CheckBox/_RadioButton
 abstract class AbstractButton: SubclassedControl
 {
 	private DialogResult _dr = DialogResult.NONE;
@@ -108,22 +112,40 @@ abstract class AbstractButton: SubclassedControl
 	}
 }
 
+/// Abstract class of a checkable button (_CheckBox, _RadioButton, ...)
 abstract class CheckedButton: AbstractButton
 {
-	public Signal!(Control, EventArgs) checkChanged;
+	public Signal!(Control, EventArgs) checkChanged; ///Checked Changed Event of a Checkable _Button
 
 	private CheckState _checkState = CheckState.UNCHECKED;
 
+	/**
+	 Returns:
+		True if the _Button is _checked otherwise False.
+
+	 See_Also:
+		checkState() property below.
+	 */
 	@property public bool checked()
 	{
 		return this.checkState is CheckState.CHECKED;
 	}
 
+	/**
+	  Sets the checked state of a checkable _button
+
+	  Params:
+		True checks the _button, False unchecks it.
+	  */
 	@property public void checked(bool b)
 	{
 		this.checkState = b ? CheckState.CHECKED : CheckState.UNCHECKED;
 	}
 
+	/**
+	  Returns:
+		A CheckState enum that returns the state of the checkable button (it includes the indeterminate state too)
+	  */
 	@property public CheckState checkState()
 	{
 		if(this.created)
@@ -134,6 +156,9 @@ abstract class CheckedButton: AbstractButton
 		return this._checkState;
 	}
 
+	/**
+	  Sets the check state of a checkable button
+	  */
 	@property public void checkState(CheckState cs)
 	{
 		this._checkState = cs;
@@ -187,13 +212,30 @@ abstract class CheckedButton: AbstractButton
 	}
 }
 
+/// Standarde windows _Button
 class Button: AbstractButton
 {
+	/**
+	  Returns:
+		A DialogResult enum (OK, IGNORE, CLOSE, YES, NO, CANCEL, ...)
+
+	See_Also:
+		Form.showDialog()
+	  */
 	@property public DialogResult dialogResult()
 	{
 		return this._dr;
 	}
 
+	/**
+	  Sets DialogResult for a button
+
+	  Params:
+		dr = DialogResult of the button.
+
+	  See_Also:
+		Form.showDialog()
+	  */
 	@property public void dialogResult(DialogResult dr)
 	{
 		this._dr = dr;
@@ -208,6 +250,7 @@ class Button: AbstractButton
 	}
 }
 
+/// Standard windows _CheckBox
 class CheckBox: CheckedButton
 {
 	protected override void preCreateWindow(ref PreCreateWindow pcw)
@@ -219,6 +262,7 @@ class CheckBox: CheckedButton
 	}
 }
 
+/// Standard windows _RadioButton
 class RadioButton: CheckedButton
 {
 	protected override void preCreateWindow(ref PreCreateWindow pcw)

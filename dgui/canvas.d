@@ -17,6 +17,7 @@
 
 module dgui.canvas;
 
+import std.conv : to;
 import std.path;
 import std.string;
 import std.c.string;
@@ -1042,35 +1043,32 @@ final class Cursor: Icon
 
 final class Font: GraphicObject
 {
-	private FontStyle _style;
-	private int _height;
-	private string _name;
+	private static int _logPixelSY = 0;
 
 	private this(HFONT hFont, bool owned)
 	{
 		super(hFont, owned);
 	}
 
-	public this(string name, int h, FontStyle style = FontStyle.NORMAL)
-	in
+	private static void initLogPixelSY()
 	{
-		assert(h > 0, "Font height must be > 0");
+		if(!_logPixelSY)
+		{
+			HDC hdc = GetWindowDC(null);
+			_logPixelSY = GetDeviceCaps(hdc, LOGPIXELSY);
+			ReleaseDC(null, hdc);
+		}
 	}
-	body
-	{
-		HDC hdc = GetWindowDC(null);
 
-		this._name = name;
-		this._height = MulDiv(cast(int)(h * 100), GetDeviceCaps(hdc, LOGPIXELSY), 72 * 100);
-		this._style = style;
+	public this(string name, int h, FontStyle style = FontStyle.NORMAL)
+	{
+		Font.initLogPixelSY();
 
 		LOGFONTW lf;
-		lf.lfHeight = this._height;
+		lf.lfHeight = -MulDiv(h, _logPixelSY, 72);
 
 		doStyle(style, lf);
 		this._handle = createFontIndirect(name, &lf);
-
-		ReleaseDC(null, hdc);
 	}
 
 	public this(Font f, FontStyle fs)
@@ -1087,15 +1085,17 @@ final class Font: GraphicObject
 		LOGFONTW lf;
 
 		getInfo!(LOGFONTW)(this._handle, lf);
-		return toUTF8(lf.lfFaceName);
+		return to!(string)(toUTF8(lf.lfFaceName).ptr);
 	}
 
 	public int height()
 	{
 		LOGFONTW lf;
 
+		Font.initLogPixelSY();
+
 		getInfo!(LOGFONTW)(this._handle, lf);
-		return lf.lfHeight;
+		return -MulDiv(72, lf.lfHeight, _logPixelSY);
 	}
 
 	private static void doStyle(FontStyle style, ref LOGFONTW lf)

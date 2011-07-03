@@ -24,6 +24,9 @@ import std.c.wcharh: wcscpy;
 import dgui.core.winapi;
 import dgui.core.utils;
 
+/**
+  * $(B) Unicode Wrapper of CreateWindowEx API $(B)
+  */
 public HWND createWindowEx(DWORD exStyle, string className, string windowName, DWORD style,
 					       int x, int y, int nWidth, int nHeight, HWND hWndParent, LPVOID lpParam)
 {

@@ -98,6 +98,11 @@ private alias extern(Windows) BOOL function(HANDLE hActCtx, ULONG_PTR* lpCookie)
 private alias extern(Windows) HANDLE function(ACTCTXW* pActCtx) CreateActCtxWProc;
 private alias extern(Windows) bool function(INITCOMMONCONTROLSEX*) InitCommonControlsExProc;
 
+/**
+   The _Application class manage the whole program, it can be used for load embedded resources,
+   close the program, get the current path and so on.
+   Internally in initialize manifest (if available), DLLs, and it handle exceptions showing a window with exception information.
+  */
 class Application
 {
 	private static class ExceptionForm: Form
@@ -154,36 +159,69 @@ class Application
 		private Button _btnQuit;
 	}
 
+	/// Static constructor (it enable the manifest, if available)
 	public static this()
 	{
 		Application.enableManifest(); //Enable Manifest (if available)
 	}
 
+	/**
+	      This method calls GetModuleHandle() API
+
+		Returns:
+			HINSTANCE of the program
+	  */
 	@property public static HINSTANCE instance()
 	{
 		return getHInstance();
 	}
 
+	/**
+		Returns:
+			String value of the executable path ($(B including) the executable name)
+	   */
 	@property public static string executablePath()
 	{
 		return getExecutablePath();
 	}
 
+	/**
+	   This method calls GetTempPath() API
+
+		Returns:
+			String value of the system's TEMP directory
+	   */
 	@property public static string tempPath()
 	{
 		return getTempPath();
 	}
 
+	/**
+	   Returns:
+		String value of the executable path ($(B without) the executable name)
+	   */
 	@property public static string startupPath()
 	{
 		return getStartupPath();
 	}
 
+	/**
+	   This property allows to load embedded _resources.
+
+		Returns:
+			The Instance of reource object
+
+		See_Also:
+			Resources Class
+	 */
 	@property public static Resources resources()
 	{
 		return Resources.instance;
 	}
 
+	/**
+	   Internal method that enable XP Manifest (if available)
+	 */
 	private static void enableManifest()
 	{
 		HMODULE hKernel32 = getModuleHandle("kernel32.dll");
@@ -225,6 +263,9 @@ class Application
 		initCommonControls();
 	}
 
+	/**
+	  Internal method that loads ComCtl32 DLL
+	  */
 	private static void initCommonControls()
 	{
 		INITCOMMONCONTROLSEX icc = void; //Inizializzata Sotto.
@@ -245,6 +286,15 @@ class Application
 		}
 	}
 
+	/**
+	  Start the program.
+	  Params:
+		mainForm = The Application's main form
+
+	  Returns:
+		ExitProcess' result (0 = OK, No 0 = Something wrong)
+	       Internally it returns the wParam value of a MSG structure.
+	  */
 	public static int run(Form mainForm)
 	{
 		mainForm.close.attach(&onMainFormClose);
@@ -253,17 +303,33 @@ class Application
 		return 0;
 	}
 
+	/**
+	  Close the program.
+	  Params:
+		exitCode = Exit code of the program (usually is 0)
+	  */
 	public static void exit(int exitCode = 0)
 	{
 		ExitProcess(exitCode);
 	}
 
+	/**
+	  When an exception was thrown, the _Application class call this method
+	  showing the exception information, the user has the choice to continue the
+	  application or terminate it.
+
+	  Returns:
+		A DialogResult enum that contains the button clicked by the user (IGNORE or EXIT)
+	  */
 	package static DialogResult showExceptionForm(Throwable e)
 	{
 		ExceptionForm ef = new ExceptionForm(e);
 		return ef.showDialog();
 	}
 
+	/**
+	  Close _Application event attached (internally) at the main form
+	  */
 	private static void onMainFormClose(Control sender, EventArgs e)
 	{
 		Application.exit();
