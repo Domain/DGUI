@@ -17,6 +17,7 @@
 
 module dgui.openfiledialog;
 
+import std.conv: to;
 import std.utf: toUTF16z, toUTF8;
 import dgui.core.utils;
 public import dgui.core.commondialog;
@@ -50,7 +51,7 @@ class OpenFileDialog: CommonDialog!(OPENFILENAMEW, string)
 
 		if(GetOpenFileNameW(&this._dlgStruct))
 		{
-			this._dlgRes = toUTF8(buffer);
+			this._dlgRes = to!(string)(toUTF8(buffer).ptr);
 			return true;
 		}
 
