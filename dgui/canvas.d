@@ -183,7 +183,7 @@ struct Color
 			ubyte red   = 0x00;
 			ubyte green = 0x00;
 			ubyte blue  = 0x00;
-			ubyte alpha = 0xFF; //0x00: Transparent, 0xFF: Opaque
+			ubyte alpha = 0x00; //0x00: Transparent (or Don't Care), 0xFF: Opaque
 		}
 
 		COLORREF colorref;
@@ -196,7 +196,7 @@ struct Color
 
 	public static Color opCall(ubyte r, ubyte g, ubyte b)
 	{
-		return Color(0xFF, r, g, b);
+		return Color(0x00, r, g, b);
 	}
 
 	public static Color opCall(ubyte a, ubyte r, ubyte g, ubyte b)
@@ -209,14 +209,20 @@ struct Color
 		color.red = r;
 		color.green = g;
 		color.blue = b;
-		color.blue = b;
 
+		return color;
+	}
+
+	public static Color invalid()
+	{
+		static Color color;
+		//color._valid = false; //Set valid to false (false = default value)
 		return color;
 	}
 
 	public static Color fromCOLORREF(COLORREF cref)
 	{
-		Color color = void; //Inializzata sotto;
+		Color color = void;
 
 		color._valid = true;
 		color.colorref = cref;

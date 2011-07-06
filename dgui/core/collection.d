@@ -84,7 +84,7 @@ class Collection(T)
 			return this._t[i];
 		}
 
-		return null;
+		assert(false, "Index out of range");
 	}
 
 	public int opApply(int delegate(ref T) dg)

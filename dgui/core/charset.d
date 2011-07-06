@@ -26,10 +26,15 @@ import std.c.wcharh: wcscpy, wcslen;
 import dgui.core.winapi;
 import dgui.core.utils;
 
-public immutable(char)* wcharToChar(wchar* pWChar)
+public immutable(char)* unicodeToAnsiPtr(wchar* pWChar)
 {
 	int len = wcslen(pWChar);
 	return toStringz(to!(string)(pWChar[0..len]));
+}
+
+public immutable(wchar)* ansiToUnicodePtr(char* pChar)
+{
+	return cast(immutable(wchar)*)toUTF16z(to!(string)(pChar));
 }
 
 /**
