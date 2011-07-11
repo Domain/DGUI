@@ -434,7 +434,7 @@ class TreeView: SubclassedControl
 		node.handle = cast(HTREEITEM)tvw.sendMessage(TVM_INSERTITEMW, 0, cast(LPARAM)&tvis);
 
 		/*
-		  Commented Out: Performance Killer, Populate the node when the node is expanded
+		  Performance Killer, Populate the node when the node is expanded
 		*/
 		if(node.hasNodes)
 		{
