@@ -30,148 +30,192 @@ import dgui.core.handle;
 import dgui.core.utils;
 public import dgui.core.geometry;
 
+/**
+  Enum that contain the font style of a Font Object.
+  */
 enum FontStyle: ubyte
 {
-	NORMAL = 0,
-	BOLD = 1,
-	ITALIC = 2,
-	UNDERLINE = 4,
-	STRIKEOUT = 8,
+	NORMAL = 0,		/// Normal Font Style
+	BOLD = 1,		/// Bold Font Style
+	ITALIC = 2,		/// Italic Font Style
+	UNDERLINE = 4,	/// Underline Font Style
+	STRIKEOUT = 8,	/// Strikeout Font Style
 }
+
+/**
+  Enum that contain the image type (useful in order to identify a Image object).
+  */
 
 enum ImageType
 {
-	BITMAP 		   = 0,
-	ICON_OR_CURSOR = 1,
+	BITMAP 		   = 0,	/// Bitmap Image
+	ICON_OR_CURSOR = 1,	/// Icon or Cursor
 }
 
+/**
+  Enum that specify the fill mode of a gradient.
+  */
 enum GradientFillRectMode
 {
-	HORIZONTAL = 0,
-	VERTICAL   = 1,
+	HORIZONTAL = 0,	/// Horizontal Fill
+	VERTICAL   = 1,	/// Vertical Fill
 }
 
+/**
+  Enum that specify the border type (used in a Canvas.drawEdge() call).
+  */
 enum EdgeType: uint
 {
-	RAISED_OUTER = BDR_RAISEDOUTER,
-	RAISED_INNER = BDR_RAISEDINNER,
+	RAISED_OUTER = BDR_RAISEDOUTER,	/// Raised Outer Edge
+	RAISED_INNER = BDR_RAISEDINNER, /// Raised Innter Edge
 
-	SUNKEN_OUTER = BDR_SUNKENOUTER,
-	SUNKEN_INNER = BDR_SUNKENINNER,
+	SUNKEN_OUTER = BDR_SUNKENOUTER,	/// Sunken Outer Edge
+	SUNKEN_INNER = BDR_SUNKENINNER, /// Sunken Inner Edge
 
-	BUMP = EDGE_BUMP,
-	ETCHED = EDGE_ETCHED,
-	EDGE_RAISED = EDGE_RAISED,
-	SUNKEN = EDGE_SUNKEN,
+	BUMP = EDGE_BUMP,				/// Bump Edge
+	ETCHED = EDGE_ETCHED,			/// Etched Edge
+	EDGE_RAISED = EDGE_RAISED,		/// Edge Raised Edge
+	SUNKEN = EDGE_SUNKEN,			/// Sunken Edge
 }
 
+/**
+  Enum that specify the draw border mode  (used in a Canvas.drawEdge() call).
+  */
 enum EdgeMode: uint
 {
-	ADJUST = BF_ADJUST,
-	DIAGONAL = BF_DIAGONAL,
-	FLAT = BF_FLAT,
-	LEFT = BF_LEFT,
-	TOP = BF_TOP,
-	RIGHT = BF_RIGHT,
-	BOTTOM = BF_BOTTOM,
-	MIDDLE = BF_MIDDLE,
-	MONO = BF_MONO,
-	RECT = BF_RECT,
-	SOFT = BF_SOFT,
+	ADJUST	 = BF_ADJUST,		/// Shrink the rectangle in order to exlude the edges that were drawn.
+	DIAGONAL = BF_DIAGONAL,		/// Diagonal Border.
+	FLAT	 = BF_FLAT,			/// Flat Border.
+	LEFT	 = BF_LEFT,			/// Left Border Only.
+	TOP		 = BF_TOP,			/// Top Border Only.
+	RIGHT    = BF_RIGHT,		/// Right Border Only.
+	BOTTOM 	 = BF_BOTTOM,		/// Bottom Border Only.
+	INTERNAL = BF_MIDDLE,		/// Internal Border will be filled.
+	MONO 	 = BF_MONO,			/// One Dimensional Border.
+	RECT 	 = BF_RECT,			/// Fills the entire border of the rectangle.
+	//SOFT 	 = BF_SOFT,
 }
 
+/**
+  Enum that specify the style of a Hatch Brush object
+  */
 enum HatchStyle: int
 {
-	HORIZONTAL = HS_HORIZONTAL,
-	VERTICAL = HS_VERTICAL,
-	BACKWARD_DIAGONAL = HS_BDIAGONAL,
-	FORWARD_DIAGONAL = HS_FDIAGONAL,
-	CROSS = HS_CROSS,
-	DIAGONAL_CROSS = HS_DIAGCROSS,
+	HORIZONTAL 		   = HS_HORIZONTAL,		/// The brush has horizontal stripes.
+	VERTICAL 		   = HS_VERTICAL,		/// The brush has vertical stripes.
+	DEGREE_45_UPWARD   = HS_BDIAGONAL, 		/// The brush has 45° degree rising stripes.
+	DEGREE_45_DOWNWARD = HS_FDIAGONAL,		/// The brush has 45° degree falling stripes.
+	CROSS			   = HS_CROSS,			/// The brush has crossed stripes.
+	DIAGONAL_CROSS	   = HS_DIAGCROSS,		/// The brush has diagonal crossed stripes.
 }
 
+
+/**
+  Enum that specify the style of a Pen object.
+  */
 enum PenStyle: uint
 {
-	SOLID = PS_SOLID,
-	DASH = PS_DASH,
-	DOT = PS_DOT,
-	DASH_DOT = PS_DASHDOT,
-	DASH_DOT_DOT = PS_DASHDOTDOT,
-	NULL = PS_NULL,
-	INSIDE_FRAME = PS_INSIDEFRAME,
+	SOLID		 = PS_SOLID,		/// Solid Pen (Standard).
+	DASH		 = PS_DASH,			/// Dashed Pen.
+	DOT  		 = PS_DOT,			/// Dotted Pen.
+	DASH_DOT	 = PS_DASHDOT,		/// Dash-Dotted Pen.
+	DASH_DOT_DOT = PS_DASHDOTDOT,	/// Dashed-Dotted-Dotted Pen.
+	NULL		 = PS_NULL,			/// Invisible Pen.
+	INSIDE_FRAME = PS_INSIDEFRAME,	/// Solid Pen (line are drown inside the border of a closed shape).
 }
 
+/**
+  Enum that specify the style of a text in a drawText() call
+  */
 enum TextFormatFlags: uint
 {
-	NO_PREFIX = DT_NOPREFIX,
-	DIRECTION_RIGHT_TO_LEFT = DT_RTLREADING,
-	WORD_BREAK = DT_WORDBREAK,
-	SINGLE_LINE = DT_SINGLELINE,
-	NO_CLIP = DT_NOCLIP,
-	LINE_LIMIT = DT_EDITCONTROL,
+	NO_PREFIX				= DT_NOPREFIX,		/// Turn of processing of prefix characters (like '&', character that it will be not displayed underline).
+	WORD_BREAK			    = DT_WORDBREAK,		/// Break the line if a carriage return is found or the selected rectangle is too small.
+	SINGLE_LINE				= DT_SINGLELINE,	/// The text is draw in one single line.
+	LINE_LIMIT 				= DT_EDITCONTROL,	/// Duplicate the text displaying of a multiline control.
+	NO_CLIP 				= DT_NOCLIP,		/// The text is not clipped.
+	//DIRECTION_RIGHT_TO_LEFT = DT_RTLREADING,
 }
 
+/**
+  Enum that specify the style of a text alignment in a drawText() call
+  */
 enum TextAlignment: uint
 {
-	LEFT = DT_LEFT,
-	RIGHT = DT_RIGHT,
-	CENTER = DT_CENTER,
+	LEFT   = DT_LEFT,		/// Text is left aligned.
+	RIGHT  = DT_RIGHT,		/// Text is right aligned.
+	CENTER = DT_CENTER,		/// Text is centred horizontally.
 
-	TOP = DT_TOP,
-	BOTTOM = DT_BOTTOM,
-	MIDDLE = DT_VCENTER,
+	TOP    = DT_TOP,		/// Text is top aligned.
+	BOTTOM = DT_BOTTOM,		/// Text is bottom aligned.
+	MIDDLE = DT_VCENTER,	/// Text is centred vertically.
 }
 
+/**
+  Enum that specify the trimming of a text alignment in a drawText() call
+  */
 enum TextTrimming: uint
 {
-	NONE = 0,
-	ELLIPSIS = DT_END_ELLIPSIS,
-	ELLIPSIS_PATH = DT_PATH_ELLIPSIS,
+	NONE 		  = 0,					/// No Trimming.
+	ELLIPSIS	  = DT_END_ELLIPSIS,	/// If the text is too long, it will be replaced with end ellipsis (like: ellips...).
+	ELLIPSIS_PATH = DT_PATH_ELLIPSIS,   /// If the text is too long, it will be replaces with middle ellipsis (like: texttr...ing).
 }
 
+/**
+  Specify the copy mode of a Bitmap
+  */
 enum BitmapCopyMode
 {
-	NORMAL 	= SRCCOPY,
-	INVERT	= SRCINVERT,
-	AND   	= SRCAND,
-	OR      = SRCPAINT,
+	NORMAL 	= SRCCOPY,		/// Standard Copy.
+	INVERT	= SRCINVERT,	/// Copy Inverted.
+	AND   	= SRCAND,		/// Copy using _AND operator (Source _AND Destination).
+	OR      = SRCPAINT,		/// Copy using _OR operator (Source _OR Destination).
 }
 
+/**
+  It rappresentes a color of a bitmap.
+  */
 struct BitmapBit
 {
 	union
 	{
 		ubyte rgbBlue;
-		ubyte Blue;
+		ubyte Blue;			/// _Blue color.
 	}
 
 	union
 	{
 		ubyte rgbGreen;
-		ubyte Green;
+		ubyte Green;	    /// _Green color.
 	}
 
 	union
 	{
 		ubyte rgbRed;
-		ubyte Red;
+		ubyte Red;			/// _Red color.
 	}
 
 	union
 	{
 		ubyte rgbReserved;
-		ubyte Alpha;
+		ubyte Alpha; 		/// _Alpha channel (if available).
 	}
 }
 
+/**
+  This structure allows direct modification of a bitmap
+  */
 struct BitmapData
 {
-	BITMAPINFO* Info;
-	uint ImageSize;
-	uint BitsCount;
-	BitmapBit* Bits;
+	BITMAPINFO* Info;	/// BITMAPINFO structure (usually, it is used internally).
+	uint ImageSize;		/// The size of the _Bitmap.
+	uint BitsCount;		/// Number of BitmapBits structure of the _Bitmap (is the _Bits field length).
+	BitmapBit* Bits;	/// Pointer to the _Bitmap's bits (it allows direct modification of the colors)
 }
 
+/**
+  A _Color in ARGB format (compatible with COLORREF win32 type)
+  */
 struct Color
 {
 	private bool _valid = false; // Check if it was assigned a value
@@ -186,9 +230,10 @@ struct Color
 			ubyte alpha = 0x00; //0x00: Transparent (or Don't Care), 0xFF: Opaque
 		}
 
-		COLORREF colorref;
+		COLORREF colorref;	/// Compatibility with COLORREF type
 	}
 
+	/// Checks if the color information is _valid.
 	@property public final bool valid()
 	{
 		return this._valid;
@@ -213,6 +258,7 @@ struct Color
 		return color;
 	}
 
+	/// Returns an invalid color
 	public static Color invalid()
 	{
 		static Color color;
@@ -220,6 +266,7 @@ struct Color
 		return color;
 	}
 
+	/// Given a COLORREF, it returns a _Color object
 	public static Color fromCOLORREF(COLORREF cref)
 	{
 		Color color = void;
@@ -230,6 +277,11 @@ struct Color
 	}
 }
 
+/**
+ The _Canvas object is the DGui's rappresentation of a Device Context (Screen DC, Memory DC and Printer DC)
+ $(DDOC_BLANKLINE)
+ $(B Note): Printer DC is not implemented
+ */
 class Canvas: Handle!(HDC), IDisposable
 {
 	private enum CanvasType: ubyte

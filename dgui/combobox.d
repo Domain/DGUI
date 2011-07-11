@@ -328,6 +328,7 @@ class ComboBox: SubclassedControl
 						break;
 				}
 			}
+			break;
 
 			default:
 				break;

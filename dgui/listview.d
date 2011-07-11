@@ -303,7 +303,7 @@ class ListViewColumn
 	}
 }
 
-public alias ItemCheckedEventArgs!(ListViewItem) ListViewItemCheckedEventArgs;
+public alias ItemEventArgs!(ListViewItem) ListViewItemCheckedEventArgs;
 
 class ListView: OwnerDrawControl
 {

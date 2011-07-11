@@ -114,7 +114,7 @@ public string getWindowText(HWND hWnd)
 	wchar[] t = new wchar[len];
 
 	GetWindowTextW(hWnd, t.ptr, len);
-	return toUTF8(t);
+	return to!(string)(toUTF8(t).ptr);
 }
 
 public BOOL setWindowText(HWND hWnd, string s)

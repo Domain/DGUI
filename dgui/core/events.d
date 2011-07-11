@@ -291,7 +291,7 @@ class KeyCharEventArgs: KeyEventArgs
 	}
 }
 
-class ItemCheckedEventArgs(T): EventArgs
+class ItemEventArgs(T): EventArgs
 {
 	private T _checkedItem;
 

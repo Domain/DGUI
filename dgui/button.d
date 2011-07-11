@@ -20,7 +20,7 @@ module dgui.button;
 import dgui.control;
 
 /**
-  Enums that contain the check state of a _CheckBox or similar component
+  Enum that contain the check state of a _CheckBox or similar component
   */
 enum CheckState: uint
 {

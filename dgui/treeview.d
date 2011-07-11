@@ -289,18 +289,23 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		{
 			foreach(TreeNode tn; this._nodes)
 			{
-				TreeView.createTreeNode(tn);
+				if(!tn.created)
+				{
+					TreeView.createTreeNode(tn);
+				}
 			}
 		}
 	}
 }
 
 public alias ItemChangedEventArgs!(TreeNode) TreeNodeChangedEventArgs;
+public alias ItemEventArgs!(TreeNode) TreeNodeExpandedEventArgs;
 
 class TreeView: SubclassedControl
 {
 	public Signal!(Control, CancelEventArgs) selectedNodeChanging;
 	public Signal!(Control, TreeNodeChangedEventArgs) selectedNodeChanged;
+	public Signal!(Control, TreeNodeExpandedEventArgs) treeNodeExpanded;
 
 	private Collection!(TreeNode) _nodes;
 	private ImageList _imgList;
@@ -428,12 +433,14 @@ class TreeView: SubclassedControl
 		TreeView tvw = node.treeView;
 		node.handle = cast(HTREEITEM)tvw.sendMessage(TVM_INSERTITEMW, 0, cast(LPARAM)&tvis);
 
+		/*
+		  Commented Out: Performance Killer, Populate the node when the node is expanded
+		*/
 		if(node.hasNodes)
 		{
 			node.doChildNodes();
 		}
 
-		node.expand();
 		tvw.redraw();
 	}
 
@@ -480,6 +487,15 @@ class TreeView: SubclassedControl
 
 			switch(pNotifyTreeView.hdr.code)
 			{
+				case TVN_ITEMEXPANDEDW:
+				{
+					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
+
+					scope TreeNodeExpandedEventArgs e = new TreeNodeExpandedEventArgs(node);
+					this.onTreeNodeExpanded(e);
+				}
+				break;
+
 				case TVN_SELCHANGINGW:
 				{
 					scope CancelEventArgs e = new CancelEventArgs();
@@ -521,6 +537,11 @@ class TreeView: SubclassedControl
 		super.onMouseKeyUp(e);
 	}
 	*/
+
+	protected void onTreeNodeExpanded(TreeNodeExpandedEventArgs e)
+	{
+		this.treeNodeExpanded(this, e);
+	}
 
 	protected void onSelectedNodeChanging(CancelEventArgs e)
 	{

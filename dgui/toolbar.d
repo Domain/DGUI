@@ -368,6 +368,7 @@ class ToolBar: SubclassedControl
 						break;
 				}
 			}
+			break;
 
 			default:
 				break;
