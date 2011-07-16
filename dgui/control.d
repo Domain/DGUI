@@ -585,6 +585,19 @@ abstract class Control: Handle!(HWND), IDisposable
 		return false;
 	}
 
+	@property public void lockRedraw(bool b)
+	{
+		if(this.created)
+		{
+			this.sendMessage(WM_SETREDRAW, !b, 0);
+
+			if(!b)
+			{
+				this.invalidate(); //Force Redraw
+			}
+		}
+	}
+
 	public final uint sendMessage(uint msg, WPARAM wParam, LPARAM lParam)
 	in
 	{

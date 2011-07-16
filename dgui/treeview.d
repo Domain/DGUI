@@ -22,28 +22,36 @@ import dgui.core.utils;
 import dgui.control;
 import dgui.imagelist;
 
+enum NodeInsertMode
+{
+	HEAD = TVI_FIRST,
+	TAIL = TVI_LAST,
+}
+
 class TreeNode: Handle!(HTREEITEM)//, IDisposable
 {
 	private Collection!(TreeNode) _nodes;
 	private TreeView _owner;
 	private TreeNode _parent;
+	private NodeInsertMode _nim;
 	private string _text;
 	private int _imgIndex;
 	private int _selImgIndex;
 	private Object _tag;
 
-	package this(TreeView owner, string txt, int imgIndex, int selImgIndex)
+	package this(TreeView owner, string txt, int imgIndex, int selImgIndex, NodeInsertMode nim)
 	{
 		this._owner = owner;
 		this._text = txt;
 		this._imgIndex = imgIndex;
 		this._selImgIndex = selImgIndex;
+		this._nim = nim;
 	}
 
-	package this(TreeView owner, TreeNode parent, string txt, int imgIndex, int selImgIndex)
+	package this(TreeView owner, TreeNode parent, string txt, int imgIndex, int selImgIndex, NodeInsertMode nim)
 	{
 		this._parent = parent;
-		this(owner, txt, imgIndex, selImgIndex);
+		this(owner, txt, imgIndex, selImgIndex, nim);
 	}
 
 	/*
@@ -65,14 +73,14 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 	}
 	*/
 
-	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1)
+	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1, NodeInsertMode nim = NodeInsertMode.TAIL)
 	{
 		if(!this._nodes)
 		{
 			this._nodes = new Collection!(TreeNode)();
 		}
 
-		TreeNode tn = new TreeNode(this._owner, this, txt, imgIndex, selImgIndex == -1 ? imgIndex : selImgIndex);
+		TreeNode tn = new TreeNode(this._owner, this, txt, imgIndex, selImgIndex == -1 ? imgIndex : selImgIndex, nim);
 		this._nodes.add(tn);
 
 		if(this._owner && this._owner.created)
@@ -81,6 +89,16 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		}
 
 		return tn;
+	}
+
+	public final TreeNode addNode(string txt, int imgIndex, NodeInsertMode nim)
+	{
+		return this.addNode(txt, imgIndex, imgIndex, nim);
+	}
+
+	public final TreeNode addNode(string txt, NodeInsertMode nim)
+	{
+		return this.addNode(txt, -1, -1, nim);
 	}
 
 	public final void removeNode(TreeNode node)
@@ -114,6 +132,11 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 	public final void remove()
 	{
 		TreeView.removeTreeNode(this);
+	}
+
+	@property package NodeInsertMode insertMode()
+	{
+		return this._nim;
 	}
 
 	@property public final TreeView treeView()
@@ -299,13 +322,14 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 }
 
 public alias ItemChangedEventArgs!(TreeNode) TreeNodeChangedEventArgs;
-public alias ItemEventArgs!(TreeNode) TreeNodeExpandedEventArgs;
+public alias ItemEventArgs!(TreeNode) TreeNodeEventArgs;
 
 class TreeView: SubclassedControl
 {
 	public Signal!(Control, CancelEventArgs) selectedNodeChanging;
 	public Signal!(Control, TreeNodeChangedEventArgs) selectedNodeChanged;
-	public Signal!(Control, TreeNodeExpandedEventArgs) treeNodeExpanded;
+	public Signal!(Control, TreeNodeEventArgs) treeNodeExpanded;
+	public Signal!(Control, TreeNodeEventArgs) treeNodeCollapsed;
 
 	private Collection!(TreeNode) _nodes;
 	private ImageList _imgList;
@@ -321,14 +345,14 @@ class TreeView: SubclassedControl
 		}
 	}
 
-	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1)
+	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1, NodeInsertMode nim = NodeInsertMode.TAIL)
 	{
 		if(!this._nodes)
 		{
 			this._nodes = new Collection!(TreeNode)();
 		}
 
-		TreeNode tn = new TreeNode(this, txt, imgIndex, selImgIndex == -1 ? imgIndex : selImgIndex);
+		TreeNode tn = new TreeNode(this, txt, imgIndex, selImgIndex == -1 ? imgIndex : selImgIndex, nim);
 		this._nodes.add(tn);
 
 		if(this.created)
@@ -337,6 +361,16 @@ class TreeView: SubclassedControl
 		}
 
 		return tn;
+	}
+
+	public final TreeNode addNode(string txt, int imgIndex, NodeInsertMode nim)
+	{
+		return this.addNode(txt, imgIndex, imgIndex, nim);
+	}
+
+	public final TreeNode addNode(string txt, NodeInsertMode nim)
+	{
+		return this.addNode(txt, -1, -1, nim);
 	}
 
 	public final void removeNode(TreeNode node)
@@ -423,7 +457,7 @@ class TreeView: SubclassedControl
 		TVINSERTSTRUCTW tvis;
 
 		tvis.hParent = node.parentNode ? node.parentNode.handle : cast(HTREEITEM)TVI_ROOT;
-		tvis.hInsertAfter = cast(HTREEITEM)TVI_LAST;
+		tvis.hInsertAfter = cast(HTREEITEM)node.insertMode;
 		tvis.item.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_TEXT | TVIF_PARAM;
 		tvis.item.iImage = node.imageIndex;
 		tvis.item.iSelectedImage = node.selectedImageIndex;
@@ -433,9 +467,6 @@ class TreeView: SubclassedControl
 		TreeView tvw = node.treeView;
 		node.handle = cast(HTREEITEM)tvw.sendMessage(TVM_INSERTITEMW, 0, cast(LPARAM)&tvis);
 
-		/*
-		  Performance Killer, Populate the node when the node is expanded
-		*/
 		if(node.hasNodes)
 		{
 			node.doChildNodes();
@@ -491,8 +522,16 @@ class TreeView: SubclassedControl
 				{
 					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
 
-					scope TreeNodeExpandedEventArgs e = new TreeNodeExpandedEventArgs(node);
-					this.onTreeNodeExpanded(e);
+					scope TreeNodeEventArgs e = new TreeNodeEventArgs(node);
+
+					if(pNotifyTreeView.action & TVE_EXPAND)
+					{
+						this.onTreeNodeExpanded(e);
+					}
+					else if(pNotifyTreeView.action & TVE_COLLAPSE)
+					{
+						this.onTreeNodeCollapsed(e);
+					}
 				}
 				break;
 
@@ -538,9 +577,14 @@ class TreeView: SubclassedControl
 	}
 	*/
 
-	protected void onTreeNodeExpanded(TreeNodeExpandedEventArgs e)
+	protected void onTreeNodeExpanded(TreeNodeEventArgs e)
 	{
 		this.treeNodeExpanded(this, e);
+	}
+
+	protected void onTreeNodeCollapsed(TreeNodeEventArgs e)
+	{
+		this.treeNodeCollapsed(this, e);
 	}
 
 	protected void onSelectedNodeChanging(CancelEventArgs e)
