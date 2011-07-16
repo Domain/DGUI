@@ -134,9 +134,11 @@ class TabPage: ContainerControl
 	}
 }
 
+alias CancelEventArgs!(TabPage) CancelTabPageEventArgs;
+
 class TabControl: OwnerDrawControl, IContainerControl
 {
-	public Signal!(Control, CancelEventArgs) tabPageChanging;
+	public Signal!(Control, CancelTabPageEventArgs) tabPageChanging;
 	public Signal!(Control, EventArgs) tagPageChanged;
 
 	private Collection!(TabPage) _tabPages;
@@ -381,7 +383,7 @@ class TabControl: OwnerDrawControl, IContainerControl
 			{
 				case TCN_SELCHANGING:
 				{
-					scope CancelEventArgs e = new CancelEventArgs();
+					scope CancelTabPageEventArgs e = new CancelTabPageEventArgs(this.selectedPage);
 
 					this.onTabPageChanging(e);
 					return e.cancel;
@@ -403,7 +405,7 @@ class TabControl: OwnerDrawControl, IContainerControl
 		return super.onReflectedMessage(msg, wParam, lParam);
 	}
 
-	protected void onTabPageChanging(CancelEventArgs e)
+	protected void onTabPageChanging(CancelTabPageEventArgs e)
 	{
 		this.tabPageChanging(this, e);
 	}

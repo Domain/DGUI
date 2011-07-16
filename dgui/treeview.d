@@ -34,13 +34,17 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 	private TreeView _owner;
 	private TreeNode _parent;
 	private NodeInsertMode _nim;
+	private bool _lazyNode;
+	private bool _childNodesCreated;
 	private string _text;
 	private int _imgIndex;
 	private int _selImgIndex;
-	private Object _tag;
+
+	mixin TagProperty;
 
 	package this(TreeView owner, string txt, int imgIndex, int selImgIndex, NodeInsertMode nim)
 	{
+		this._childNodesCreated = false;
 		this._owner = owner;
 		this._text = txt;
 		this._imgIndex = imgIndex;
@@ -144,7 +148,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		return this._owner;
 	}
 
-	@property public final TreeNode parentNode()
+	@property public final TreeNode parent()
 	{
 		return this._parent;
 	}
@@ -166,14 +170,14 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 		return false;
 	}
 
-	@property public final Object tag()
+	@property public final bool lazyNode()
 	{
-		return this._tag;
+		return this._lazyNode;
 	}
 
-	@property public final void tag(Object obj)
+	@property public final void lazyNode(bool b)
 	{
-		this._tag = obj;
+		this._lazyNode = b;
 	}
 
 	@property public final string text()
@@ -308,7 +312,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 	package void doChildNodes()
 	{
-		if(this._nodes)
+		if(this._nodes && !this._childNodesCreated)
 		{
 			foreach(TreeNode tn; this._nodes)
 			{
@@ -317,17 +321,21 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 					TreeView.createTreeNode(tn);
 				}
 			}
+
+			this._childNodesCreated = true;
 		}
 	}
 }
 
 public alias ItemChangedEventArgs!(TreeNode) TreeNodeChangedEventArgs;
 public alias ItemEventArgs!(TreeNode) TreeNodeEventArgs;
+public alias CancelEventArgs!(TreeNode) CancelTreeNodeEventArgs;
 
 class TreeView: SubclassedControl
 {
-	public Signal!(Control, CancelEventArgs) selectedNodeChanging;
+	public Signal!(Control, CancelTreeNodeEventArgs) selectedNodeChanging;
 	public Signal!(Control, TreeNodeChangedEventArgs) selectedNodeChanged;
+	public Signal!(Control, CancelTreeNodeEventArgs) treeNodeExpanding;
 	public Signal!(Control, TreeNodeEventArgs) treeNodeExpanded;
 	public Signal!(Control, TreeNodeEventArgs) treeNodeCollapsed;
 
@@ -456,9 +464,10 @@ class TreeView: SubclassedControl
 	{
 		TVINSERTSTRUCTW tvis;
 
-		tvis.hParent = node.parentNode ? node.parentNode.handle : cast(HTREEITEM)TVI_ROOT;
+		tvis.hParent = (node.parent ? node.parent.handle : cast(HTREEITEM)TVI_ROOT);
 		tvis.hInsertAfter = cast(HTREEITEM)node.insertMode;
-		tvis.item.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_TEXT | TVIF_PARAM;
+		tvis.item.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN | TVIF_TEXT | TVIF_PARAM;
+		tvis.item.cChildren = I_CHILDRENCALLBACK;
 		tvis.item.iImage = node.imageIndex;
 		tvis.item.iSelectedImage = node.selectedImageIndex;
 		tvis.item.pszText  = toUTF16z(node.text);
@@ -467,12 +476,16 @@ class TreeView: SubclassedControl
 		TreeView tvw = node.treeView;
 		node.handle = cast(HTREEITEM)tvw.sendMessage(TVM_INSERTITEMW, 0, cast(LPARAM)&tvis);
 
+		/*
+		  *  Performance Killer: simulate a virtual tree view instead
+		  *
 		if(node.hasNodes)
 		{
 			node.doChildNodes();
 		}
+		*/
 
-		tvw.redraw();
+		//tvw.redraw();
 	}
 
 	package static void removeTreeNode(TreeNode node)
@@ -518,10 +531,32 @@ class TreeView: SubclassedControl
 
 			switch(pNotifyTreeView.hdr.code)
 			{
+				case TVN_GETDISPINFOW:
+				{
+					NMTVDISPINFOW* pTvDispInfo = cast(NMTVDISPINFOW*)lParam;
+					TreeNode node = winCast!(TreeNode)(pTvDispInfo.item.lParam);
+					pTvDispInfo.item.cChildren = node.lazyNode; //Is a Lazy Node, sooner or later a child node will be added
+				}
+				break;
+
+				case TVN_ITEMEXPANDINGW:
+				{
+					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
+					scope CancelTreeNodeEventArgs e = new CancelTreeNodeEventArgs(node);
+
+					this.onTreeNodeExpanding(e); //Allow the user to add nodes if e.cancel is 'false'
+
+					if(!e.cancel && pNotifyTreeView.action & TVE_EXPAND)
+					{
+						node.doChildNodes();
+					}
+
+					return e.cancel;
+				}
+
 				case TVN_ITEMEXPANDEDW:
 				{
 					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
-
 					scope TreeNodeEventArgs e = new TreeNodeEventArgs(node);
 
 					if(pNotifyTreeView.action & TVE_EXPAND)
@@ -537,7 +572,8 @@ class TreeView: SubclassedControl
 
 				case TVN_SELCHANGINGW:
 				{
-					scope CancelEventArgs e = new CancelEventArgs();
+					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
+					scope CancelTreeNodeEventArgs e = new CancelTreeNodeEventArgs(node);
 					this.onSelectedNodeChanging(e);
 					return e.cancel;
 				}
@@ -577,6 +613,11 @@ class TreeView: SubclassedControl
 	}
 	*/
 
+	protected void onTreeNodeExpanding(CancelTreeNodeEventArgs e)
+	{
+		this.treeNodeExpanding(this, e);
+	}
+
 	protected void onTreeNodeExpanded(TreeNodeEventArgs e)
 	{
 		this.treeNodeExpanded(this, e);
@@ -587,7 +628,7 @@ class TreeView: SubclassedControl
 		this.treeNodeCollapsed(this, e);
 	}
 
-	protected void onSelectedNodeChanging(CancelEventArgs e)
+	protected void onSelectedNodeChanging(CancelTreeNodeEventArgs e)
 	{
 		this.selectedNodeChanging(this, e);
 	}

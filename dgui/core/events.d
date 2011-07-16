@@ -41,18 +41,29 @@ class EventArgs
 	}
 }
 
-class CancelEventArgs: EventArgs
+class CancelEventArgs(T): EventArgs
 {
 	private bool _cancel = false;
+	private T _t;
 
-	@property public bool cancel()
+	public this(T t)
+	{
+		this._t = t;
+	}
+
+	@property public final bool cancel()
 	{
 		return this._cancel;
 	}
 
-	@property public void cancel(bool b)
+	@property public final void cancel(bool b)
 	{
 		this._cancel = b;
+	}
+
+	@property public final T item()
+	{
+		return this._t;
 	}
 }
 

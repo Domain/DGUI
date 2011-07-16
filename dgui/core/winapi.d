@@ -28,6 +28,11 @@ public import std.c.windows.windows;
 
 extern(Windows)
 {
+	enum: int
+	{
+		I_CHILDRENCALLBACK = -1,
+	}
+
 	/* Windows Generic Messages */
 	enum: uint
 	{

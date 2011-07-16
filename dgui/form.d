@@ -37,12 +37,14 @@ private struct FormInfo
 	bool ShowInTaskbar = false;
 }
 
+alias CancelEventArgs!(Form) CancelFormEventArgs;
+
 class Form: ContainerControl, IDialogResult
 {
 	private FormInfo _formInfo;
 
 	public Signal!(Control, EventArgs) close;
-	public Signal!(Control, CancelEventArgs) closing;
+	public Signal!(Control, CancelFormEventArgs) closing;
 
 	@property public final void formBorderStyle(FormBorderStyle fbs)
 	{
@@ -417,7 +419,7 @@ class Form: ContainerControl, IDialogResult
 		{
 			case WM_CLOSE:
 			{
-				scope CancelEventArgs e = new CancelEventArgs();
+				scope CancelFormEventArgs e = new CancelFormEventArgs(this);
 				this.onClosing(e);
 
 				if(!e.cancel)
@@ -441,7 +443,7 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	protected void onClosing(CancelEventArgs e)
+	protected void onClosing(CancelFormEventArgs e)
 	{
 		this.closing(this, e);
 	}
