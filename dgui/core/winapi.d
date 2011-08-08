@@ -1516,6 +1516,30 @@ extern(Windows)
 		HICON hIconSm;
 	}
 
+	align(1) struct TEXTMETRICW
+	{
+		LONG tmHeight;
+		LONG tmAscent;
+		LONG tmDescent;
+		LONG tmInternalLeading;
+		LONG tmExternalLeading;
+		LONG tmAveCharWidth;
+		LONG tmMaxCharWidth;
+		LONG tmWeight;
+		LONG tmOverhang;
+		LONG tmDigitizedAspectX;
+		LONG tmDigitizedAspectY;
+		wchar tmFirstChar;
+		wchar tmLastChar;
+		wchar tmDefaultChar;
+		wchar tmBreakChar;
+		BYTE tmItalic;
+		BYTE tmUnderlined;
+		BYTE tmStruckOut;
+		BYTE tmPitchAndFamily;
+		BYTE tmCharSet;
+	}
+
 	struct SIZE
 	{
 		LONG cx;
@@ -2232,6 +2256,7 @@ extern(Windows)
 	int GetObjectW(HGDIOBJ hgdiobj, int cbBuffer, void* lpvObject);
 	BOOL GetIconInfo(HICON hIcon, ICONINFO* iconinfo);
 	HBRUSH CreateHatchBrush(int ht, COLORREF crColor);
+	BOOL GetTextMetricsW(HDC hdc, TEXTMETRICW* lptm);
 	HBRUSH CreateSolidBrush(COLORREF crColor);
 	HFONT CreateFontIndirectW(LOGFONTW* lplf);
 	BOOL DrawEdge(HDC, LPRECT, UINT, UINT);

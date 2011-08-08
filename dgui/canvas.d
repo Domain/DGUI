@@ -277,6 +277,17 @@ struct Color
 	}
 }
 
+struct FontMetrics
+{
+	int Height;
+	int Ascent;
+	int Descent;
+	int InternalLeading;
+	int ExternalLeading;
+	int AverageCharWidth;
+	int MaxCharWidth;
+}
+
 /**
  The _Canvas object is the DGui's rappresentation of a Device Context (Screen DC, Memory DC and Printer DC)
  $(DDOC_BLANKLINE)
@@ -1103,6 +1114,9 @@ final class Font: GraphicObject
 {
 	private static int _logPixelSY = 0;
 
+	private bool _metricsDone = false;
+	private FontMetrics _metrics;
+
 	private this(HFONT hFont, bool owned)
 	{
 		super(hFont, owned);
@@ -1138,7 +1152,7 @@ final class Font: GraphicObject
 		this._handle = createFontIndirect(&lf);
 	}
 
-	public string name()
+	@property public string name()
 	{
 		LOGFONTW lf;
 
@@ -1146,7 +1160,7 @@ final class Font: GraphicObject
 		return to!(string)(toUTF8(lf.lfFaceName).ptr);
 	}
 
-	public int height()
+	@property public int height()
 	{
 		LOGFONTW lf;
 
@@ -1154,6 +1168,32 @@ final class Font: GraphicObject
 
 		getInfo!(LOGFONTW)(this._handle, lf);
 		return -MulDiv(72, lf.lfHeight, _logPixelSY);
+	}
+
+	@property public FontMetrics metrics()
+	{
+		if(!this._metricsDone)
+		{
+			TEXTMETRICW tm;
+
+			HDC hdc = CreateCompatibleDC(null);
+			HFONT hOldFont = SelectObject(hdc, this._handle);
+			GetTextMetricsW(hdc, &tm);
+			SelectObject(hdc, hOldFont);
+			DeleteDC(hdc);
+
+			this._metrics.Height = tm.tmHeight;
+			this._metrics.Ascent = tm.tmAscent;
+			this._metrics.Descent = tm.tmDescent;
+			this._metrics.InternalLeading = tm.tmInternalLeading;
+			this._metrics.ExternalLeading = tm.tmExternalLeading;
+			this._metrics.AverageCharWidth = tm.tmAveCharWidth;
+			this._metrics.MaxCharWidth = tm.tmMaxCharWidth;
+
+			this._metricsDone = true;
+		}
+
+		return this._metrics;
 	}
 
 	private static void doStyle(FontStyle style, ref LOGFONTW lf)
