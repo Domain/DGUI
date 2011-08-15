@@ -247,7 +247,10 @@ abstract class Control: Handle!(HWND), IDisposable
 	@property public final void parent(Control c)
 	{
 		this._controlInfo.Parent = c;
+
+		c.setStyle(WS_CLIPCHILDREN, true);
 		this.setStyle(WS_CHILD, true);
+		this.setStyle(WS_CLIPSIBLINGS, true);
 
 		IContainerControl cc = cast(IContainerControl)c;
 

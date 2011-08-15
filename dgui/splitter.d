@@ -280,7 +280,6 @@ class Splitter: Control
 			pcw.DefaultCursor = SystemCursors.sizeWE;
 		}
 
-		this.setStyle(ControlStyle.NO_ERASE, true);
 		super.preCreateWindow(pcw);
 	}
 
@@ -369,11 +368,10 @@ class Splitter: Control
 
 	protected override void onPaint(PaintEventArgs e)
 	{
-		Canvas c = e.canvas;
-		Rect r = void; //Inizializzati sotto
-
+		Rect r = void;
 		GetClientRect(this._handle, &r.rect);
-		drawBullets(c, this.dock, r);
+		drawBullets(e.canvas, this.dock, r);
+
 		super.onPaint(e);
 	}
 }
