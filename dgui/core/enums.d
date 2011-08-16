@@ -196,7 +196,15 @@ enum ScrollMode: uint
 	PAGERIGHT 	  = SB_PAGERIGHT,
 }
 
-enum ScrollDir: ubyte
+enum ScrollWindowDirection: ubyte
+{
+	LEFT  = 0,
+	UP    = 1,
+	RIGHT = 2,
+	DOWN  = 4,
+}
+
+enum ScrollDirection: ubyte
 {
 	VERTICAL,
 	HORIZONTAL,

@@ -33,6 +33,11 @@ extern(Windows)
 		I_CHILDRENCALLBACK = -1,
 	}
 
+	enum
+	{
+		SW_INVALIDATE = 2,
+	}
+
 	/* Windows Generic Messages */
 	enum: uint
 	{

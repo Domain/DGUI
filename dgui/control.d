@@ -879,6 +879,39 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
+	protected final void scrollWindow(ScrollWindowDirection swd, int amount)
+	{
+		this.scrollWindow(swd, amount, NullRect);
+	}
+
+	protected final void scrollWindow(ScrollWindowDirection swd, int amount, Rect rectScroll)
+	{
+		if(this.created)
+		{
+			switch(swd)
+			{
+				case ScrollWindowDirection.LEFT:
+					ScrollWindowEx(this._handle, amount, 0, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					break;
+
+				case ScrollWindowDirection.UP:
+					ScrollWindowEx(this._handle, 0, amount, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					break;
+
+				case ScrollWindowDirection.RIGHT:
+					ScrollWindowEx(this._handle, -amount, 0, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					break;
+
+				case ScrollWindowDirection.DOWN:
+					ScrollWindowEx(this._handle, 0, -amount, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
+
 	protected final void setWindowPos(int x, int y, int w, int h, PositionSpecified ps)
 	{
 		if(ps is PositionSpecified.NONE)
@@ -1391,7 +1424,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			case WM_VSCROLL, WM_HSCROLL:
 			{
-				ScrollDir sd = msg == WM_VSCROLL ? ScrollDir.VERTICAL : ScrollDir.HORIZONTAL;
+				ScrollDirection sd = msg == WM_VSCROLL ? ScrollDirection.VERTICAL : ScrollDirection.HORIZONTAL;
 				ScrollMode sm = cast(ScrollMode)wParam;
 
 				scope ScrollEventArgs e = new ScrollEventArgs(sd, sm);

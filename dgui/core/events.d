@@ -240,16 +240,16 @@ class MouseWheelEventArgs: MouseEventArgs
 
 class ScrollEventArgs: EventArgs
 {
-	private ScrollDir _dir;
+	private ScrollDirection _dir;
 	private ScrollMode _mode;
 
-	public this(ScrollDir sd, ScrollMode sm)
+	public this(ScrollDirection sd, ScrollMode sm)
 	{
 		this._dir = sd;
 		this._mode = sm;
 	}
 
-	@property public ScrollDir direction()
+	@property public ScrollDirection direction()
 	{
 		return this._dir;
 	}
