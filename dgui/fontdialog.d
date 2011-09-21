@@ -17,7 +17,7 @@
 
 module dgui.fontdialog;
 
-public import dgui.core.commondialog;
+public import dgui.core.dialogs.commondialog;
 
 class FontDialog: CommonDialog!(CHOOSEFONTW, Font)
 {

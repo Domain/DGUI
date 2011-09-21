@@ -17,7 +17,7 @@
 
 module dgui.scrollbar;
 
-import dgui.control;
+import dgui.core.controls.control; //?? Control ??
 import dgui.core.winapi;
 
 enum ScrollBarType

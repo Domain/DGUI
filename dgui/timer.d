@@ -17,17 +17,17 @@
 
 module dgui.timer;
 
+import dgui.core.interfaces.idisposable;
 import dgui.core.winapi;
-import dgui.core.idisposable;
-import dgui.core.signal;
-import dgui.core.events;
+import dgui.core.events.event;
+import dgui.core.events.eventargs;
 import dgui.core.exception;
 
 final class Timer: IDisposable
 {
 	private alias Timer[uint] TimerMap;
 
-	public Signal!(Timer, EventArgs) tick;
+	public Event!(Timer, EventArgs) tick;
 
 	private static TimerMap _timers;
 	private uint _timerId = 0;

@@ -17,34 +17,57 @@
 
 module dgui.form;
 
-import dgui.core.utils;
-import dgui.application;
-import dgui.control;
-
-private struct FormInfo
-{
-	MenuBar Menu;
-	Icon FormIcon;
-	FormStartPosition StartPosition = FormStartPosition.MANUAL;
-	DialogResult Result = DialogResult.CANCEL;
-	FormBorderStyle FrameBorder = FormBorderStyle.SIZEABLE;
-	HWND hActiveWnd;
-	bool ModalCompleted = false;
-	bool IsModal = false;
-	bool MaximizeBox = true;
-	bool MinimizeBox = true;
-	bool ControlBox = true;
-	bool ShowInTaskbar = false;
-}
+public import dgui.core.dialogs.dialogresult;
+public import dgui.menubar;
+private import dgui.core.utils;
+import dgui.layout.layoutcontrol;
+import dgui.core.events.eventargs;
 
 alias CancelEventArgs!(Form) CancelFormEventArgs;
 
-class Form: ContainerControl, IDialogResult
+enum FormBits: ubyte
 {
-	private FormInfo _formInfo;
+	NONE 		 	= 0,
+	MODAL_COMPLETED = 1,
+}
 
-	public Signal!(Control, EventArgs) close;
-	public Signal!(Control, CancelFormEventArgs) closing;
+enum FormBorderStyle: ubyte
+{
+	NONE 				= 0,
+	MANUAL 				= 1, // Internal Use
+	FIXED_SINGLE 		= 2,
+	FIXED_3D 			= 4,
+	FIXED_DIALOG		= 8,
+	SIZEABLE 			= 16,
+	FIXED_TOOLWINDOW 	= 32,
+	SIZEABLE_TOOLWINDOW = 64,
+}
+
+enum FormStartPosition: ubyte
+{
+	MANUAL 			 = 0,
+	CENTER_PARENT	 = 1,
+	CENTER_SCREEN	 = 2,
+	DEFAULT_LOCATION = 4,
+}
+
+class Form: LayoutControl
+{
+	private FormBits _fBits = FormBits.NONE;
+	private FormStartPosition _startPosition = FormStartPosition.MANUAL;
+	private FormBorderStyle _formBorder = FormBorderStyle.SIZEABLE;
+	private DialogResult _dlgResult = DialogResult.CANCEL;
+	private HWND _hActiveWnd;
+	private Icon _formIcon;
+	private MenuBar _menu;
+
+	public Event!(Control, EventArgs) close;
+	public Event!(Control, CancelFormEventArgs) closing;
+
+	public this()
+	{
+		this.setStyle(WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX, true);
+	}
 
 	@property public final void formBorderStyle(FormBorderStyle fbs)
 	{
@@ -52,7 +75,7 @@ class Form: ContainerControl, IDialogResult
 		{
 			uint style, exStyle;
 
-			makeFormBorderStyle(this._formInfo.FrameBorder, style, exStyle); // Vecchio Stile.
+			makeFormBorderStyle(this._formBorder, style, exStyle); // Vecchio Stile.
 			this.setStyle(style, false);
 			this.setExStyle(exStyle, false);
 
@@ -64,113 +87,83 @@ class Form: ContainerControl, IDialogResult
 			this.setExStyle(exStyle, true);
 		}
 
-		this._formInfo.FrameBorder = fbs;
-	}
-
-	@property public final void dialogResult(DialogResult dr)
-	{
-		this._formInfo.Result = dr;
-		this._formInfo.ModalCompleted =  true;
-
-		ShowWindow(this._handle, SW_HIDE); // Hide this window (it waits to be destroyed)
-		EnableWindow(this._formInfo.hActiveWnd, true);
-		SetActiveWindow(this._formInfo.hActiveWnd); // Restore the previous active window
+		this._formBorder = fbs;
 	}
 
 	@property public final void controlBox(bool b)
 	{
-		this._formInfo.ControlBox = b;
-
-		if(this.created)
-		{
-			this.setStyle(WS_SYSMENU, b);
-		}
+		this.setStyle(WS_SYSMENU, b);
 	}
 
 	@property public final void maximizeBox(bool b)
 	{
-		this._formInfo.MaximizeBox = b;
-
-		if(this.created)
-		{
-			this.setStyle(WS_MAXIMIZEBOX, b);
-		}
+		this.setStyle(WS_MAXIMIZEBOX, b);
 	}
 
 	@property public final void minimizeBox(bool b)
 	{
-		this._formInfo.MinimizeBox = b;
-
-		if(this.created)
-		{
-			this.setStyle(WS_MINIMIZEBOX, b);
-		}
+		this.setStyle(WS_MINIMIZEBOX, b);
 	}
 
 	@property public final void showInTaskbar(bool b)
 	{
-		this._formInfo.ShowInTaskbar = b;
-
-		if(this.created)
-		{
-			this.setExStyle(WS_EX_APPWINDOW, b);
-		}
+		this.setExStyle(WS_EX_APPWINDOW, b);
 	}
 
 	@property public final MenuBar menu()
 	{
-		return this._formInfo.Menu;
+		return this._menu;
 	}
 
 	@property public final void menu(MenuBar mb)
 	{
 		if(this.created)
 		{
-			if(this._formInfo.Menu)
+			if(this._menu)
 			{
-				this._formInfo.Menu.dispose();
+				this._menu.dispose();
 			}
 
 			mb.create();
 			SetMenu(this._handle, mb.handle);
 		}
 
-		this._formInfo.Menu = mb;
+		this._menu = mb;
 	}
 
 	@property public final Icon icon()
 	{
-		return this._formInfo.FormIcon;
+		return this._formIcon;
 	}
 
 	@property public final void icon(Icon ico)
 	{
 		if(this.created)
 		{
-			if(this._formInfo.FormIcon)
+			if(this._formIcon)
 			{
-				this._formInfo.FormIcon.dispose();
+				this._formIcon.dispose();
 			}
 
 			this.sendMessage(WM_SETICON, ICON_BIG, cast(LPARAM)ico.handle);
 			this.sendMessage(WM_SETICON, ICON_SMALL, cast(LPARAM)ico.handle);
 		}
 
-		this._formInfo.FormIcon = ico;
+		this._formIcon = ico;
 	}
 
 	@property public final void startPosition(FormStartPosition fsp)
 	{
-		this._formInfo.StartPosition = fsp;
+		this._startPosition = fsp;
 	}
 
-	private void doEvents(bool isModal)
+	private void doEvents()
 	{
 		MSG m = void;
 
 		while(GetMessageW(&m, null, 0, 0))
 		{
-			if(isModal && this._formInfo.ModalCompleted)
+			if(Form.hasBit(this._cBits, ControlBits.MODAL_CONTROL) && Form.hasBit(this._fBits, FormBits.MODAL_COMPLETED))
 			{
 				break;
 			}
@@ -182,77 +175,45 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	private void doShow(bool isModal = false)
-	{
-		try
-		{
-			if(!this.created)
-			{
-				this._formInfo.IsModal = isModal;
-
-				if(isModal)
-				{
-					this._formInfo.hActiveWnd = GetActiveWindow();
-					EnableWindow(this._formInfo.hActiveWnd, false);
-				}
-
-				this.create(isModal);
-			}
-
-			this.doEvents(isModal);
-		}
-		catch(Throwable e)
-		{
-			switch(Application.showExceptionForm(e))
-			{
-				case DialogResult.ABORT:
-					TerminateProcess(GetCurrentProcess(), -1);
-					break;
-
-				case DialogResult.IGNORE:
-					this.doShow(isModal);
-					break;
-
-				default:
-					break;
-			}
-		}
-	}
-
 	public override void show()
 	{
-		this.doShow();
 		super.show();
+
+		this.doEvents();
 	}
 
 	public final DialogResult showDialog()
 	{
-		this.doShow(true);
-		return this._formInfo.Result;
+		Form.setBit(this._cBits, ControlBits.MODAL_CONTROL, true);
+		this._hActiveWnd = GetActiveWindow();
+		EnableWindow(this._hActiveWnd, false);
+
+		this.show();
+		return this._dlgResult;
 	}
 
 	private final void doFormStartPosition()
 	{
-		if((this._formInfo.StartPosition is FormStartPosition.CENTER_PARENT && !this.parent) ||
-			this._formInfo.StartPosition is FormStartPosition.CENTER_SCREEN)
+		if((this._startPosition is FormStartPosition.CENTER_PARENT && !this.parent) ||
+			this._startPosition is FormStartPosition.CENTER_SCREEN)
 		{
 			Rect wa = Screen.workArea;
-			Rect b = this._controlInfo.Bounds;
+			Rect b = this._bounds;
 
-			this._controlInfo.Bounds.location = Point((wa.width - b.width) / 2,
-													  (wa.height - b.height) / 2);
+			this._bounds.position = Point((wa.width - b.width) / 2,
+										  (wa.height - b.height) / 2);
 		}
-		else if(this._formInfo.StartPosition is FormStartPosition.CENTER_PARENT)
+		else if(this._startPosition is FormStartPosition.CENTER_PARENT)
 		{
 			Rect pr = this.parent.bounds;
-			Rect b = this._controlInfo.Bounds;
+			Rect b = this._bounds;
 
-			this._controlInfo.Bounds.location = Point(pr.left + (pr.width - b.width) / 2,
-													  pr.top + (pr.height - b.height) / 2);
+			this._bounds.position = Point(pr.left + (pr.width - b.width) / 2,
+										  pr.top + (pr.height - b.height) / 2);
 		}
-		else if(this._formInfo.StartPosition is FormStartPosition.DEFAULT_LOCATION)
+		else if(this._startPosition is FormStartPosition.DEFAULT_LOCATION)
 		{
-			this._controlInfo.Bounds.location = Point(CW_USEDEFAULT, CW_USEDEFAULT);
+			this._bounds.position = Point(CW_USEDEFAULT, CW_USEDEFAULT);
 		}
 	}
 
@@ -319,103 +280,64 @@ class Form: ContainerControl, IDialogResult
 		}
 	}
 
-	private void drawMenuItemImage(DRAWITEMSTRUCT* pDrawItem)
+	protected override void onDGuiMessage(ref Message m)
 	{
-		MenuItem mi = winCast!(MenuItem)(pDrawItem.itemData);
-
-		if(mi)
+		switch(m.Msg)
 		{
-			scope Canvas c = Canvas.fromHDC(pDrawItem.hDC, false); //HDC Not Owned by Canvas Object
-			int icoSize = GetSystemMetrics(SM_CYMENU);
-			c.drawImage(mi.rootMenu.imageList.images[mi.imageIndex], Rect(0, 0, icoSize, icoSize));
+			case DGUI_SETDIALOGRESULT:
+			{
+				this._dlgResult = cast(DialogResult)m.wParam;
+
+				Form.setBit(this._fBits, FormBits.MODAL_COMPLETED, true);
+				ShowWindow(this._handle, SW_HIDE); // Hide this window (it waits to be destroyed)
+				EnableWindow(this._hActiveWnd, true);
+				SetActiveWindow(this._hActiveWnd); // Restore the previous active window
+			}
+			break;
+
+			default:
+				break;
 		}
+
+		super.onDGuiMessage(m);
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.ClassName = WC_FORM;
-		pcw.DefaultCursor = SystemCursors.arrow;
+		ccp.ClassName = WC_FORM;
+		ccp.DefaultCursor = SystemCursors.arrow;
 
-		makeFormBorderStyle(this._formInfo.FrameBorder, pcw.Style, pcw.ExtendedStyle);
+		makeFormBorderStyle(this._formBorder, ccp.Style, ccp.ExtendedStyle);
 		this.doFormStartPosition();
 
-		this._formInfo.ControlBox ? (pcw.Style |= WS_SYSMENU) : (pcw.Style &= ~WS_SYSMENU);
-
-		if(this._formInfo.ControlBox)
-		{
-			this._formInfo.MaximizeBox ? (pcw.Style |= WS_MAXIMIZEBOX) : (pcw.Style &= ~WS_MAXIMIZEBOX);
-			this._formInfo.MinimizeBox ? (pcw.Style |= WS_MINIMIZEBOX) : (pcw.Style &= ~WS_MINIMIZEBOX);
-		}
-
-		if(this._formInfo.ShowInTaskbar)
-		{
-			pcw.ExtendedStyle |= WS_EX_APPWINDOW;
-		}
-
-		AdjustWindowRectEx(&this._controlInfo.Bounds.rect, pcw.Style, false, pcw.ExtendedStyle);
-		super.preCreateWindow(pcw);
+		AdjustWindowRectEx(&this._bounds.rect, ccp.Style, false, ccp.ExtendedStyle);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
 	{
-		if(this._formInfo.Menu)
+		if(this._menu)
 		{
-			this._formInfo.Menu.create();
-			SetMenu(this._handle, this._formInfo.Menu.handle);
+			this._menu.create();
+			SetMenu(this._handle, this._menu.handle);
 			DrawMenuBar(this._handle);
 		}
 
-		if(this._formInfo.FormIcon)
+		if(this._formIcon)
 		{
-			this.originalWndProc(WM_SETICON, ICON_BIG, cast(LPARAM)this._formInfo.FormIcon.handle);
-			this.originalWndProc(WM_SETICON, ICON_SMALL, cast(LPARAM)this._formInfo.FormIcon.handle);
+			Message m = Message(this._handle, WM_SETICON, ICON_BIG, cast(LPARAM)this._formIcon.handle);
+			this.originalWndProc(m);
+
+			m.Msg = ICON_SMALL;
+			this.originalWndProc(m);
 		}
 
-		super.onHandleCreated(e); //Per ultimo: Prima deve creare il menu se no i componenti si dispongono male.
+		super.onHandleCreated(e);
 	}
 
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void wndProc(ref Message m)
 	{
-		if(msg == WM_MEASUREITEM)
-		{
-			MEASUREITEMSTRUCT* pMeasureItem = cast(MEASUREITEMSTRUCT*)lParam;
-
-			if(pMeasureItem.CtlType == ODT_MENU)
-			{
-				MenuItem mi = winCast!(MenuItem)(pMeasureItem.itemData);
-
-				if(mi)
-				{
-					if(mi.parent is this._formInfo.Menu) // Check if parent of 'mi' is the menu bar
-					{
-						Size sz = Canvas.measureString(" ");
-						int icoSize = GetSystemMetrics(SM_CYMENU);
-
-						pMeasureItem.itemWidth = icoSize + sz.width;
-					}
-					else
-					{
-						pMeasureItem.itemWidth = 10;
-					}
-				}
-			}
-		}
-		else if(msg == WM_DRAWITEM)
-		{
-			DRAWITEMSTRUCT* pDrawItem = cast(DRAWITEMSTRUCT*)lParam;
-
-			if(pDrawItem.CtlType == ODT_MENU)
-			{
-				this.drawMenuItemImage(pDrawItem);
-			}
-		}
-
-		return super.onReflectedMessage(msg, wParam, lParam);
-	}
-
-	protected override int wndProc(uint msg, WPARAM wParam, LPARAM lParam)
-	{
-		switch(msg)
+		switch(m.Msg)
 		{
 			case WM_CLOSE:
 			{
@@ -426,20 +348,22 @@ class Form: ContainerControl, IDialogResult
 				{
 					this.onClose(EventArgs.empty);
 
-					if(this._formInfo.IsModal)
+					if(Form.hasBit(this._cBits, ControlBits.MODAL_CONTROL))
 					{
-						EnableWindow(this._formInfo.hActiveWnd, true);
-						SetActiveWindow(this._formInfo.hActiveWnd);
+						EnableWindow(this._hActiveWnd, true);
+						SetActiveWindow(this._hActiveWnd);
 					}
 
-					return super.wndProc(msg, wParam, lParam);
+					super.wndProc(m);
 				}
 
-				return 0;
+				m.Result = 0;
 			}
+			break;
 
 			default:
-				return super.wndProc(msg, wParam, lParam);
+				super.wndProc(m);
+				break;
 		}
 	}
 

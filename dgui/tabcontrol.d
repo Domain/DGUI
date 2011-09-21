@@ -17,20 +17,16 @@
 
 module dgui.tabcontrol;
 
-import std.utf: toUTF16z;
+import std.utf: toUTFz;
+import dgui.core.controls.subclassedcontrol;
+import dgui.core.interfaces.ilayoutcontrol;
+import dgui.layout.panel;
 import dgui.imagelist;
-import dgui.control;
 
 private struct TcItem
 {
 	TCITEMHEADERW Header;
 	TabPage Page;
-}
-
-private struct TabControlInfo
-{
-	TabPage SelectedPage;
-	int SelectedIndex = -1;
 }
 
 enum TabAlignment
@@ -41,15 +37,10 @@ enum TabAlignment
 	BOTTOM = TCS_BOTTOM,
 }
 
-class TabPage: ContainerControl
+class TabPage: Panel
 {
 	private int _imgIndex;
 	private TabControl _owner;
-
-	package this()
-	{
-		this.initTabPage();
-	}
 
 	protected void initTabPage()
 	{
@@ -97,7 +88,7 @@ class TabPage: ContainerControl
 			TcItem tci = void;
 
 			tci.Header.mask = TCIF_TEXT;
-			tci.Header.pszText = toUTF16z(txt);
+			tci.Header.pszText = toUTFz!(wchar*)(txt);
 
 			this._owner.sendMessage(TCM_SETITEMW, this.index, cast(LPARAM)&tci);
 			this.redraw();
@@ -124,36 +115,48 @@ class TabPage: ContainerControl
 		}
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.ExtendedStyle |= WS_EX_STATICEDGE;
-		pcw.ClassName = WC_DTABPAGE;
-		pcw.DefaultCursor = SystemCursors.arrow;
+		ccp.ExtendedStyle |= WS_EX_STATICEDGE;
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
+	}
+
+	protected override void onHandleCreated(EventArgs e)
+	{
+		this.initTabPage();
+
+		super.onHandleCreated(e);
 	}
 }
 
 alias CancelEventArgs!(TabPage) CancelTabPageEventArgs;
 
-class TabControl: OwnerDrawControl, IContainerControl
+class TabControl: SubclassedControl, ILayoutControl
 {
-	public Signal!(Control, CancelTabPageEventArgs) tabPageChanging;
-	public Signal!(Control, EventArgs) tagPageChanged;
+	public Event!(Control, CancelTabPageEventArgs) tabPageChanging;
+	public Event!(Control, EventArgs) tagPageChanged;
 
 	private Collection!(TabPage) _tabPages;
-	private ImageList _imgList;
-	private int _selIndex = 0; //Di default seleziona il primo TabPage.
 	private TabAlignment _ta = TabAlignment.TOP;
+	private ImageList _imgList;
+	private int _selIndex = 0; //By Default: select the first TagPage (if exists)
 
 	public final T addPage(T: TabPage = TabPage)(string t, int imgIndex = -1)
 	{
+		if(!this._tabPages)
+		{
+			this._tabPages = new Collection!(TabPage);
+		}
+
 		T tp = new T();
 		tp.text = t;
 		tp.imageIndex = imgIndex;
 		tp.visible = false;
 		tp.tabControl = this;
 		tp.parent = this;
+
+		this._tabPages.add(tp);
 
 		if(this.created)
 		{
@@ -207,19 +210,19 @@ class TabControl: OwnerDrawControl, IContainerControl
 	{
 		if(this._tabPages)
 		{
-			TabPage sp = this.selectedPage; 	//Vecchio TabPage
-			TabPage tp = this._tabPages[idx];	//Nuovo TabPage
+			TabPage sp = this.selectedPage;   //Old TabPage
+			TabPage tp = this._tabPages[idx]; //New TabPage
 
 			if(sp && sp !is tp)
 			{
 				this._selIndex = idx;
-				tp.visible = true;  //Visualizzo il nuovo TabPage
-				sp.visible = false; //Nascondo il vecchio TabPage
+				tp.visible = true;  //Show new TabPage
+				sp.visible = false; //Hide old TabPage
 			}
-			else if(sp is tp) // E' lo stesso TabPage, rendilo visibile (succede quando si aggiunge un TabPage a runtime)
+			else if(sp is tp) // Same TabPage, make visibile
 			{
 				/*
-				 * Di default i TabPage appena creati sono nascosti.
+				 * By default, TabPages are created not visible
 				 */
 
 				tp.visible = true;
@@ -227,7 +230,7 @@ class TabControl: OwnerDrawControl, IContainerControl
 
 			if(this.created)
 			{
-				TabControl.adjustTabPage(tp);
+				this.updateLayout();
 			}
 		}
 	}
@@ -260,46 +263,59 @@ class TabControl: OwnerDrawControl, IContainerControl
 		this._ta = ta;
 	}
 
-	private static void adjustTabPage(TabPage selPage)
+	private void doTabPages()
 	{
-		/*
-		 * Resize TabPage e posizionamento al centro del TabControl
-		 */
+		if(this._tabPages)
+		{
+			foreach(int i, TabPage tp; this._tabPages)
+			{
+				this.createTabPage(tp, false);
 
-		Rect r, adjRect;
+				if(i == this._selIndex)
+				{
+					tp.visible = true;
+					this.updateLayout();
+				}
+			}
 
+			this.selectedIndex = this._selIndex;
+		}
+	}
+
+	public void updateLayout()
+	{
+		TabPage selPage = this.selectedPage;
 		TabControl tc = selPage.tabControl;
-		GetClientRect(tc.handle, &r.rect);
-		tc.sendMessage(TCM_ADJUSTRECT, FALSE, cast(LPARAM)&adjRect.rect);
+		Rect adjRect, r = Rect(NullPoint, tc.clientSize);
+
+		tc.sendMessage(TCM_ADJUSTRECT, false, cast(LPARAM)&adjRect.rect);
 
 		r.left += adjRect.left;
 		r.top += adjRect.top;
 		r.right += r.left + adjRect.width;
 		r.bottom += r.top + adjRect.height;
 
-		selPage.bounds = r; //Fa anche il Dock (inviati WM_WINDOWPOSCHANGED -> WM_MOVE -> WM_SIZE)
+		selPage.bounds = r; //selPage docks its child components
 	}
 
-	private TcItem createTabPage(TabPage tp, bool adding = true)
+	private void createTabPage(TabPage tp, bool adding = true)
 	{
 		TcItem tci;
 		tci.Header.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
 		tci.Header.iImage = tp.imageIndex;
-		tci.Header.pszText = toUTF16z(tp.text);
+		tci.Header.pszText = toUTFz!(wchar*)(tp.text);
 		tci.Page = tp;
 
-		tp.create();
+		tp.sendMessage(DGUI_CREATEONLY, 0, 0); //Calls Control.create()
 
 		int idx = tp.index;
 		this.sendMessage(TCM_INSERTITEMW, idx, cast(LPARAM)&tci);
 
-		if(adding) //Il componente e' stato creato in precedentemente, verra' selezionato l'ultimo TabPage.
+		if(adding) //Adding mode: select the last TabPage
 		{
 			this.sendMessage(TCM_SETCURSEL, idx, 0);
 			this.selectedIndex = idx;
 		}
-
-		return tci;
 	}
 
 	private void removeTabPage(int idx)
@@ -314,32 +330,22 @@ class TabControl: OwnerDrawControl, IContainerControl
 			if(this.created)
 			{
 				this.sendMessage(TCM_DELETEITEM, idx, 0);
-				this.sendMessage(TCM_SETCURSEL, this._selIndex, 0); //Mi posiziono nel nuovo tab
+				this.sendMessage(TCM_SETCURSEL, this._selIndex, 0); //Set the new tab's index
 			}
 
 			TabPage tp = this._tabPages[idx];
-			tp.dispose(); //Deallocazione Risorse.
+			tp.dispose();
 		}
 	}
 
-	protected final void addChildControl(Control c)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		if(!this._tabPages)
-		{
-			this._tabPages = new Collection!(TabPage)();
-		}
+		ccp.ExtendedStyle |= WS_EX_CONTROLPARENT;
+		ccp.Style |= WS_CLIPCHILDREN;
+		ccp.OldClassName = WC_TABCONTROL;
+		ccp.ClassName = WC_DTABCONTROL;
 
-		this._tabPages.add(cast(TabPage)c);
-	}
-
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
-	{
-		pcw.ExtendedStyle |= WS_EX_CONTROLPARENT;
-		pcw.OldClassName = WC_TABCONTROL;
-		pcw.ClassName = WC_DTABCONTROL;
-		pcw.DefaultCursor = SystemCursors.arrow;
-
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
@@ -349,60 +355,47 @@ class TabControl: OwnerDrawControl, IContainerControl
 			this.sendMessage(TCM_SETIMAGELIST, 0, cast(LPARAM)this._imgList.handle);
 		}
 
-		if(this._tabPages)
-		{
-			int i;
-			TcItem tci = void;
-
-			foreach(TabPage tp; this._tabPages)
-			{
-				tci = this.createTabPage(tp, false);
-
-				if(i == this._selIndex)
-				{
-					tp.visible = true;
-					TabControl.adjustTabPage(tp);
-				}
-
-				i++;
-			}
-
-			this.selectedIndex = this._selIndex;
-		}
-
+		this.doTabPages();
 		super.onHandleCreated(e);
 	}
 
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void onReflectedMessage(ref Message m)
 	{
-		if(msg == WM_NOTIFY)
+		if(m.Msg == WM_NOTIFY)
 		{
-			NMHDR* pNotify = cast(NMHDR*)lParam;
+			NMHDR* pNotify = cast(NMHDR*)m.lParam;
 
 			switch(pNotify.code)
 			{
 				case TCN_SELCHANGING:
-				{
 					scope CancelTabPageEventArgs e = new CancelTabPageEventArgs(this.selectedPage);
-
 					this.onTabPageChanging(e);
-					return e.cancel;
-				}
+					m.Result = e.cancel;
+					break;
 
 				case TCN_SELCHANGE:
-				{
 					this.selectedIndex = this.sendMessage(TCM_GETCURSEL, 0, 0);
 					this.onTabPageChanged(EventArgs.empty);
-					return 0;
-
-				}
+					break;
 
 				default:
 					break;
 			}
 		}
 
-		return super.onReflectedMessage(msg, wParam, lParam);
+		super.onReflectedMessage(m);
+	}
+
+	protected override void show()
+	{
+		super.show();
+		this.updateLayout();
+	}
+
+	protected override void onResize(EventArgs e)
+	{
+		this.updateLayout();
+		super.onResize(e);
 	}
 
 	protected void onTabPageChanging(CancelTabPageEventArgs e)
@@ -413,30 +406,5 @@ class TabControl: OwnerDrawControl, IContainerControl
 	protected void onTabPageChanged(EventArgs e)
 	{
 		this.tagPageChanged(this, e);
-	}
-
-	protected override int wndProc(uint msg, WPARAM wParam, LPARAM lParam)
-	{
-		switch(msg)
-		{
-			case WM_WINDOWPOSCHANGED:
-			{
-				WINDOWPOS* pWndPos = cast(WINDOWPOS*)lParam;
-
-				if(!(pWndPos.flags & SWP_NOMOVE) || !(pWndPos.flags & SWP_NOSIZE))
-				{
-					if(this._tabPages)
-					{
-						TabControl.adjustTabPage(this.selectedPage);
-					}
-				}
-			}
-			break;
-
-			default:
-				break;
-		}
-
-		return super.wndProc(msg, wParam, lParam);
 	}
 }

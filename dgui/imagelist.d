@@ -17,11 +17,11 @@
 
 module dgui.imagelist;
 
+import dgui.core.interfaces.idisposable;
+import dgui.core.collection;
 import dgui.core.charset;
 import dgui.core.winapi;
-import dgui.core.collection;
 import dgui.core.handle;
-import dgui.core.idisposable;
 import dgui.canvas;
 
 enum ColorDepth: uint
@@ -37,12 +37,12 @@ enum ColorDepth: uint
  * Dynamic Binding (Uses The Latest Version Available)
  */
 
-alias extern(Windows) HIMAGELIST function(int, int, uint, int, int) ImageList_CreateProc;
-alias extern(Windows) HIMAGELIST function(HIMAGELIST) ImageList_DestroyProc;
-alias extern(Windows) BOOL function(HIMAGELIST, int) ImageList_RemoveProc;
-alias extern(Windows) int function(HIMAGELIST, HICON) ImageList_AddIconProc;
-alias extern(Windows) int function(HIMAGELIST, int, HDC, int, int, UINT) ImageList_DrawProc;
-alias extern(Windows) int function(HIMAGELIST, COLORREF) ImageList_SetBkColorProc;
+private alias extern(Windows) HIMAGELIST function(int, int, uint, int, int) ImageList_CreateProc;
+private alias extern(Windows) HIMAGELIST function(HIMAGELIST) ImageList_DestroyProc;
+private alias extern(Windows) BOOL function(HIMAGELIST, int) ImageList_RemoveProc;
+private alias extern(Windows) int function(HIMAGELIST, HICON) ImageList_AddIconProc;
+private alias extern(Windows) int function(HIMAGELIST, int, HDC, int, int, UINT) ImageList_DrawProc;
+private alias extern(Windows) int function(HIMAGELIST, COLORREF) ImageList_SetBkColorProc;
 
 class ImageList: Handle!(HIMAGELIST), IDisposable
 {

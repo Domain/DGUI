@@ -17,7 +17,7 @@
 
 module dgui.progressbar;
 
-import dgui.control;
+import dgui.core.controls.subclassedcontrol;
 
 class ProgressBar: SubclassedControl
 {
@@ -103,19 +103,19 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_PROGRESSBAR;
-		pcw.ClassName = WC_DPROGRESSBAR;
+		ccp.OldClassName = WC_PROGRESSBAR;
+		ccp.ClassName = WC_DPROGRESSBAR;
 
-		assert(this._controlInfo.Dock !is DockStyle.FILL, "ProgressBar: Invalid Dock Style");
+		assert(this._dock !is DockStyle.FILL, "ProgressBar: Invalid Dock Style");
 
-		if(this._controlInfo.Dock is DockStyle.LEFT || this._controlInfo.Dock is DockStyle.RIGHT)
+		if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT)
 		{
-			pcw.Style |= PBS_VERTICAL;
+			ccp.Style |= PBS_VERTICAL;
 		}
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)

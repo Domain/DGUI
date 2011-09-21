@@ -17,7 +17,7 @@
 
 module dgui.label;
 
-import dgui.control;
+import dgui.core.controls.control;
 
 enum LabelDrawMode: ubyte
 {
@@ -60,13 +60,19 @@ class Label: Control
 	@property public final void alignment(TextAlignment ta)
 	{
 		this._textAlign = ta;
+
+		if(this.created)
+		{
+			this.invalidate();
+		}
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.ClassName = WC_DLABEL;
+		ccp.ClassName = WC_DLABEL;
+		ccp.ClassStyle = ClassStyles.PARENTDC | ClassStyles.HREDRAW | ClassStyles.VREDRAW;
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onPaint(PaintEventArgs e)
@@ -75,17 +81,15 @@ class Label: Control
 
 		if(this._drawMode is LabelDrawMode.NORMAL)
 		{
-			Rect r = void; //Inizializzata da GetClientRect()
 			Canvas c = e.canvas;
+			Rect r = Rect(NullPoint, this.clientSize);
 
-			GetClientRect(this._handle, &r.rect);
-
-			scope TextFormat tf = new TextFormat(TextFormatFlags.WORD_BREAK);
+			scope TextFormat tf = new TextFormat(TextFormatFlags.SINGLE_LINE);
 			tf.alignment = this._textAlign;
 
-			scope SolidBrush sb = new SolidBrush(this._controlInfo.BackColor);
+			scope SolidBrush sb = new SolidBrush(this._backColor);
 			c.fillRectangle(sb, r);
-			c.drawText(this.text, r, this._controlInfo.ForeColor, this.font, tf);
+			c.drawText(this.text, r, this._foreColor, this.font, tf);
 		}
 	}
 }

@@ -18,13 +18,11 @@
 module dgui.canvas;
 
 import std.conv : to;
-import std.path;
 import std.string;
-import std.c.string;
 import core.memory;
+import dgui.core.interfaces.idisposable;
 import dgui.core.charset;
 import dgui.core.winapi;
-import dgui.core.idisposable;
 import dgui.core.exception;
 import dgui.core.handle;
 import dgui.core.utils;
@@ -315,11 +313,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public ~this()
 	{
-		if(this._handle && this._owned)
-		{
-			this.dispose();
-			this._handle = null;
-		}
+		this.dispose();
 	}
 
 	public void copyTo(Canvas c, BitmapCopyMode bcm)
@@ -346,19 +340,24 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public void dispose()
 	{
-		switch(this._canvasType)
+		if(this._handle && this._owned)
 		{
-			case CanvasType.FROM_CONTROL:
-				ReleaseDC(WindowFromDC(this._handle), this._handle);
-				break;
+			switch(this._canvasType)
+			{
+				case CanvasType.FROM_CONTROL:
+					ReleaseDC(WindowFromDC(this._handle), this._handle);
+					break;
 
-			case CanvasType.IN_MEMORY:
-				DeleteObject(this._hBitmap);
-				DeleteDC(this._handle);
-				break;
+				case CanvasType.IN_MEMORY:
+					DeleteObject(this._hBitmap);
+					DeleteDC(this._handle);
+					break;
 
-			default:
-				break;
+				default:
+					break;
+			}
+
+			this._handle = null;
 		}
 	}
 
@@ -367,7 +366,7 @@ class Canvas: Handle!(HDC), IDisposable
 		Size sz;
 
 		HFONT hOldFont = f ? SelectObject(c.handle, f.handle) : null;
-		GetTextExtentPoint32W(c.handle, toUTF16z(s), s.length, &sz.size);
+		GetTextExtentPoint32W(c.handle, toUTFz!(wchar*)(s), s.length, &sz.size);
 
 		if(f)
 		{
@@ -677,18 +676,24 @@ class Canvas: Handle!(HDC), IDisposable
 
 		if(!b)
 		{
-			BITMAP bmp;
+			Rect r;
+			HWND hWnd = WindowFromDC(this._handle);
 
-			GetObjectW(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
-			hBitmap = CreateCompatibleBitmap(this._handle, bmp.bmWidth, bmp.bmHeight);
+			if(!hWnd)
+			{
+				throwException!(Win32Exception)("No Window for DC: %08X", cast(uint)this._handle);
+			}
+
+			GetClientRect(hWnd, &r.rect);
+
+			hBitmap = CreateCompatibleBitmap(this._handle, r.width, r.height);
 			c._hBitmap = hBitmap;
-			SelectObject(hdc, hBitmap);  // La seleziona e la distrugge quando ha finito.
+			SelectObject(hdc, hBitmap);  // Destroyed by Mem Canvas Object
 		}
 		else
 		{
-			SelectObject(hdc, b.handle); // La prende 'in prestito', ma non la distrugge.
+			SelectObject(hdc, b.handle); // This bitmap is not destroyed because the Bitmap object own his HBITMAP
 		}
-
 
 		return c;
 	}
@@ -721,11 +726,7 @@ abstract class GraphicObject: Handle!(HGDIOBJ), IDisposable
 
 	public ~this()
 	{
-		if(this._owned && this._handle)
-		{
-			this.dispose();
-			this._handle = null;
-		}
+		this.dispose();
 	}
 
 	protected static int getInfo(T)(HGDIOBJ hGdiObj, ref T t)
@@ -735,7 +736,11 @@ abstract class GraphicObject: Handle!(HGDIOBJ), IDisposable
 
 	public void dispose()
 	{
-		DeleteObject(this._handle);
+		if(this._handle && this._owned)
+		{
+			DeleteObject(this._handle);
+			this._handle = null;
+		}
 	}
 }
 
@@ -807,9 +812,9 @@ class Bitmap: Image
 		HBITMAP hBitmap = CreateCompatibleBitmap(hdc, w, h);
 		HBITMAP hOldBitmap = SelectObject(hcdc, hBitmap);
 
-		COLORREF oldColor = SetBkColor(hcdc, backColor);
-		extTextOut(hcdc, 0, 0, ETO_OPAQUE, &r.rect, "", 0, null);
-		SetBkColor(hcdc, oldColor);
+		HBRUSH hBrush = CreateSolidBrush(backColor);
+		FillRect(hcdc, &r.rect, hBrush);
+		DeleteObject(hBrush);
 
 		SelectObject(hcdc, hOldBitmap);
 		DeleteDC(hcdc);
@@ -981,7 +986,7 @@ class Icon: Image
 	{
 		HICON hIcon;
 
-		if(!icmp(getExt(fileName), "ico"))
+		if(!icmp(std.path.extension(fileName), ".ico"))
 		{
 			hIcon = loadImage(null, fileName, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		}
@@ -1001,7 +1006,10 @@ class Icon: Image
 
 	public override void dispose()
 	{
-		DestroyIcon(this._handle);
+		if(this._handle && this._owned)
+		{
+			DestroyIcon(this._handle); // Use DestroyIcon() not DestroyObject()
+		}
 	}
 
 	@property public override Size size()
@@ -1054,10 +1062,10 @@ class Icon: Image
 		HBITMAP hBitmap = CreateCompatibleBitmap(hwdc, sz.width, sz.height);
 		HBITMAP hOldBitmap = SelectObject(hdc1, hBitmap);
 
-		Rect r = Rect(0, 0, sz.width, sz.height);
-
-		SetBkColor(hdc1, RGB(255, 255, 255));
-		extTextOut(hdc1, 0, 0, ETO_OPAQUE,  &r.rect, null, 0, null);
+		Rect r = Rect(NullPoint, sz);
+		HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+		FillRect(hdc1, &r.rect, hBrush);
+		DeleteObject(hBrush);
 
 		DrawIconEx(hdc1, 0, 0, this._handle, sz.width, sz.height, 0, null, DI_NORMAL);
 		SelectObject(hdc1, hOldBitmap);
@@ -1093,7 +1101,10 @@ final class Cursor: Icon
 
 	public override void dispose()
 	{
-		DestroyCursor(this._handle);
+		if(this._handle && this._owned)
+		{
+			DestroyCursor(this._handle); // Use DestroyCursor() not DestroyObject()
+		}
 	}
 
 	@property public static Point location()
@@ -1157,7 +1168,7 @@ final class Font: GraphicObject
 		LOGFONTW lf;
 
 		getInfo!(LOGFONTW)(this._handle, lf);
-		return to!(string)(toUTF8(lf.lfFaceName).ptr);
+		return to!(string)(lf.lfFaceName);
 	}
 
 	@property public int height()

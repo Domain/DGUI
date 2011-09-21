@@ -36,8 +36,7 @@
 
 module dgui.richtextbox;
 
-import dgui.control;
-public import dgui.textbox;
+public import dgui.core.controls.textcontrol;
 
 class RichTextBox: TextControl
 {
@@ -63,16 +62,11 @@ class RichTextBox: TextControl
 	}
 
 	public void redo()
-	in
-	{
-		assert(this.created);
-	}
-	body
 	{
 		this.sendMessage(EM_REDO, 0, 0);
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		++_refCount;
 
@@ -81,11 +75,11 @@ class RichTextBox: TextControl
 			_hRichDll = loadLibrary("riched20.dll"); // Load the standard version
 		}
 
-		pcw.Style |= ES_MULTILINE | ES_WANTRETURN;
-		pcw.OldClassName = WC_RICHEDIT;
-		pcw.ClassName = WC_DRICHEDIT;
+		ccp.Style |= ES_MULTILINE | ES_WANTRETURN;
+		ccp.OldClassName = WC_RICHEDIT;
+		ccp.ClassName = WC_DRICHEDIT;
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
@@ -93,6 +87,6 @@ class RichTextBox: TextControl
 		super.onHandleCreated(e);
 
 		this.sendMessage(EM_SETEVENTMASK, 0, ENM_CHANGE | ENM_UPDATE);
-		this.sendMessage(EM_SETBKGNDCOLOR, 0, this._controlInfo.BackColor.colorref);
+		this.sendMessage(EM_SETBKGNDCOLOR, 0, this._backColor.colorref);
 	}
 }

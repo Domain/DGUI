@@ -19,23 +19,11 @@
 
 module dgui.core.charset;
 
-import std.string: toStringz;
+import std.array;
 import std.conv: to;
-import std.utf: toUTF16z, toUTF8;
-import std.c.wcharh: wcscpy, wcslen;
+import std.utf: toUTFz;
 import dgui.core.winapi;
 import dgui.core.utils;
-
-public immutable(char)* unicodeToAnsiPtr(wchar* pWChar)
-{
-	int len = wcslen(pWChar);
-	return toStringz(to!(string)(pWChar[0..len]));
-}
-
-public immutable(wchar)* ansiToUnicodePtr(char* pChar)
-{
-	return cast(immutable(wchar)*)toUTF16z(to!(string)(pChar));
-}
 
 /**
   * $(B) Unicode Wrapper of CreateWindowEx API $(B)
@@ -43,36 +31,31 @@ public immutable(wchar)* ansiToUnicodePtr(char* pChar)
 public HWND createWindowEx(DWORD exStyle, string className, string windowName, DWORD style,
 					       int x, int y, int nWidth, int nHeight, HWND hWndParent, LPVOID lpParam)
 {
-	return CreateWindowExW(exStyle, toUTF16z(className), toUTF16z(windowName), style, x, y,
+	return CreateWindowExW(exStyle, toUTFz!(wchar*)(className), toUTFz!(wchar*)(windowName), style, x, y,
 						   nWidth, nHeight, hWndParent, null, getHInstance(), lpParam);
 }
 
 public BOOL getClassInfoEx(string className, WNDCLASSEXW* pWndClassEx)
 {
-	return GetClassInfoExW(getHInstance(), toUTF16z(className), pWndClassEx);
+	return GetClassInfoExW(getHInstance(), toUTFz!(wchar*)(className), pWndClassEx);
 }
 
 public string getModuleFileName(HMODULE hModule)
 {
-	wchar[] path = new wchar[MAX_PATH];
+	wchar[MAX_PATH + 1] path = void;
 
-	int res = GetModuleFileNameW(hModule, path.ptr, path.length);
-	return toUTF8(path);
-}
-
-public BOOL extTextOut(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, string s, uint cbCount, int* lpDx)
-{
-	return ExtTextOutW(hdc, x, y, fuOptions, lprc, toUTF16z(s), cbCount, lpDx);
+	int len = GetModuleFileNameW(hModule, path.ptr, path.length);
+	return to!(string)(path[0..len]);
 }
 
 public HICON extractAssociatedIcon(string s, WORD* pIcon)
 {
-	return ExtractAssociatedIconW(getHInstance(), toUTF16z(s), pIcon);
+	return ExtractAssociatedIconW(getHInstance(), toUTFz!(wchar*)(s), pIcon);
 }
 
 public HANDLE loadImage(HINSTANCE hInstance, string s, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)
 {
-	return LoadImageW(hInstance, toUTF16z(s), uType, cxDesired, cyDesired, fuLoad);
+	return LoadImageW(hInstance, toUTFz!(wchar*)(s), uType, cxDesired, cyDesired, fuLoad);
 }
 
 public HANDLE loadImage(HINSTANCE hInstance, wchar* pResID, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)
@@ -82,25 +65,25 @@ public HANDLE loadImage(HINSTANCE hInstance, wchar* pResID, UINT uType, int cxDe
 
 public int drawTextEx(HDC hdc, string s, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams)
 {
-	return DrawTextExW(hdc, toUTF16z(s), -1, lprc, dwDTFormat, lpDTParams);
+	return DrawTextExW(hdc, toUTFz!(wchar*)(s), -1, lprc, dwDTFormat, lpDTParams);
 }
 
 public HMODULE loadLibrary(string s)
 {
-	return LoadLibraryW(toUTF16z(s));
+	return LoadLibraryW(toUTFz!(wchar*)(s));
 }
 
 public HMODULE getModuleHandle(string s)
 {
-	return GetModuleHandleW(toUTF16z(s));
+	return GetModuleHandleW(toUTFz!(wchar*)(s));
 }
 
 public void getTempPath(ref string s)
 {
-	wchar[] path = new wchar[MAX_PATH];
+	wchar[MAX_PATH + 1] path = void;
 
 	int len = GetTempPathW(MAX_PATH, path.ptr);
-	s = toUTF8(path[0..len]);
+	s = to!(string)(path[0..len]);
 }
 
 public int getWindowTextLength(HWND hWnd)
@@ -110,16 +93,23 @@ public int getWindowTextLength(HWND hWnd)
 
 public string getWindowText(HWND hWnd)
 {
-	int len = getWindowTextLength(hWnd) + 1;
-	wchar[] t = new wchar[len];
+	int len = getWindowTextLength(hWnd);
 
-	GetWindowTextW(hWnd, t.ptr, len);
-	return to!(string)(toUTF8(t).ptr);
+	if(!len)
+	{
+		return null;
+	}
+
+	len++;
+
+	wchar[] t = new wchar[len];
+	len = GetWindowTextW(hWnd, t.ptr, len);
+	return to!(string)(t[0..len]);
 }
 
 public BOOL setWindowText(HWND hWnd, string s)
 {
-	return SetWindowTextW(hWnd, toUTF16z(s));
+	return SetWindowTextW(hWnd, toUTFz!(wchar*)(s));
 }
 
 public HFONT createFontIndirect(LOGFONTW* lf)
@@ -129,7 +119,20 @@ public HFONT createFontIndirect(LOGFONTW* lf)
 
 public HFONT createFontIndirect(string s, LOGFONTW* lf)
 {
-	wcscpy(lf.lfFaceName.ptr, toUTF16z(s));
+	if(s.length >= LF_FACESIZE)
+	{
+		s = s[0..LF_FACESIZE - 1];
+	}
+
+	wstring ws = to!(wstring)(s);
+
+	foreach(int i, wchar wch; ws)
+	{
+		lf.lfFaceName[i] = wch;
+	}
+
+	lf.lfFaceName[ws.length] = '\0';
+
 	return CreateFontIndirectW(lf);
 }
 
@@ -153,7 +156,7 @@ public ATOM registerClassEx(string className, HCURSOR hCursor, HBRUSH hBackgroun
 	WNDCLASSEXW wc;
 
 	wc.cbSize = WNDCLASSEXW.sizeof;
-	wc.lpszClassName = toUTF16z(className);
+	wc.lpszClassName = toUTFz!(wchar*)(className);
 	wc.hCursor = hCursor;
 	wc.hInstance = getHInstance();
 	wc.hbrBackground = hBackground;
@@ -161,4 +164,9 @@ public ATOM registerClassEx(string className, HCURSOR hCursor, HBRUSH hBackgroun
 	wc.style = style;
 
 	return RegisterClassExW(&wc);
+}
+
+public ATOM registerClassEx(WNDCLASSEXW* wc)
+{
+	return RegisterClassExW(wc);
 }

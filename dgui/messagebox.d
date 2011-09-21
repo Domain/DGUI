@@ -17,9 +17,9 @@
 
 module dgui.messagebox;
 
-import std.utf;
-import dgui.core.enums;
-import dgui.core.winapi;
+import std.utf: toUTFz;
+private import dgui.core.winapi;
+public import dgui.core.dialogs.dialogresult;
 
 enum MsgBoxButtons: uint
 {
@@ -49,7 +49,7 @@ final class MsgBox
 
 	public static DialogResult show(string title, string text, MsgBoxButtons button, MsgBoxIcons icon)
 	{
-		return cast(DialogResult)MessageBoxW(GetActiveWindow(), toUTF16z(text), toUTF16z(title), button | icon);
+		return cast(DialogResult)MessageBoxW(GetActiveWindow(), toUTFz!(wchar*)(text), toUTFz!(wchar*)(title), button | icon);
 	}
 
 	public static DialogResult show(string title, string text, MsgBoxButtons button)

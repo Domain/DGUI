@@ -17,8 +17,7 @@
 
 module dgui.textbox;
 
-import std.utf: toUTF16z;
-import dgui.control;
+import dgui.core.controls.textcontrol;
 
 enum CharacterCasing
 {
@@ -27,214 +26,26 @@ enum CharacterCasing
 	LOWERCASE = ES_LOWERCASE,
 }
 
-abstract class TextControl: SubclassedControl
-{
-	public Signal!(Control, EventArgs) textChanged;
-
-	public this()
-	{
-
-	}
-
-	public void appendText(string s)
-	{
-		if(this.created)
-		{
-			this.sendMessage(EM_REPLACESEL, true, cast(LPARAM)toUTF16z(s));
-		}
-		else
-		{
-			this._controlInfo.Text ~= s;
-		}
-	}
-
-	@property public final bool readOnly()
-	{
-		return !(this.getStyle() & ES_READONLY);
-	}
-
-	@property public final void readOnly(bool b)
-	{
-		this.setStyle(ES_READONLY, b);
-	}
-
-	public void undo()
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(EM_UNDO, 0, 0);
-	}
-
-	public void cut()
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(WM_CUT, 0, 0);
-	}
-
-	public void copy()
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(WM_COPY, 0, 0);
-	}
-
-	public void paste()
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(WM_PASTE, 0, 0);
-	}
-	public void selectAll()
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(EM_SETSEL, 0, -1);
-	}
-
-	public void clear()
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(WM_CLEAR, 0, 0);
-	}
-
-	@property public bool modified()
-	{
-		if(this.created)
-		{
-			return cast(bool)this.sendMessage(EM_GETMODIFY, 0, 0);
-		}
-
-		return false;
-	}
-
-	@property public void modified(bool b)
-	in
-	{
-		assert(this.created);
-	}
-	body
-	{
-		this.sendMessage(EM_SETMODIFY, b, 0);
-	}
-
-	@property public int textLength()
-	{
-		if(this.created)
-		{
-			return getWindowTextLength(this._handle);
-		}
-
-		return this._controlInfo.Text.length;
-	}
-
-	@property public final string selectedText()
-	{
-		CHARRANGE chrg = void; //Inizializzata sotto
-
-		this.sendMessage(EM_EXGETSEL, 0, cast(LPARAM)&chrg);
-		return this.text[chrg.cpMin..chrg.cpMax];
-	}
-
-	@property public final int selectionStart()
-	{
-		CHARRANGE chrg = void; //Inizializzata sotto
-
-		this.sendMessage(EM_EXGETSEL, 0, cast(LPARAM)&chrg);
-		return chrg.cpMin;
-	}
-
-	@property public final int selectionLength()
-	{
-		CHARRANGE chrg = void; //Inizializzata sotto
-
-		this.sendMessage(EM_EXGETSEL, 0, cast(LPARAM)&chrg);
-		return chrg.cpMax - chrg.cpMin;
-	}
-
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
-	{
-		pcw.Style |= WS_TABSTOP;
-		pcw.ExtendedStyle = WS_EX_CLIENTEDGE;
-		pcw.DefaultBackColor = SystemColors.colorWindow;
-
-		super.preCreateWindow(pcw);
-	}
-
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM  lParam)
-	{
-		if(msg == WM_COMMAND)
-		{
-			if(HIWORD(wParam) == EN_CHANGE && this._controlInfo.CanNotify)
-			{
-				this.onTextChanged(EventArgs.empty);
-			}
-		}
-
-		return super.onReflectedMessage(msg, wParam, lParam);
-	}
-
-	protected override void onHandleCreated(EventArgs e)
-	{
-		this.focus();
-		this.modified = false; // Force to 'False'
-
-		super.onHandleCreated(e);
-	}
-
-	protected void onTextChanged(EventArgs e)
-	{
-		this.textChanged(this, e);
-	}
-}
-
 class TextBox: TextControl
 {
 	private CharacterCasing _chChasing  = CharacterCasing.NORMAL;
 	private uint _maxLength = 0;
-	private bool _multiline = false;
-	private bool _numbersOnly = false;
-	private bool _passText = false;
 
 	@property public final bool multiline()
 	{
-		return this._multiline;
+		return cast(bool)(this.getStyle() & ES_MULTILINE);
 	}
 
 	@property public final void multiline(bool b)
 	{
-		this._multiline = b;
-
-		if(this.created)
-		{
-			this.setStyle(ES_MULTILINE, b);
-		}
+		this.setStyle(ES_MULTILINE, b);
 	}
 
 	@property public final uint maxLength()
 	{
 		if(!this._maxLength)
 		{
-			if(this._multiline)
+			if(this.getStyle() & ES_MULTILINE)
 			{
 				return 0xFFFFFFFF;
 			}
@@ -253,7 +64,7 @@ class TextBox: TextControl
 
 		if(!len)
 		{
-			if(this._multiline)
+			if(this.getStyle() & ES_MULTILINE)
 			{
 				len = 0xFFFFFFFF;
 			}
@@ -276,53 +87,34 @@ class TextBox: TextControl
 
 	@property public final void characterCasing(CharacterCasing ch)
 	{
+		this._chChasing = ch;
+
 		if(this.created)
 		{
-			this.setStyle(this._chChasing, false); //Vecchio
-			this.setStyle(ch, true); //Nuovo
+			this.setStyle(this._chChasing, false); //Remove Old Style
+			this.setStyle(ch, true); //Add New Style
 		}
-
-		this._chChasing = ch;
 	}
 
 	@property public final void numbersOnly(bool b)
 	{
-		this._numbersOnly = b;
-
-		if(this.created)
-		{
-			this.setStyle(ES_NUMBER, b);
-		}
+		this.setStyle(ES_NUMBER, b);
 	}
 
 	@property public final void passwordText(bool b)
 	{
-		this._passText = b;
-
-		if(this.created)
-		{
-			this.setStyle(ES_PASSWORD, b);
-		}
+		this.setStyle(ES_PASSWORD, b);
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_EDIT;
-		pcw.ClassName = WC_DEDIT;
-		pcw.Style |= this._chChasing | (this._multiline ? ES_MULTILINE : 0);
+		ccp.ExtendedStyle |= WS_EX_CLIENTEDGE;
+		ccp.Style |= this._chChasing;
+		ccp.OldClassName = WC_EDIT;
+		ccp.ClassName = WC_DEDIT;
 
-		if(this._numbersOnly)
-		{
-			pcw.Style |= ES_NUMBER;
-		}
-
-		if(this._passText)
-		{
-			pcw.Style |= ES_PASSWORD;
-		}
-
-		this.height = 20;
-		super.preCreateWindow(pcw);
+		this.height = 20; //E questo cos'è?
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)

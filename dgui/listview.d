@@ -18,8 +18,8 @@
 module dgui.listview;
 
 import std.utf: toUTF8;
+import dgui.core.controls.ownerdrawcontrol;
 import dgui.core.utils;
-import dgui.control;
 import dgui.imagelist;
 
 enum ColumnTextAlign: int
@@ -37,13 +37,12 @@ enum ViewStyle: uint
 	SMALL_ICON = LVS_SMALLICON,
 }
 
-private struct ListViewInfo
+enum ListViewBits: ubyte
 {
-	ListViewItem SelectedItem;
-	ImageList ImgList;
-	bool GridLines = false;
-	bool FullRow = false;
-	bool CheckBoxes = false;
+	NONE 			   = 0,
+	GRID_LINES  	   = 1,
+	FULL_ROW_SELECT    = 2,
+	CHECK_BOXES 	   = 4,
 }
 
 class ListViewItem
@@ -130,7 +129,7 @@ class ListViewItem
 			lvi.mask = LVIF_TEXT;
 			lvi.iItem = this.index;
 			lvi.iSubItem = !this._parentItem ? 0 : this.subitemIndex;
-			lvi.pszText = toUTF16z(s);
+			lvi.pszText = toUTFz!(wchar*)(s);
 
 			this._owner.sendMessage(LVM_SETITEMW, 0, cast(LPARAM)&lvi);
 		}
@@ -307,28 +306,23 @@ public alias ItemEventArgs!(ListViewItem) ListViewItemCheckedEventArgs;
 
 class ListView: OwnerDrawControl
 {
-	public Signal!(Control, EventArgs) itemChanged;
-	public Signal!(Control, ListViewItemCheckedEventArgs) itemChecked;
+	public Event!(Control, EventArgs) itemChanged;
+	public Event!(Control, ListViewItemCheckedEventArgs) itemChecked;
 
 	private Collection!(ListViewColumn) _columns;
 	private Collection!(ListViewItem) _items;
-	private ListViewInfo _lvwInfo;
-
-	public this()
-	{
-		super();
-
-		this.setStyle(LVS_ALIGNTOP | LVS_AUTOARRANGE | LVS_SHAREIMAGELISTS, true);
-	}
+	private ListViewBits _lBits = ListViewBits.NONE;
+	private ListViewItem _selectedItem;
+	private ImageList _imgList;
 
 	@property public final ImageList imageList()
 	{
-		return this._lvwInfo.ImgList;
+		return this._imgList;
 	}
 
 	@property public final void imageList(ImageList imgList)
 	{
-		 this._lvwInfo.ImgList = imgList;
+		 this._imgList = imgList;
 
 		if(this.created)
 		{
@@ -364,14 +358,14 @@ class ListView: OwnerDrawControl
 		this.setStyle(vs, true);
 	}
 
-	@property public final bool fullRow()
+	@property public final bool fullRowSelect()
 	{
-		return this._lvwInfo.FullRow;
+		return cast(bool)(this._lBits & ListViewBits.FULL_ROW_SELECT);
 	}
 
-	@property public final void fullRow(bool b)
+	@property public final void fullRowSelect(bool b)
 	{
-		this._lvwInfo.FullRow = b;
+		this._lBits |= ListViewBits.FULL_ROW_SELECT;
 
 		if(this.created)
 		{
@@ -381,12 +375,12 @@ class ListView: OwnerDrawControl
 
 	@property public final bool gridLines()
 	{
-		return this._lvwInfo.GridLines;
+		return cast(bool)(this._lBits & ListViewBits.GRID_LINES);
 	}
 
 	@property public final void gridLines(bool b)
 	{
-		this._lvwInfo.GridLines = b;
+		this._lBits |= ListViewBits.GRID_LINES;
 
 		if(this.created)
 		{
@@ -396,12 +390,12 @@ class ListView: OwnerDrawControl
 
 	@property public final bool checkBoxes()
 	{
-		return this._lvwInfo.CheckBoxes;
+		return cast(bool)(this._lBits & ListViewBits.CHECK_BOXES);
 	}
 
 	@property public final void checkBoxes(bool b)
 	{
-		this._lvwInfo.CheckBoxes = b;
+		this._lBits |= ListViewBits.CHECK_BOXES;
 
 		if(this.created)
 		{
@@ -410,13 +404,8 @@ class ListView: OwnerDrawControl
 	}
 
 	@property public final ListViewItem selectedItem()
-	in
 	{
-		assert(this.created);
-	}
-	body
-	{
-		return this._lvwInfo.SelectedItem;
+		return this._selectedItem;
 	}
 
 	public final ListViewColumn addColumn(string txt, int w, ColumnTextAlign cta = ColumnTextAlign.LEFT)
@@ -523,8 +512,8 @@ class ListView: OwnerDrawControl
 	package static void insertItem(ListViewItem item, bool subitem = false)
 	{
 		/*
-		 * Item: Item (o SubItem) da inserire.
-		 * Subitem = E' un SubItem?
+		 * Item: Item (or SubItem) to insert.
+		 * Subitem = Is a SubItem?
 		 */
 
 		int idx = item.index;
@@ -533,17 +522,17 @@ class ListView: OwnerDrawControl
 		lvi.mask = LVIF_TEXT | (!subitem ? (LVIF_IMAGE | LVIF_STATE | LVIF_PARAM) : 0);
 		lvi.iImage = !subitem ? item.imageIndex : -1;
 		lvi.iItem = !subitem ? idx : item.parentItem.index;
-		lvi.iSubItem = !subitem ? 0 : item.subitemIndex; //Per windows il subitem inizia da 1 (lo 0 e' l'item principale).
-		lvi.pszText = toUTF16z(item.text);
+		lvi.iSubItem = !subitem ? 0 : item.subitemIndex; //ListView's subitem starts from 1 (0 is the main item).
+		lvi.pszText = toUTFz!(wchar*)(item.text);
 		lvi.lParam = winCast!(LPARAM)(item);
 
 		item.listView.sendMessage(!subitem ? LVM_INSERTITEMW : LVM_SETITEMW, 0, cast(LPARAM)&lvi);
 
 		if(!subitem)
 		{
-			if(item.listView.checkBoxes) //LVM_INSERTITEM non gestisce i checkbox, uso LVM_SETITEMSTATE
+			if(item.listView.checkBoxes) //LVM_INSERTITEM doesn't handle CheckBoxes, use LVM_SETITEMSTATE
 			{
-				//Riciclo la variabile 'lvi'
+				//Recycle the variable 'lvi'
 
 				lvi.mask = LVIF_STATE;
 				lvi.stateMask = LVIS_STATEIMAGEMASK;
@@ -570,28 +559,28 @@ class ListView: OwnerDrawControl
 		lvc.mask =  LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
 		lvc.cx = col.width;
 		lvc.fmt = col.textAlign;
-		lvc.pszText = toUTF16z(col.text);
+		lvc.pszText = toUTFz!(wchar*)(col.text);
 
 		col.listView.sendMessage(LVM_INSERTCOLUMNW, col.listView._columns.length, cast(LPARAM)&lvc);
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.Style |= LVS_ALIGNLEFT;
-		pcw.OldClassName = WC_LISTVIEW;
-		pcw.ClassName = WC_DLISTVIEW;
-		pcw.DefaultBackColor = SystemColors.colorWindow;
+		ccp.Style |= LVS_ALIGNLEFT | LVS_ALIGNTOP | LVS_AUTOARRANGE | LVS_SHAREIMAGELISTS;
+		ccp.OldClassName = WC_LISTVIEW;
+		ccp.ClassName = WC_DLISTVIEW;
+		ccp.DefaultBackColor = SystemColors.colorWindow;
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(msg)
+		switch(m.Msg)
 		{
 			case WM_NOTIFY:
 			{
-				NMLISTVIEW* pNotify = cast(NMLISTVIEW*)lParam;
+				NMLISTVIEW* pNotify = cast(NMLISTVIEW*)m.lParam;
 
 				if(pNotify && pNotify.iItem != -1)
 				{
@@ -605,7 +594,7 @@ class ListView: OwnerDrawControl
 
 								if(pNotify.uNewState & LVIS_SELECTED)
 								{
-									this._lvwInfo.SelectedItem = this._items[pNotify.iItem];
+									this._selectedItem = this._items[pNotify.iItem];
 									this.onSelectedItemChanged(EventArgs.empty);
 								}
 
@@ -629,30 +618,30 @@ class ListView: OwnerDrawControl
 				break;
 		}
 
-		return super.onReflectedMessage(msg, wParam, lParam);
+		super.onReflectedMessage(m);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
 	{
-		if(this._lvwInfo.GridLines)
+		if(this._lBits & ListViewBits.GRID_LINES)
 		{
 			this.sendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_GRIDLINES, LVS_EX_GRIDLINES);
 		}
 
-		if(this._lvwInfo.FullRow)
+		if(this._lBits & ListViewBits.FULL_ROW_SELECT)
 		{
 			this.sendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
 		}
 
-		if(this._lvwInfo.CheckBoxes)
+		if(this._lBits & ListViewBits.CHECK_BOXES)
 		{
 			this.sendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 		}
 
-		if(this._lvwInfo.ImgList)
+		if(this._imgList)
 		{
-			this.sendMessage(LVM_SETIMAGELIST, LVSIL_NORMAL, cast(LPARAM)this._lvwInfo.ImgList.handle);
-			this.sendMessage(LVM_SETIMAGELIST, LVSIL_SMALL, cast(LPARAM)this._lvwInfo.ImgList.handle);
+			this.sendMessage(LVM_SETIMAGELIST, LVSIL_NORMAL, cast(LPARAM)this._imgList.handle);
+			this.sendMessage(LVM_SETIMAGELIST, LVSIL_SMALL, cast(LPARAM)this._imgList.handle);
 		}
 
 		if(this.getStyle() & ViewStyle.REPORT)

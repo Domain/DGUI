@@ -20,7 +20,6 @@
 
 module dgui.core.wincomp;
 
-import dgui.core.enums;
 import dgui.core.utils;
 import dgui.core.winapi;
 import dgui.core.charset;

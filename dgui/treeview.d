@@ -17,9 +17,9 @@
 
 module dgui.treeview;
 
-import std.utf: toUTF16z;
+import std.utf: toUTFz;
 import dgui.core.utils;
-import dgui.control;
+import dgui.core.controls.subclassedcontrol;
 import dgui.imagelist;
 
 enum NodeInsertMode
@@ -195,7 +195,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 			tvi.mask = TVIF_TEXT | TVIF_HANDLE;
 			tvi.hItem = this._handle;
-			tvi.pszText = toUTF16z(txt);
+			tvi.pszText = toUTFz!(wchar*)(txt);
 			this._owner.sendMessage(TVM_SETITEMW, 0, cast(LPARAM)&tvi);
 		}
 	}
@@ -333,11 +333,11 @@ public alias CancelEventArgs!(TreeNode) CancelTreeNodeEventArgs;
 
 class TreeView: SubclassedControl
 {
-	public Signal!(Control, CancelTreeNodeEventArgs) selectedNodeChanging;
-	public Signal!(Control, TreeNodeChangedEventArgs) selectedNodeChanged;
-	public Signal!(Control, CancelTreeNodeEventArgs) treeNodeExpanding;
-	public Signal!(Control, TreeNodeEventArgs) treeNodeExpanded;
-	public Signal!(Control, TreeNodeEventArgs) treeNodeCollapsed;
+	public Event!(Control, CancelTreeNodeEventArgs) selectedNodeChanging;
+	public Event!(Control, TreeNodeChangedEventArgs) selectedNodeChanged;
+	public Event!(Control, CancelTreeNodeEventArgs) treeNodeExpanding;
+	public Event!(Control, TreeNodeEventArgs) treeNodeExpanded;
+	public Event!(Control, TreeNodeEventArgs) treeNodeCollapsed;
 
 	private Collection!(TreeNode) _nodes;
 	private ImageList _imgList;
@@ -470,7 +470,7 @@ class TreeView: SubclassedControl
 		tvis.item.cChildren = I_CHILDRENCALLBACK;
 		tvis.item.iImage = node.imageIndex;
 		tvis.item.iSelectedImage = node.selectedImageIndex;
-		tvis.item.pszText  = toUTF16z(node.text);
+		tvis.item.pszText  = toUTFz!(wchar*)(node.text);
 		tvis.item.lParam = winCast!(LPARAM)(node);
 
 		TreeView tvw = node.treeView;
@@ -494,15 +494,14 @@ class TreeView: SubclassedControl
 		//node.dispose();
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_TREEVIEW;
-		pcw.ClassName = WC_DTREEVIEW;
-		pcw.Style |= TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS;
-		pcw.ExtendedStyle = WS_EX_CLIENTEDGE;
-		pcw.DefaultBackColor = SystemColors.colorWindow;
+		ccp.OldClassName = WC_TREEVIEW;
+		ccp.ClassName = WC_DTREEVIEW;
+		ccp.Style |= TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS;
+		ccp.DefaultBackColor = SystemColors.colorWindow;
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
@@ -523,17 +522,17 @@ class TreeView: SubclassedControl
 		super.onHandleCreated(e);
 	}
 
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void onReflectedMessage(ref Message m)
 	{
-		if(msg == WM_NOTIFY)
+		if(m.Msg == WM_NOTIFY)
 		{
-			NMTREEVIEWW* pNotifyTreeView = cast(NMTREEVIEWW*)lParam;
+			NMTREEVIEWW* pNotifyTreeView = cast(NMTREEVIEWW*)m.lParam;
 
 			switch(pNotifyTreeView.hdr.code)
 			{
 				case TVN_GETDISPINFOW:
 				{
-					NMTVDISPINFOW* pTvDispInfo = cast(NMTVDISPINFOW*)lParam;
+					NMTVDISPINFOW* pTvDispInfo = cast(NMTVDISPINFOW*)m.lParam;
 					TreeNode node = winCast!(TreeNode)(pTvDispInfo.item.lParam);
 					pTvDispInfo.item.cChildren = node.lazyNode; //Is a Lazy Node, sooner or later a child node will be added
 				}
@@ -551,8 +550,9 @@ class TreeView: SubclassedControl
 						node.doChildNodes();
 					}
 
-					return e.cancel;
+					m.Result = e.cancel;
 				}
+				break;
 
 				case TVN_ITEMEXPANDEDW:
 				{
@@ -575,8 +575,9 @@ class TreeView: SubclassedControl
 					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
 					scope CancelTreeNodeEventArgs e = new CancelTreeNodeEventArgs(node);
 					this.onSelectedNodeChanging(e);
-					return e.cancel;
+					m.Result = e.cancel;
 				}
+				break;
 
 				case TVN_SELCHANGEDW:
 				{
@@ -590,28 +591,17 @@ class TreeView: SubclassedControl
 				break;
 
 				case NM_RCLICK: //Trigger a WM_CONTEXMENU Message (Fixes the double click/context menu bug, probably it's a windows bug).
-					this.wndProc(WM_CONTEXTMENU, 0, 0);
+					Message sm = Message(this._handle, WM_CONTEXTMENU, 0, 0);
+					this.wndProc(sm);
+					m.Result = sm.Result;
 					break;
 
 				default:
+					super.onReflectedMessage(m);
 					break;
 			}
 		}
-
-		return super.onReflectedMessage(msg, wParam, lParam);
 	}
-
-	/*
-	protected override void onMouseKeyUp(MouseEventArgs e)
-	{
-		if(e.keys is MouseKeys.RIGHT)
-		{
-			this.sendMessage(WM_CONTEXTMENU, 0, 0);
-		}
-
-		super.onMouseKeyUp(e);
-	}
-	*/
 
 	protected void onTreeNodeExpanding(CancelTreeNodeEventArgs e)
 	{

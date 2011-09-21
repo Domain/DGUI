@@ -17,8 +17,8 @@
 
 module dgui.combobox;
 
-import std.utf: toUTF16z;
-import dgui.control;
+import std.utf: toUTFz;
+import dgui.core.controls.subclassedcontrol;
 import dgui.core.utils;
 public import dgui.imagelist;
 
@@ -27,13 +27,6 @@ enum DropDownStyles: uint
 	SIMPLE = CBS_SIMPLE,
 	DROPDOWN = CBS_DROPDOWN,
 	DROPDOWN_LIST = CBS_DROPDOWNLIST,
-}
-
-struct ComboInfo
-{
-	int SelectedIndex;
-	ImageList ImgList;
-	DropDownStyles DDStyle = DropDownStyles.DROPDOWN;
 }
 
 class ComboBoxItem
@@ -105,7 +98,7 @@ class ComboBoxItem
 			COMBOBOXEXITEMW cbei;
 
 			cbei.mask = CBEIF_TEXT;
-			cbei.pszText = toUTF16z(txt);
+			cbei.pszText = toUTFz!(wchar*)(txt);
 			cbei.iItem = this._idx;
 
 			this._owner.sendMessage(CBEM_SETITEMW, 0, cast(LPARAM)&cbei);
@@ -125,10 +118,12 @@ class ComboBoxItem
 
 class ComboBox: SubclassedControl
 {
-	public Signal!(Control, EventArgs) itemChanged;
+	public Event!(Control, EventArgs) itemChanged;
 
 	private Collection!(ComboBoxItem) _items;
-	private ComboInfo _cbxInfo;
+	private int _selectedIndex;
+	private ImageList _imgList;
+	private DropDownStyles _ddStyle = DropDownStyles.DROPDOWN;
 
 	public this()
 	{
@@ -172,12 +167,12 @@ class ComboBox: SubclassedControl
 			return this.sendMessage(CB_GETCURSEL, 0, 0);
 		}
 
-		return this._cbxInfo.SelectedIndex;
+		return this._selectedIndex;
 	}
 
 	@property public final void selectedIndex(int i)
 	{
-		this._cbxInfo.SelectedIndex = i;
+		this._selectedIndex = i;
 
 		if(this.created)
 		{
@@ -204,7 +199,7 @@ class ComboBox: SubclassedControl
 	{
 		if(this.created)
 		{
-			return this._items[this._cbxInfo.SelectedIndex];
+			return this._items[this._selectedIndex];
 		}
 		else
 		{
@@ -221,26 +216,26 @@ class ComboBox: SubclassedControl
 
 	@property public final ImageList imageList()
 	{
-		return this._cbxInfo.ImgList;
+		return this._imgList;
 	}
 
 	@property public void imageList(ImageList imgList)
 	{
-		this._cbxInfo.ImgList = imgList;
+		this._imgList = imgList;
 
 		if(this.created)
 		{
-			this.sendMessage(CBEM_SETIMAGELIST, 0, cast(LPARAM)this._cbxInfo.ImgList.handle);
+			this.sendMessage(CBEM_SETIMAGELIST, 0, cast(LPARAM)this._imgList.handle);
 		}
 	}
 
 	@property public final void dropDownStyle(DropDownStyles dds)
 	{
-		if(dds !is this._cbxInfo.DDStyle)
+		if(dds !is this._ddStyle)
 		{
-			this.setStyle(this._cbxInfo.DDStyle, false); //Rimuovo il vecchio
+			this.setStyle(this._ddStyle, false); //Rimuovo il vecchio
 			this.setStyle(dds, true); //Aggiungo il nuovo
-			this._cbxInfo.DDStyle = dds; //Salvo il nuovo
+			this._ddStyle = dds; //Salvo il nuovo
 		}
 	}
 
@@ -262,7 +257,7 @@ class ComboBox: SubclassedControl
 		cbei.iItem = -1;
 		cbei.iImage = cbi.imageIndex;
 		cbei.iSelectedImage = cbi.imageIndex;
-		cbei.pszText = toUTF16z(cbi.text);
+		cbei.pszText = toUTFz!(wchar*)(cbi.text);
 		cbei.lParam = winCast!(LPARAM)(cbi);
 
 		cbi.index = this.sendMessage(CBEM_INSERTITEMW, 0, cast(LPARAM)&cbei);
@@ -275,24 +270,24 @@ class ComboBox: SubclassedControl
 		this.itemChanged(this, e);
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_COMBOBOXEX;
-		pcw.ClassName = WC_DCOMBOBOX;
+		ccp.OldClassName = WC_COMBOBOXEX;
+		ccp.ClassName = WC_DCOMBOBOX;
 
 		if(!this.height)
 		{
 			this.height = this.topLevelControl.height;
 		}
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
 	{
-		if(this._cbxInfo.ImgList)
+		if(this._imgList)
 		{
-			this.sendMessage(CBEM_SETIMAGELIST, 0, cast(LPARAM)this._cbxInfo.ImgList.handle);
+			this.sendMessage(CBEM_SETIMAGELIST, 0, cast(LPARAM)this._imgList.handle);
 		}
 
 		if(this._items)
@@ -303,24 +298,24 @@ class ComboBox: SubclassedControl
 			}
 		}
 
-		if(this._cbxInfo.SelectedIndex != -1)
+		if(this._selectedIndex != -1)
 		{
-			this.selectedIndex = this._cbxInfo.SelectedIndex;
+			this.selectedIndex = this._selectedIndex;
 		}
 
 		super.onHandleCreated(e);
 	}
 
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(msg)
+		switch(m.Msg)
 		{
 			case WM_COMMAND:
 			{
-				switch(HIWORD(wParam))
+				switch(HIWORD(m.wParam))
 				{
 					case CBN_SELCHANGE:
-						this._cbxInfo.SelectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
+						this._selectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
 						this.onItemChanged(EventArgs.empty);
 						break;
 
@@ -334,6 +329,6 @@ class ComboBox: SubclassedControl
 				break;
 		}
 
-		return super.onReflectedMessage(msg, wParam, lParam);
+		super.onReflectedMessage(m);
 	}
 }

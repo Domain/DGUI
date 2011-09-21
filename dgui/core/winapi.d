@@ -42,6 +42,7 @@ extern(Windows)
 	enum: uint
 	{
 		WM_USER 				= 0x0400,
+		WM_APP					= 0x8000,
 		WM_SETFONT 				= 0x0030,
 		WM_GETFONT 			    = 0x0031,
 		WM_WINDOWPOSCHANGING	= 0x0046,
@@ -2250,7 +2251,6 @@ extern(Windows)
 	int GetDIBits(HDC hdc, HBITMAP hbmp, UINT uStartScan, UINT cScanLines, void* lpvBits, BITMAPINFO* lpbi, UINT uUsage);
 	HBITMAP CreateDIBSection(HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset);
 	int DrawTextExW(HDC hdc, LPCWSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
-	BOOL ExtTextOutW(HDC hdc, int x, int y, UINT fuOptions, RECT* lprc, LPCWSTR lpString, uint cbCount, int* lpDx);
 	BOOL GdiGradientFill(HDC hdc, TRIVERTEX* pVertex, ULONG dwNumVertex, void* pMesh, ULONG dwNumMesh, ULONG dwMode);
 	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, const(void*) lpvBits);
 	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);

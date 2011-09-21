@@ -19,11 +19,11 @@ module dgui.registry;
 
 pragma(lib, "advapi32.lib");
 
-import std.utf: toUTF16z, toUTF8;
-import std.string: format;
-import std.conv;
+private import std.utf: toUTFz, toUTF8;
+private import std.string: format;
+private import std.conv;
 import dgui.core.winapi;
-import dgui.core.idisposable;
+import dgui.core.interfaces.idisposable;
 import dgui.core.exception;
 import dgui.core.handle;
 
@@ -79,7 +79,7 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 
 	public void write(RegistryKey owner, string name)
 	{
-		ulong res = RegSetValueExW(owner.handle, toUTF16z(name), 0, REG_BINARY, cast(ubyte*)this._value.ptr, this._value.length);
+		ulong res = RegSetValueExW(owner.handle, toUTFz!(wchar*)(name), 0, REG_BINARY, cast(ubyte*)this._value.ptr, this._value.length);
 
 		if(res != ERROR_SUCCESS)
 		{
@@ -107,7 +107,7 @@ final class RegistryValueString: RegistryValue!(string)
 
 	public void write(RegistryKey owner, string name)
 	{
-		ulong res = RegSetValueExW(owner.handle, toUTF16z(name), 0, REG_SZ, cast(ubyte*)this._value.ptr, this._value.length);
+		ulong res = RegSetValueExW(owner.handle, toUTFz!(wchar*)(name), 0, REG_SZ, cast(ubyte*)this._value.ptr, this._value.length);
 
 		if(res != ERROR_SUCCESS)
 		{
@@ -135,7 +135,7 @@ final class RegistryValueDword: RegistryValue!(uint)
 
 	public void write(RegistryKey owner, string name)
 	{
-		ulong res = RegSetValueExW(owner.handle, toUTF16z(name), 0, REG_DWORD, cast(ubyte*)&this._value, uint.sizeof);
+		ulong res = RegSetValueExW(owner.handle, toUTFz!(wchar*)(name), 0, REG_DWORD, cast(ubyte*)&this._value, uint.sizeof);
 
 		if(res != ERROR_SUCCESS)
 		{
@@ -163,7 +163,7 @@ final class RegistryValueQword: RegistryValue!(ulong)
 
 	public void write(RegistryKey owner, string name)
 	{
-		ulong res = RegSetValueExW(owner.handle, toUTF16z(name), 0, REG_QWORD, cast(ubyte*)&this._value, ulong.sizeof);
+		ulong res = RegSetValueExW(owner.handle, toUTFz!(wchar*)(name), 0, REG_QWORD, cast(ubyte*)&this._value, ulong.sizeof);
 
 		if(res != ERROR_SUCCESS)
 		{
@@ -206,7 +206,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		wchar[] keyName = new wchar[MAX_KEY_LENGTH];
 		wchar[] valName = new wchar[MAX_VALUE_NAME];
 
-		if(RegOpenKeyExW(hKey, toUTF16z(name), 0, KEY_ALL_ACCESS, &hDelKey) != ERROR_SUCCESS)
+		if(RegOpenKeyExW(hKey, toUTFz!(wchar*)(name), 0, KEY_ALL_ACCESS, &hDelKey) != ERROR_SUCCESS)
 		{
 			throwException!(RegistryException)("Cannot open Key '%s'", to!(string)(name.ptr));
 		}
@@ -241,7 +241,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 
 		RegCloseKey(hDelKey);
 
-		if(RegDeleteKeyW(hKey, toUTF16z(name)) != ERROR_SUCCESS)
+		if(RegDeleteKeyW(hKey, toUTFz!(wchar*)(name)) != ERROR_SUCCESS)
 		{
 			throwException!(RegistryException)("Cannot delete Key '%s'", to!(string)(name.ptr));
 		}
@@ -252,7 +252,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		HKEY hKey;
 		uint disp;
 
-		int res = RegCreateKeyExW(this._handle, toUTF16z(name), 0, null, 0, KEY_ALL_ACCESS, null, &hKey, &disp);
+		int res = RegCreateKeyExW(this._handle, toUTFz!(wchar*)(name), 0, null, 0, KEY_ALL_ACCESS, null, &hKey, &disp);
 
 		switch(res)
 		{
@@ -275,7 +275,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 	{
 		HKEY hKey;
 
-		int res = RegOpenKeyExW(this._handle, toUTF16z(name), 0, KEY_ALL_ACCESS, &hKey);
+		int res = RegOpenKeyExW(this._handle, toUTFz!(wchar*)(name), 0, KEY_ALL_ACCESS, &hKey);
 
 		switch(res)
 		{
@@ -300,7 +300,7 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		uint type;
 		IRegistryValue ival = null;
 
-		int res = RegQueryValueExW(this._handle, toUTF16z(name), null, &type, null, &len);
+		int res = RegQueryValueExW(this._handle, toUTFz!(wchar*)(name), null, &type, null, &len);
 
 		if(res != ERROR_SUCCESS)
 		{
@@ -311,25 +311,25 @@ final class RegistryKey: Handle!(HKEY), IDisposable
 		{
 			case REG_BINARY:
 				ubyte[] val = new ubyte[len];
-				RegQueryValueExW(this._handle, toUTF16z(name), null, &type, val.ptr, &len);
+				RegQueryValueExW(this._handle, toUTFz!(wchar*)(name), null, &type, val.ptr, &len);
 				ival = new RegistryValueBinary(val);
 				break;
 
 			case REG_DWORD:
 				uint val;
-				RegQueryValueExW(this._handle, toUTF16z(name), null, &type, cast(ubyte*)&val, &len);
+				RegQueryValueExW(this._handle, toUTFz!(wchar*)(name), null, &type, cast(ubyte*)&val, &len);
 				ival = new RegistryValueDword(val);
 				break;
 
 			case REG_QWORD:
 				ulong val;
-				RegQueryValueExW(this._handle, toUTF16z(name), null, &type, cast(ubyte*)&val, &len);
+				RegQueryValueExW(this._handle, toUTFz!(wchar*)(name), null, &type, cast(ubyte*)&val, &len);
 				ival = new RegistryValueQword(val);
 				break;
 
 			case REG_SZ:
 				wchar[] val = new wchar[len];
-				RegQueryValueExW(this._handle, toUTF16z(name), null, &type, cast(ubyte*)val.ptr, &len);
+				RegQueryValueExW(this._handle, toUTFz!(wchar*)(name), null, &type, cast(ubyte*)val.ptr, &len);
 				ival = new RegistryValueString(toUTF8(val));
 				break;
 

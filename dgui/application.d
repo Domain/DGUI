@@ -20,20 +20,18 @@ module dgui.application;
 pragma(lib, "gdi32.lib");
 pragma(lib, "comdlg32.lib");
 
+private import dgui.core.winapi;
+private import dgui.core.utils;
+private import dgui.richtextbox;
+private import dgui.form;
+private import dgui.button;
+private import dgui.label;
+private import std.utf: toUTFz;
+private import std.file;
+private import std.conv;
 public import dgui.resources;
-import dgui.core.charset;
-import dgui.core.winapi;
-import dgui.core.utils;
-import dgui.richtextbox;
-import dgui.control;
-import dgui.form;
-import dgui.button;
-import dgui.label;
-import std.utf: toUTF16z;
-import std.file;
-import std.conv;
 
-enum
+private enum
 {
 	INFO = "Exception Information:",
 	XP_MANIFEST_FILE = "dgui.xml.manifest",
@@ -79,21 +77,6 @@ enum
 						  `</asmv3:application>` "\r\n"
 					`</assembly>` "\r\n",
 }
-
-/*
-private const string XP_MANIFEST =  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` "\r\n"
-									  `<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">` "\r\n"
-										`<description>DGui Manifest</description>` "\r\n"
-											`<dependency>` "\r\n"
-											`<dependentAssembly>` "\r\n"
-												`<assemblyIdentity ``type="win32" ``name="Microsoft.Windows.Common-Controls" `
-												`version="6.0.0.0" ``processorArchitecture="X86" ``publicKeyToken="6595b64144ccf1df" `
-												`language="*" ``/>` "\r\n"
-											`</dependentAssembly>` "\r\n"
-										`</dependency>` "\r\n"
-									`</assembly>` "\r\n";
-*/
-
 private alias extern(Windows) BOOL function(HANDLE hActCtx, ULONG_PTR* lpCookie) ActivateActCtxProc;
 private alias extern(Windows) HANDLE function(ACTCTXW* pActCtx) CreateActCtxWProc;
 private alias extern(Windows) bool function(INITCOMMONCONTROLSEX*) InitCommonControlsExProc;
@@ -131,6 +114,7 @@ class Application
 			this._lblInfo.parent = this;
 
 			this._rtfText = new RichTextBox();
+			this._rtfText.borderStyle = BorderStyle.FIXED_3D;
 			this._rtfText.dock = DockStyle.TOP;
 			this._rtfText.height = 90;
 			this._rtfText.backColor = SystemColors.colorBtnFace;
@@ -193,7 +177,7 @@ class Application
 	   */
 	@property public static string tempPath()
 	{
-		return getTempPath();
+		return dgui.core.utils.getTempPath();
 	}
 
 	/**
@@ -232,18 +216,16 @@ class Application
 
 			if(createActCtx) // Don't break Win2k compatibility
 			{
-				string temp;
-
+				string temp = dgui.core.utils.getTempPath();
 				ActivateActCtxProc activateActCtx = cast(ActivateActCtxProc)GetProcAddress(hKernel32, "ActivateActCtx");
-				getTempPath(temp);
-				temp = std.path.join(temp, XP_MANIFEST_FILE);
+				temp = std.path.buildPath(temp, XP_MANIFEST_FILE);
 				std.file.write(temp, XP_MANIFEST);
 
 				ACTCTXW actx;
 
 				actx.cbSize = ACTCTXW.sizeof;
 				actx.dwFlags = 0;
-				actx.lpSource = toUTF16z(temp);
+				actx.lpSource = toUTFz!(wchar*)(temp);
 
 				HANDLE hActx = createActCtx(&actx);
 
@@ -268,7 +250,7 @@ class Application
 	  */
 	private static void initCommonControls()
 	{
-		INITCOMMONCONTROLSEX icc = void; //Inizializzata Sotto.
+		INITCOMMONCONTROLSEX icc = void;
 
 		icc.dwSize = INITCOMMONCONTROLSEX.sizeof;
 		icc.dwICC = 0xFFFFFFFF;
@@ -287,20 +269,54 @@ class Application
 	}
 
 	/**
-	  Start the program.
+	  Start the program and handles handles Exception
 	  Params:
 		mainForm = The Application's main form
 
 	  Returns:
-		ExitProcess' result (0 = OK, No 0 = Something wrong)
-	       Internally it returns the wParam value of a MSG structure.
+		Zero
+	  */
+
+	private static int doRun(Form mainForm)
+	{
+		//try
+		//{
+			mainForm.show();
+		//}
+		/*
+		catch(Throwable e)
+		{
+			switch(Application.showExceptionForm(e))
+			{
+				case DialogResult.ABORT:
+					TerminateProcess(GetCurrentProcess(), -1);
+					break;
+
+				case DialogResult.IGNORE:
+					Application.doRun(mainForm);
+					break;
+
+				default:
+					break;
+			}
+		}
+		*/
+
+		return 0;
+	}
+
+	/**
+	  Start the program and adds onClose() event at the MainForm
+	  Params:
+		mainForm = The Application's main form
+
+	  Returns:
+		Zero
 	  */
 	public static int run(Form mainForm)
 	{
 		mainForm.close.attach(&onMainFormClose);
-		mainForm.show();
-
-		return 0;
+		return Application.doRun(mainForm);
 	}
 
 	/**

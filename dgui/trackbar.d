@@ -17,11 +17,11 @@
 
 module dgui.trackbar;
 
-import dgui.control;
+import dgui.core.controls.subclassedcontrol;
 
 class TrackBar: SubclassedControl
 {
-	public Signal!(Control, EventArgs) valueChanged;
+	public Event!(Control, EventArgs) valueChanged;
 
 	private int _minRange = 0;
 	private int _maxRange = 100;
@@ -78,24 +78,24 @@ class TrackBar: SubclassedControl
 		}
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_TRACKBAR;
-		pcw.ClassName = WC_DTRACKBAR;
-		pcw.Style |= TBS_AUTOTICKS;
+		ccp.OldClassName = WC_TRACKBAR;
+		ccp.ClassName = WC_DTRACKBAR;
+		ccp.Style |= TBS_AUTOTICKS;
 
-		assert(this._controlInfo.Dock is DockStyle.FILL, "TrackBar: Invalid Dock Style");
+		assert(this._dock is DockStyle.FILL, "TrackBar: Invalid Dock Style");
 
-		if(this._controlInfo.Dock is DockStyle.TOP || this._controlInfo.Dock is DockStyle.BOTTOM || (this._controlInfo.Dock is DockStyle.NONE && this._controlInfo.Bounds.width >= this._controlInfo.Bounds.height))
+		if(this._dock is DockStyle.TOP || this._dock is DockStyle.BOTTOM || (this._dock is DockStyle.NONE && this._bounds.width >= this._bounds.height))
 		{
-			pcw.Style |= TBS_HORZ;
+			ccp.Style |= TBS_HORZ;
 		}
-		else if(this._controlInfo.Dock is DockStyle.LEFT || this._controlInfo.Dock is DockStyle.RIGHT || (this._controlInfo.Dock is DockStyle.NONE && this._controlInfo.Bounds.height < this._controlInfo.Bounds.width))
+		else if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT || (this._dock is DockStyle.NONE && this._bounds.height < this._bounds.width))
 		{
-			pcw.Style |= TBS_VERT;
+			ccp.Style |= TBS_VERT;
 		}
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
@@ -107,9 +107,13 @@ class TrackBar: SubclassedControl
 		super.onHandleCreated(e);
 	}
 
-	protected override uint wndProc(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void wndProc(ref Message m)
 	{
-		if(msg == WM_MOUSEMOVE && (cast(MouseKeys)wParam) is MouseKeys.LEFT || msg == WM_KEYDOWN && ((cast(Keys)wParam) is Keys.LEFT || (cast(Keys)wParam) is Keys.UP || (cast(Keys)wParam) is Keys.RIGHT || (cast(Keys)wParam) is Keys.DOWN))
+		if(m.Msg == WM_MOUSEMOVE && (cast(MouseKeys)m.wParam) is MouseKeys.LEFT ||
+		   m.Msg == WM_KEYDOWN && ((cast(Keys)m.wParam) is Keys.LEFT ||
+		   (cast(Keys)m.wParam) is Keys.UP ||
+		   (cast(Keys)m.wParam) is Keys.RIGHT ||
+		   (cast(Keys)m.wParam) is Keys.DOWN))
 		{
 			if(this._lastValue != this.position)
 			{
@@ -118,7 +122,7 @@ class TrackBar: SubclassedControl
 			}
 		}
 
-		return super.wndProc(msg, wParam, lParam);
+		super.wndProc(m);
 	}
 
 	private void onValueChanged(EventArgs e)

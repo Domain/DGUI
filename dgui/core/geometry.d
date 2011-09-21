@@ -102,12 +102,12 @@ struct Rect
 		this.bottom = this.top + h;
 	}
 
-	public @property Point location()
+	public @property Point position()
 	{
 		return Point(this.left, this.top);
 	}
 
-	public @property void location(Point pt)
+	public @property void position(Point pt)
 	{
 		Size sz = this.size; //Copia dimensioni
 

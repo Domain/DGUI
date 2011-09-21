@@ -17,8 +17,8 @@
 
 module dgui.toolbar;
 
+import dgui.core.controls.subclassedcontrol;
 import dgui.core.utils;
-import dgui.control;
 public import dgui.imagelist;
 
 enum ToolButtonStyle: ubyte
@@ -30,7 +30,7 @@ enum ToolButtonStyle: ubyte
 
 class ToolButton
 {
-	public Signal!(ToolButton, EventArgs) click;
+	public Event!(ToolButton, EventArgs) click;
 
 	private ToolBar _owner;
 	private ContextMenu _ctxMenu;
@@ -272,7 +272,7 @@ class ToolBar: SubclassedControl
 				assert(false, "Unknown ToolButton Style");
 		}
 
-		if(tb.toolBar._controlInfo.Dock is DockStyle.LEFT || tb.toolBar._controlInfo.Dock is DockStyle.RIGHT)
+		if(tb.toolBar._dock is DockStyle.LEFT || tb.toolBar._dock is DockStyle.RIGHT)
 		{
 			tbtn.fsState |= TBSTATE_WRAP;
 		}
@@ -280,23 +280,23 @@ class ToolBar: SubclassedControl
 		tb.toolBar.sendMessage(TB_INSERTBUTTONW, tb.index, cast(LPARAM)&tbtn);
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_TOOLBAR;
-		pcw.ClassName = WC_DTOOLBAR;
-		pcw.Style |= TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN;
+		ccp.OldClassName = WC_TOOLBAR;
+		ccp.ClassName = WC_DTOOLBAR;
+		ccp.Style |= TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN;
 
-		if(this._controlInfo.Dock is DockStyle.NONE)
+		if(this._dock is DockStyle.NONE)
 		{
-			this._controlInfo.Dock = DockStyle.TOP;
+			this._dock = DockStyle.TOP;
 		}
 
-		if(this._controlInfo.Dock is DockStyle.LEFT || this._controlInfo.Dock is DockStyle.RIGHT)
+		if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT)
 		{
-			pcw.Style |= CCS_VERT;
+			ccp.Style |= CCS_VERT;
 		}
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
@@ -322,31 +322,31 @@ class ToolBar: SubclassedControl
 		super.onHandleCreated(e);
 	}
 
-	protected override int onReflectedMessage(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(msg)
+		switch(m.Msg)
 		{
 			case WM_NOTIFY:
 			{
-				NMHDR* pNmhdr = cast(NMHDR*)lParam;
+				NMHDR* pNmhdr = cast(NMHDR*)m.lParam;
 
 				switch(pNmhdr.code)
 				{
 					case NM_CLICK:
 					{
-						NMMOUSE* pNMouse = cast(NMMOUSE*)lParam;
+						NMMOUSE* pNMouse = cast(NMMOUSE*)m.lParam;
 						ToolButton tBtn = winCast!(ToolButton)(pNMouse.dwItemData);
 
 						if(tBtn)
 						{
-							tBtn.onToolBarButtonClick(EventArgs.empty);
+							tBtn.onToolBarButtonClick(EventArgs.empty); //FIXME!
 						}
 					}
 					break;
 
 					case TBN_DROPDOWN:
 					{
-						NMTOOLBARW* pNmToolbar = cast(NMTOOLBARW*)lParam;
+						NMTOOLBARW* pNmToolbar = cast(NMTOOLBARW*)m.lParam;
 
 						Point pt = Cursor.location;
 						convertPoint(pt, null, this);
@@ -374,21 +374,21 @@ class ToolBar: SubclassedControl
 				break;
 		}
 
-		return super.onReflectedMessage(msg, wParam, lParam);
+		super.onReflectedMessage(m);
 	}
 
-	protected override int wndProc(uint msg, WPARAM wParam, LPARAM lParam)
+	protected override void wndProc(ref Message m)
 	{
-		if(msg == WM_WINDOWPOSCHANGING)
+		if(m.Msg == WM_WINDOWPOSCHANGING)
 		{
 			/*
 			 * HACK: Forza il ridimensionamento della barra strumenti.
 			 */
 
-			WINDOWPOS* pWindowPos = cast(WINDOWPOS*)lParam;
+			WINDOWPOS* pWindowPos = cast(WINDOWPOS*)m.lParam;
 			uint sz = this.sendMessage(TB_GETBUTTONSIZE, 0, 0);
 
-			switch(this._controlInfo.Dock)
+			switch(this._dock)
 			{
 				case DockStyle.TOP, DockStyle.BOTTOM:
 					pWindowPos.cy = HIWORD(sz);
@@ -403,6 +403,6 @@ class ToolBar: SubclassedControl
 			}
 		}
 
-		return super.wndProc(msg, wParam, lParam);
+		super.wndProc(m);
 	}
 }

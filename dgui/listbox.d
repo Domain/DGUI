@@ -17,18 +17,12 @@
 
 module dgui.listbox;
 
-import std.utf: toUTF16z;
+import std.utf: toUTFz;
+import dgui.core.controls.ownerdrawcontrol;
 import dgui.core.utils;
-import dgui.control;
 
 class ListBox: OwnerDrawControl
 {
-	private static struct ListBoxInfo
-	{
-		int SelectedIndex;
-		Object SelectedItem;
-	}
-
 	private static class StringItem
 	{
 		private string _str;
@@ -45,14 +39,8 @@ class ListBox: OwnerDrawControl
 	}
 
 	private Collection!(Object) _items;
-	private ListBoxInfo _lbxInfo;
-
-	public this()
-	{
-		super();
-
-		this.setStyle(WS_BORDER, true);
-	}
+	private Object _selectedItem;
+	private int _selectedIndex;
 
 	public final int addItem(string s)
 	{
@@ -94,12 +82,12 @@ class ListBox: OwnerDrawControl
 			return this.sendMessage(LB_GETCURSEL, 0, 0);
 		}
 
-		return this._lbxInfo.SelectedIndex;
+		return this._selectedIndex;
 	}
 
 	@property public final void selectedIndex(int i)
 	{
-		this._lbxInfo.SelectedIndex = i;
+		this._selectedIndex = i;
 
 		if(this.created)
 		{
@@ -137,16 +125,17 @@ class ListBox: OwnerDrawControl
 
 	private int insertItem(Object obj)
 	{
-		return this.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTF16z(obj.toString()));
+		return this.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTFz!(wchar*)(obj.toString()));
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.OldClassName = WC_LISTBOX;
-		pcw.ClassName = WC_DLISTBOX;
-		pcw.DefaultBackColor = SystemColors.colorWindow;
+		ccp.ExtendedStyle |= WS_EX_CLIENTEDGE;
+		ccp.OldClassName = WC_LISTBOX;
+		ccp.ClassName = WC_DLISTBOX;
+		ccp.DefaultBackColor = SystemColors.colorWindow;
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)

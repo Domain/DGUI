@@ -17,10 +17,17 @@
 
 module dgui.core.utils;
 
-import std.path;
 import dgui.core.winapi;
 import dgui.core.charset;
-public import dgui.core.enums;
+
+enum WindowsVersion
+{
+	UNKNOWN       = 0,
+	WINDOWS_2000  = 1,
+	WINDOWS_XP    = 2,
+	WINDOWS_VISTA = 4,
+	WINDOWS_7     = 8,
+}
 
 T winCast(T)(Object o)
 {
@@ -62,7 +69,7 @@ string getStartupPath()
 
 	if(!startPath.length)
 	{
-		startPath = getDirName(getExecutablePath());
+		startPath = std.path.dirName(getExecutablePath());
 	}
 
 	return startPath;

@@ -17,8 +17,8 @@
 
 module dgui.statusbar;
 
-import std.utf: toUTF16z;
-import dgui.control;
+import std.utf: toUTFz;
+import dgui.core.controls.subclassedcontrol;
 
 final class StatusPart
 {
@@ -44,7 +44,7 @@ final class StatusPart
 
 		if(this._owner && this._owner.created)
 		{
-			this._owner.sendMessage(SB_SETTEXTW, MAKEWPARAM(this.index, 0), cast(LPARAM)toUTF16z(s));
+			this._owner.sendMessage(SB_SETTEXTW, MAKEWPARAM(this.index, 0), cast(LPARAM)toUTFz!(wchar*)(s));
 		}
 	}
 
@@ -154,19 +154,19 @@ class StatusBar: SubclassedControl
 
 		foreach(int i, StatusPart sp; sparts)
 		{
-			owner.sendMessage(SB_SETTEXTW, MAKEWPARAM(i, 0), cast(LPARAM)toUTF16z(sp.text));
+			owner.sendMessage(SB_SETTEXTW, MAKEWPARAM(i, 0), cast(LPARAM)toUTFz!(wchar*)(sp.text));
 		}
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this._controlInfo.Dock = DockStyle.BOTTOM; //Forza il dock
+		this._dock = DockStyle.BOTTOM; //Force dock
 
-		pcw.OldClassName = WC_STATUSBAR;
-		pcw.ClassName = WC_DSTATUSBAR;
-		pcw.Style |= (this._partsVisible ? SBARS_SIZEGRIP : 0);
+		ccp.OldClassName = WC_STATUSBAR;
+		ccp.ClassName = WC_DSTATUSBAR;
+		ccp.Style |= (this._partsVisible ? SBARS_SIZEGRIP : 0);
 
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onHandleCreated(EventArgs e)

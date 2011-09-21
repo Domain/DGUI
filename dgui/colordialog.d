@@ -17,7 +17,7 @@
 
 module dgui.colordialog;
 
-public import dgui.core.commondialog;
+public import dgui.core.dialogs.commondialog;
 
 class ColorDialog: CommonDialog!(CHOOSECOLORW, Color)
 {

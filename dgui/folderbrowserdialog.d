@@ -19,21 +19,21 @@ module dgui.folderbrowserdialog;
 
 pragma(lib, "shell32.lib");
 
-import std.utf: toUTF16z, toUTF8;
+private import std.array;
+public import dgui.core.dialogs.commondialog;
+import std.utf: toUTFz, toUTF8;
 import std.conv;
-public import dgui.core.commondialog;
 
 class FolderBrowserDialog: CommonDialog!(BROWSEINFOW, string)
 {
 	public override bool showDialog()
 	{
-		wchar[MAX_PATH] buffer = void;
-		buffer[0] = '\0';
+		wchar[MAX_PATH] buffer = uninitializedArray!(wchar[])(MAX_PATH + 1);
 
 		this._dlgStruct.hwndOwner = GetActiveWindow();
 		this._dlgStruct.pszDisplayName = buffer.ptr;
 		this._dlgStruct.ulFlags = BIF_RETURNONLYFSDIRS;
-		this._dlgStruct.lpszTitle = toUTF16z(this._title);
+		this._dlgStruct.lpszTitle = toUTFz!(wchar*)(this._title);
 
 		ITEMIDLIST* pidl = SHBrowseForFolderW(&this._dlgStruct);
 

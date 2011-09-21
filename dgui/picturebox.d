@@ -17,7 +17,7 @@
 
 module dgui.picturebox;
 
-import dgui.control;
+import dgui.core.controls.control;
 import dgui.canvas;
 
 enum SizeMode
@@ -83,7 +83,7 @@ class PictureBox: Control
 	{
 		if(this._img)
 		{
-			this._img.dispose(); //Distruggo l'immagine precedente
+			this._img.dispose(); // Destroy the previous image
 		}
 
 		this._img = img;
@@ -94,14 +94,13 @@ class PictureBox: Control
 		}
 	}
 
-	protected override void preCreateWindow(ref PreCreateWindow pcw)
+	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		pcw.ClassName  = WC_DPICTUREBOX;
-		pcw.DefaultCursor = SystemCursors.arrow;
-		pcw.ClassStyle = ClassStyles.HREDRAW | ClassStyles.VREDRAW;
+		ccp.ClassName  = WC_DPICTUREBOX;
+		ccp.DefaultCursor = SystemCursors.arrow;
+		ccp.ClassStyle = ClassStyles.PARENTDC | ClassStyles.HREDRAW | ClassStyles.VREDRAW;
 
-		this.setStyle(ControlStyle.NO_ERASE, true);
-		super.preCreateWindow(pcw);
+		super.createControlParams(ccp);
 	}
 
 	protected override void onPaint(PaintEventArgs e)
