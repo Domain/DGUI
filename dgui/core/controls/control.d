@@ -171,6 +171,11 @@ abstract class Control: Handle!(HWND), IDisposable
 		MapWindowPoints(from ? from.handle : null, to ? to.handle : null, &pt.point, 1);
 	}
 
+	public static void convertSize(ref Size sz, Control from, Control to)
+	{
+		MapWindowPoints(from ? from.handle : null, to ? to.handle : null, cast(POINT*)&sz.size, 1);
+	}
+
 	@property public final Rect bounds()
 	{
 		return this._bounds;
@@ -387,10 +392,10 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	@property public final Size clientSize()
 	{
-		Rect r;
-
 		if(this.created)
 		{
+			Rect r = void;
+
 			GetClientRect(this._handle, &r.rect);
 			return r.size;
 		}
@@ -1067,18 +1072,18 @@ abstract class Control: Handle!(HWND), IDisposable
 
 				if(!(pWndPos.flags & SWP_NOMOVE) || !(pWndPos.flags & SWP_NOSIZE))
 				{
-					/*
-					this._controlInfo.Bounds.x = pWndPos.x;
-					this._controlInfo.Bounds.y = pWndPos.y;
-					this._controlInfo.Bounds.width = pWndPos.cx;
-					this._controlInfo.Bounds.height = pWndPos.cy;
-					*/
+					/* Note: 'pWndPos' has NonClient coordinates */
 
-					GetWindowRect(this._handle, &this._bounds.rect);
-
-					if(this._parent)
+					if(!(pWndPos.flags & SWP_NOMOVE))
 					{
-						Control.convertRect(this._bounds, null, this._parent);
+						this._bounds.x = pWndPos.x;
+						this._bounds.y = pWndPos.y;
+					}
+
+					if(!(pWndPos.flags & SWP_NOSIZE))
+					{
+						this._bounds.width = pWndPos.cx;
+						this._bounds.height = pWndPos.cy;
 					}
 
 					if(!(pWndPos.flags & SWP_NOSIZE))

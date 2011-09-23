@@ -310,7 +310,6 @@ class Form: LayoutControl
 		makeFormBorderStyle(this._formBorder, ccp.Style, ccp.ExtendedStyle);
 		this.doFormStartPosition();
 
-		AdjustWindowRectEx(&this._bounds.rect, ccp.Style, false, ccp.ExtendedStyle);
 		super.createControlParams(ccp);
 	}
 
