@@ -32,7 +32,7 @@ class SplitPanel: LayoutControl
 		this._panel2.parent = this;
 	}
 
-	@property public void splitPos(int sp)
+	@property public void splitPosition(int sp)
 	{
 		this._splitPos = sp;
 
