@@ -571,6 +571,7 @@ class ListView: OwnerDrawControl
 		ccp.ClassName = WC_DLISTVIEW;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
+		ListView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 

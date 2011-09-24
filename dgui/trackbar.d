@@ -25,7 +25,7 @@ class TrackBar: SubclassedControl
 
 	private int _minRange = 0;
 	private int _maxRange = 100;
-	private int _position = 0;
+	private int _value = 0;
 	private int _lastValue = 0;
 
 	@property public uint minRange()
@@ -58,19 +58,19 @@ class TrackBar: SubclassedControl
 		}
 	}
 
-	@property public int position()
+	@property public int value()
 	{
 		if(this.created)
 		{
 			return this.sendMessage(TBM_GETPOS, 0, 0);
 		}
 
-		return this._position;
+		return this._value;
 	}
 
-	@property public void position(int p)
+	@property public void value(int p)
 	{
-		this._position = p;
+		this._value = p;
 
 		if(this.created)
 		{
@@ -102,7 +102,7 @@ class TrackBar: SubclassedControl
 	{
 		this.sendMessage(TBM_SETRANGE, true, MAKELPARAM(this._minRange, this._maxRange));
 		this.sendMessage(TBM_SETTIC, 20, 0);
-		this.sendMessage(TBM_SETPOS, true, this._position);
+		this.sendMessage(TBM_SETPOS, true, this._value);
 
 		super.onHandleCreated(e);
 	}
@@ -115,9 +115,11 @@ class TrackBar: SubclassedControl
 		   (cast(Keys)m.wParam) is Keys.RIGHT ||
 		   (cast(Keys)m.wParam) is Keys.DOWN))
 		{
-			if(this._lastValue != this.position)
+			int val = this.value;
+
+			if(this._lastValue != val)
 			{
-				this._lastValue = this.position; //Save last position.
+				this._lastValue = val; //Save last position.
 				this.onValueChanged(EventArgs.empty);
 			}
 		}

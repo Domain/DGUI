@@ -1,4 +1,22 @@
-﻿module dgui.layout.gridpanel;
+﻿/*
+	Copyright (c) 2011 Trogu Antonio Davide
+
+	This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+module dgui.layout.gridpanel;
 
 import std.algorithm;
 import dgui.core.interfaces.idisposable;
@@ -163,7 +181,9 @@ class RowPart: IDisposable
 
 		if(c)
 		{
-			c.parent = this._gridPanel; //Set the parent
+			this._gridPanel.canAddChild = true;  // Unlock Add Child
+			c.parent = this._gridPanel; 		 // Set the parent
+			this._gridPanel.canAddChild = false; // Lock Add Child
 		}
 
 		ColumnPart cp = new ColumnPart(this._gridPanel, c);
@@ -201,6 +221,12 @@ class RowPart: IDisposable
 class GridPanel: LayoutControl
 {
 	private Collection!(RowPart) _rows;
+	private bool _canAddChild = false;
+
+	@property package void canAddChild(bool b)
+	{
+		this._canAddChild = b;
+	}
 
 	public RowPart addRow()
 	{
@@ -244,6 +270,30 @@ class GridPanel: LayoutControl
 		super.createControlParams(ccp);
 	}
 
+	protected override void onDGuiMessage(ref Message m)
+	{
+		switch(m.Msg)
+		{
+			case DGUI_ADDCHILDCONTROL:
+			{
+				if(this._canAddChild)
+				{
+					super.onDGuiMessage(m);
+				}
+				else
+				{
+					throwException!(DGuiException)("GridPanel doesn't accept child controls");
+				}
+			}
+			break;
+
+			default:
+				super.onDGuiMessage(m);
+				break;
+		}
+	}
+
+
 	public override void updateLayout()
 	{
 		if(this._rows)
@@ -283,11 +333,11 @@ class GridPanel: LayoutControl
 							cp.control.bounds = Rect(cp.marginLeft + x, rp.marginTop + y, w, maxCtrlHeight);
 						}
 
-						x += w + cp.marginRight;
+						x += cp.marginLeft + w + cp.marginRight;
 					}
 				}
 
-				y += maxCtrlHeight + rp.marginBottom;
+				y += rp.marginTop + maxCtrlHeight + rp.marginBottom;
 			}
 		}
 	}

@@ -74,7 +74,8 @@ class RichTextBox: TextControl
 		ccp.OldClassName = WC_RICHEDIT;
 		ccp.ClassName = WC_DRICHEDIT;
 
-		RichTextBox.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true); //
+		// Probably the RichTextbox ignores the wParam parameter in WM_PAINT
+		RichTextBox.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 

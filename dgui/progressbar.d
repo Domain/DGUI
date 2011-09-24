@@ -24,7 +24,7 @@ class ProgressBar: SubclassedControl
 	private uint _minRange = 0;
 	private uint _maxRange = 100;
 	private uint _step = 10;
-	private uint _position = 0;
+	private uint _value = 0;
 
 	@property public uint minRange()
 	{
@@ -71,19 +71,19 @@ class ProgressBar: SubclassedControl
 		}
 	}
 
-	@property public uint position()
+	@property public uint value()
 	{
 		if(this.created)
 		{
 			return this.sendMessage(PBM_GETPOS, 0, 0);
 		}
 
-		return this._position;
+		return this._value;
 	}
 
-	@property public void position(uint p)
+	@property public void value(uint p)
 	{
-		this._position = p;
+		this._value = p;
 
 		if(this.created)
 		{
@@ -122,6 +122,7 @@ class ProgressBar: SubclassedControl
 	{
 		this.sendMessage(PBM_SETRANGE32, this._minRange, this._maxRange);
 		this.sendMessage(PBM_SETSTEP, this._step, 0);
+		this.sendMessage(PBM_SETPOS, this._value, 0);
 
 		super.onHandleCreated(e);
 	}

@@ -24,8 +24,9 @@ public import dgui.imagelist;
 
 enum DropDownStyles: uint
 {
-	SIMPLE = CBS_SIMPLE,
-	DROPDOWN = CBS_DROPDOWN,
+	NONE 		  = 0, // Internal Use
+	SIMPLE 		  = CBS_SIMPLE,
+	DROPDOWN 	  = CBS_DROPDOWN,
 	DROPDOWN_LIST = CBS_DROPDOWNLIST,
 }
 
@@ -33,9 +34,10 @@ class ComboBoxItem
 {
 	private ComboBox _owner;
 	private string _text;
-	private int _imgIndex;
-	private Object _tag;
+	private int _imgIndex = -1;
 	private int _idx;
+
+	mixin TagProperty;
 
 	package this(string txt, int idx = -1)
 	{
@@ -104,16 +106,6 @@ class ComboBoxItem
 			this._owner.sendMessage(CBEM_SETITEMW, 0, cast(LPARAM)&cbei);
 		}
 	}
-
-	@property public final Object tag()
-	{
-		return this._tag;
-	}
-
-	@property public final void tag(Object obj)
-	{
-		this._tag = obj;
-	}
 }
 
 class ComboBox: SubclassedControl
@@ -121,14 +113,13 @@ class ComboBox: SubclassedControl
 	public Event!(Control, EventArgs) itemChanged;
 
 	private Collection!(ComboBoxItem) _items;
+
+	private DropDownStyles _oldDdStyle = DropDownStyles.NONE;
 	private int _selectedIndex;
 	private ImageList _imgList;
-	private DropDownStyles _ddStyle = DropDownStyles.DROPDOWN;
 
 	public this()
 	{
-		super();
-
 		this.setStyle(DropDownStyles.DROPDOWN, true);
 	}
 
@@ -231,11 +222,12 @@ class ComboBox: SubclassedControl
 
 	@property public final void dropDownStyle(DropDownStyles dds)
 	{
-		if(dds !is this._ddStyle)
+		if(dds !is this._oldDdStyle)
 		{
-			this.setStyle(this._ddStyle, false); //Rimuovo il vecchio
+			this.setStyle(this._oldDdStyle, false); //Rimuovo il vecchio
 			this.setStyle(dds, true); //Aggiungo il nuovo
-			this._ddStyle = dds; //Salvo il nuovo
+
+			this._oldDdStyle = dds;
 		}
 	}
 
@@ -277,9 +269,12 @@ class ComboBox: SubclassedControl
 
 		if(!this.height)
 		{
+			// If this row is removed, the dropdown list is not displayed
 			this.height = this.topLevelControl.height;
 		}
 
+		/* Use Original Paint Routine, the double buffered one causes some issues */
+		ComboBox.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 

@@ -9,6 +9,9 @@ class MainForm: Form
 		this.text = "GDI: Gradient Fill Triangle";
 		this.size = Size(360, 190);
 		this.startPosition = FormStartPosition.CENTER_SCREEN;
+		this.formBorderStyle = FormBorderStyle.FIXED_DIALOG;
+		this.maximizeBox = false;
+		this.minimizeBox = false;
 	}
 
 	protected override void onPaint(PaintEventArgs e)

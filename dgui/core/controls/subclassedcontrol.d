@@ -46,7 +46,7 @@ abstract class SubclassedControl: Control
 	{
 		switch(m.Msg)
 		{
-			case WM_ERASEBKGND, WM_PRINTCLIENT:
+			case WM_ERASEBKGND:
 			{
 				if(!SubclassedControl.hasBit(this._cBits, ControlBits.ORIGINAL_PAINT))
 				{
@@ -70,12 +70,7 @@ abstract class SubclassedControl: Control
 					this.onPaint(e);
 
 					memCanvas.copyTo(orgCanvas);
-
-					if(m.Msg == WM_ERASEBKGND)
-					{
-						SubclassedControl.setBit(this._cBits, ControlBits.ERASED, true);
-					}
-
+					SubclassedControl.setBit(this._cBits, ControlBits.ERASED, true);
 					m.Result = 0;
 				}
 				else
@@ -99,7 +94,7 @@ abstract class SubclassedControl: Control
 					GetUpdateRect(this._handle, &r.rect, false); //Keep drawing area
 					this.originalWndProc(m);
 
-					scope Canvas c = Canvas.fromHDC(GetDC(this._handle));
+					scope Canvas c = Canvas.fromHDC(m.wParam ? cast(HDC)m.wParam : GetDC(this._handle), m.wParam ? false : true);
 					HRGN hRgn = CreateRectRgnIndirect(&r.rect);
 					SelectClipRgn(c.handle, hRgn);
 					DeleteObject(hRgn);

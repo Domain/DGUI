@@ -501,6 +501,7 @@ class TreeView: SubclassedControl
 		ccp.Style |= TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
+		TreeView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 
@@ -534,7 +535,15 @@ class TreeView: SubclassedControl
 				{
 					NMTVDISPINFOW* pTvDispInfo = cast(NMTVDISPINFOW*)m.lParam;
 					TreeNode node = winCast!(TreeNode)(pTvDispInfo.item.lParam);
-					pTvDispInfo.item.cChildren = node.lazyNode; //Is a Lazy Node, sooner or later a child node will be added
+
+					if(node.lazyNode || node.nodes) //Is a Lazy Node, or has childNodes sooner or later a child node will be added
+					{
+						pTvDispInfo.item.cChildren = node.nodes ? node.nodes.length : 1;
+					}
+					else
+					{
+						pTvDispInfo.item.cChildren = 0;
+					}
 				}
 				break;
 
