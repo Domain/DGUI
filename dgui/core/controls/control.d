@@ -1021,6 +1021,27 @@ abstract class Control: Handle!(HWND), IDisposable
 				m.Result = 0; // Do nothing here, handle it in WM_PAINT
 				break;
 
+			case WM_PRINTCLIENT:
+			{
+				Rect r = void;
+				GetUpdateRect(this._handle, &r.rect, false);
+				Rect cr = Rect(NullPoint, this.clientSize);	//Client Rectangle
+
+				scope Canvas orgCanvas = Canvas.fromHDC(cast(HDC)m.wParam, false); //Don't delete it, it's a DC from WM_PRINTCLIENT
+				scope Canvas memCanvas = orgCanvas.createInMemory(); // Off Screen Canvas
+
+				SetBkColor(memCanvas.handle, this.backColor.colorref);
+				SetTextColor(memCanvas.handle, this.foreColor.colorref);
+				FillRect(memCanvas.handle, &cr.rect, this._backBrush); //Fill with background color;
+
+				scope PaintEventArgs e = new PaintEventArgs(memCanvas, r);
+				this.onPaint(e);
+
+				memCanvas.copyTo(orgCanvas);
+				m.Result = 0;
+			}
+			break;
+
 			case WM_PAINT:
 			{
 				PAINTSTRUCT ps; //Inizializzata da BeginPaint()

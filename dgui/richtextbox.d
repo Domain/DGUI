@@ -43,11 +43,6 @@ class RichTextBox: TextControl
 	private static int _refCount = 0;
 	private static HMODULE _hRichDll;
 
-	public this()
-	{
-
-	}
-
 	public override void dispose()
 	{
 		--_refCount;
@@ -72,13 +67,14 @@ class RichTextBox: TextControl
 
 		if(!_hRichDll)
 		{
-			_hRichDll = loadLibrary("riched20.dll"); // Load the standard version
+			_hRichDll = loadLibrary("RichEd20.dll"); // Load the standard version
 		}
 
 		ccp.Style |= ES_MULTILINE | ES_WANTRETURN;
 		ccp.OldClassName = WC_RICHEDIT;
 		ccp.ClassName = WC_DRICHEDIT;
 
+		RichTextBox.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true); //
 		super.createControlParams(ccp);
 	}
 

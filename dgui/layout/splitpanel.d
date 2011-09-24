@@ -13,7 +13,7 @@ enum SplitOrientation
 
 class SplitPanel: LayoutControl
 {
-	private const int SPLITTER_SIZE = 6;
+	private const int SPLITTER_SIZE = 8;
 
 	private SplitOrientation _splitOrientation = SplitOrientation.VERTICAL;
 	private bool _downing = false;
@@ -24,11 +24,9 @@ class SplitPanel: LayoutControl
 	public this()
 	{
 		this._panel1 = new Panel();
-		this._panel1.borderStyle = BorderStyle.FIXED_3D;
 		this._panel1.parent = this;
 
 		this._panel2 = new Panel();
-		this._panel2.borderStyle = BorderStyle.FIXED_3D;
 		this._panel2.parent = this;
 	}
 
@@ -202,6 +200,7 @@ class SplitPanel: LayoutControl
 	protected override void onPaint(PaintEventArgs e)
 	{
 		Canvas c = e.canvas;
+		Rect cr = e.clipRectangle;
 		int mid = this._splitPos + (SPLITTER_SIZE / 2);
 		scope Pen dp = new Pen(SystemColors.color3DdarkShadow, 2, PenStyle.DOT);
 		scope Pen lp = new Pen(SystemColors.colorBtnFace, 2, PenStyle.DOT);
@@ -210,6 +209,8 @@ class SplitPanel: LayoutControl
 		{
 			case SplitOrientation.VERTICAL:
 			{
+				c.drawEdge(Rect(this._splitPos, cr.top, SPLITTER_SIZE, cr.bottom), EdgeType.EDGE_RAISED, EdgeMode.LEFT | EdgeMode.RIGHT);
+
 				for(int p = (this.height / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
 					c.drawLine(dp, mid, p, mid, p + 1);
@@ -220,6 +221,8 @@ class SplitPanel: LayoutControl
 
 			default: // SplitOrientation.HORIZONTAL
 			{
+				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, SPLITTER_SIZE), EdgeType.EDGE_RAISED, EdgeMode.TOP | EdgeMode.BOTTOM);
+
 				for(int p = (this.width / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
 					c.drawLine(dp, p, mid, p + 1, mid);

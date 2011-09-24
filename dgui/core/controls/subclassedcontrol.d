@@ -46,19 +46,19 @@ abstract class SubclassedControl: Control
 	{
 		switch(m.Msg)
 		{
-			case WM_ERASEBKGND:
+			case WM_ERASEBKGND, WM_PRINTCLIENT:
 			{
 				if(!SubclassedControl.hasBit(this._cBits, ControlBits.ORIGINAL_PAINT))
 				{
 					Rect r = void;
 					GetUpdateRect(this._handle, &r.rect, false);
 
-					scope Canvas orgCanvas = Canvas.fromHDC(cast(HDC)m.wParam, false); //Don't delete it, it's a DC from WM_ERASEBKGND
+					scope Canvas orgCanvas = Canvas.fromHDC(cast(HDC)m.wParam, false); //Don't delete it, it's a DC from WM_ERASEBKGND or WM_PAINT
 					scope Canvas memCanvas = orgCanvas.createInMemory(); // Off Screen Canvas
 
 					Message rm = m;
 
-					//rm.Msg = WM_ERASEBKGND;
+					rm.Msg = WM_ERASEBKGND;
 					rm.wParam = cast(WPARAM)memCanvas.handle;
 					this.originalWndProc(rm);
 
@@ -70,7 +70,12 @@ abstract class SubclassedControl: Control
 					this.onPaint(e);
 
 					memCanvas.copyTo(orgCanvas);
-					SubclassedControl.setBit(this._cBits, ControlBits.ERASED, true);
+
+					if(m.Msg == WM_ERASEBKGND)
+					{
+						SubclassedControl.setBit(this._cBits, ControlBits.ERASED, true);
+					}
+
 					m.Result = 0;
 				}
 				else
