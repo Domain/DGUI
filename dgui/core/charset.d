@@ -19,7 +19,6 @@
 
 module dgui.core.charset;
 
-import std.array;
 import std.conv: to;
 import std.utf: toUTFz;
 import dgui.core.winapi;

@@ -17,7 +17,6 @@
 
 module dgui.filebrowserdialog;
 
-private import std.array;
 private import std.utf: toUTFz, toUTF8;
 private import std.conv: to;
 public import dgui.core.dialogs.commondialog;
@@ -51,7 +50,8 @@ class FileBrowserDialog: CommonDialog!(OPENFILENAMEW, string)
 
 	public override bool showDialog()
 	{
-		wchar[] buffer = uninitializedArray!(wchar[])(MAX_PATH + 1);
+		wchar[MAX_PATH + 1] buffer;
+		buffer[] = '\0';
 
 		this._dlgStruct.lStructSize = OPENFILENAMEW.sizeof;
 		this._dlgStruct.hwndOwner = GetActiveWindow();
