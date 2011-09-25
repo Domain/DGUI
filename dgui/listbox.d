@@ -131,6 +131,7 @@ class ListBox: OwnerDrawControl
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		ccp.ExtendedStyle |= WS_EX_CLIENTEDGE;
+		ccp.Style |=  LBS_NOINTEGRALHEIGHT;
 		ccp.OldClassName = WC_LISTBOX;
 		ccp.ClassName = WC_DLISTBOX;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
