@@ -18,7 +18,7 @@
 module dgui.listbox;
 
 import std.utf: toUTFz;
-import dgui.core.controls.ownerdrawcontrol;
+public import dgui.core.controls.ownerdrawcontrol;
 import dgui.core.utils;
 
 class ListBox: OwnerDrawControl
