@@ -578,7 +578,7 @@ class ListView: OwnerDrawControl
 				break;
 
 			case ItemDrawMode.OWNER_DRAW_VARIABLE:
-				assert(false, "ListView: Owner Draw Style not allowed");
+				assert(false, "ListView: Owner Draw Variable Style not allowed");
 
 			default:
 				break;
