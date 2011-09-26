@@ -571,6 +571,19 @@ class ListView: OwnerDrawControl
 		ccp.ClassName = WC_DLISTVIEW;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
+		switch(this._drawMode)
+		{
+			case ItemDrawMode.OWNER_DRAW_FIXED:
+				ccp.Style |= LVS_OWNERDRAWFIXED;
+				break;
+
+			case ItemDrawMode.OWNER_DRAW_VARIABLE:
+				assert(false, "ListView: Owner Draw Style not allowed");
+
+			default:
+				break;
+		}
+
 		ListView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}

@@ -136,6 +136,20 @@ class ListBox: OwnerDrawControl
 		ccp.ClassName = WC_DLISTBOX;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
+		switch(this._drawMode)
+		{
+			case ItemDrawMode.OWNER_DRAW_FIXED:
+				ccp.Style |= LBS_OWNERDRAWFIXED;
+				break;
+
+			case ItemDrawMode.OWNER_DRAW_VARIABLE:
+				ccp.Style |= LBS_OWNERDRAWVARIABLE;
+				break;
+
+			default:
+				break;
+		}
+
 		super.createControlParams(ccp);
 	}
 
