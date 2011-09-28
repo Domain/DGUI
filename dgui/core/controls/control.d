@@ -852,13 +852,13 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected static uint defWindowProc(ref Message m)
 	{
-		if(!IsWindowUnicode(m.hWnd))
+		if(IsWindowUnicode(m.hWnd))
 		{
-			m.Result = DefWindowProcA(m.hWnd, m.Msg, m.wParam, m.lParam);
+			m.Result = DefWindowProcW(m.hWnd, m.Msg, m.wParam, m.lParam);
 		}
 		else
 		{
-			m.Result = DefWindowProcW(m.hWnd, m.Msg, m.wParam, m.lParam);
+			m.Result = DefWindowProcA(m.hWnd, m.Msg, m.wParam, m.lParam);
 		}
 
 		return m.Result;

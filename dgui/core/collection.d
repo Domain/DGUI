@@ -17,8 +17,6 @@
 
 module dgui.core.collection;
 
-private import algorithm = std.algorithm;
-
 class Collection(T)
 {
 	private T[] _t;
@@ -39,7 +37,7 @@ class Collection(T)
 		return this._t;
 	}
 
-	@property public final int length()
+	@property public final int length() nothrow
 	{
 		return this._t.length;
 	}
@@ -51,18 +49,35 @@ class Collection(T)
 
 	public final void removeAt(int idx)
 	{
-		if(idx != -1)
+		int x = 0;
+		T[] newT = new T[this._t.length - 1];
+
+		foreach(int i, T t; this._t)
 		{
-			this._t = algorithm.remove(this._t, idx);
+			if(i != idx)
+			{
+				newT[x] = t;
+				x++;
+			}
 		}
+
+		this._t = newT;
 	}
 
 	public final int find(T t)
 	{
-		return algorithm.countUntil(this._t, t);
+		foreach(int i, T ft; this._t)
+		{
+			if(ft is t)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
-	public T opIndex(int i)
+	public T opIndex(int i) nothrow
 	{
 		if(i >= 0 && i < this._t.length)
 		{

@@ -30,13 +30,13 @@ abstract class SubclassedControl: Control
 
 	protected override uint originalWndProc(ref Message m)
 	{
-		if(!IsWindowUnicode(this._handle))
+		if(IsWindowUnicode(this._handle))
 		{
-			m.Result = CallWindowProcA(this._oldWndProc, this._handle, m.Msg, m.wParam, m.lParam);
+			m.Result = CallWindowProcW(this._oldWndProc, this._handle, m.Msg, m.wParam, m.lParam);
 		}
 		else
 		{
-			m.Result = CallWindowProcW(this._oldWndProc, this._handle, m.Msg, m.wParam, m.lParam);
+			m.Result = CallWindowProcA(this._oldWndProc, this._handle, m.Msg, m.wParam, m.lParam);
 		}
 
 		return m.Result;
