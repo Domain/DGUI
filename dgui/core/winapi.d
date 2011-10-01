@@ -530,7 +530,7 @@ extern(Windows)
 		WS_EX_STATICEDGE		 = 0x20000,
 		WS_EX_TOOLWINDOW		 = 128,
 		WS_EX_TOPMOST 			 = 8,
-		WS_EX_TRANSPARENT		 = 32,
+		//WS_EX_TRANSPARENT		 = 32,
 		WS_EX_WINDOWEDGE 		 = 256,
 	}
 
@@ -2245,15 +2245,15 @@ extern(Windows)
 	BOOL ImageList_Destroy(HIMAGELIST himl);
 
 	/* *** Gdi32.dll *** */
-	BOOL GdiTransparentBlt(HDC hdcDest, int xoriginDest, int yoriginDest,int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
-	BOOL GdiAlphaBlend(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, BLENDFUNCTION ftn);
+	//BOOL GdiTransparentBlt(HDC hdcDest, int xoriginDest, int yoriginDest,int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
+	//BOOL GdiAlphaBlend(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, BLENDFUNCTION ftn);
 	BOOL DrawIconEx(HDC hdc, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, UINT diFlags);
 	BOOL PlgBlt(HDC hdcDest, POINT *lpPoint, HDC hdcSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HBITMAP hbmMask, int xMask, int yMask);
 	BOOL BitBlt(HDC hdcDest, int nXDest,int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 	int GetDIBits(HDC hdc, HBITMAP hbmp, UINT uStartScan, UINT cScanLines, void* lpvBits, BITMAPINFO* lpbi, UINT uUsage);
 	HBITMAP CreateDIBSection(HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset);
 	int DrawTextExW(HDC hdc, LPCWSTR lpchText, int cchText, RECT* lprc, UINT dwDTFormat, DRAWTEXTPARAMS* lpDTParams);
-	BOOL GdiGradientFill(HDC hdc, TRIVERTEX* pVertex, ULONG dwNumVertex, void* pMesh, ULONG dwNumMesh, ULONG dwMode);
+	//BOOL GdiGradientFill(HDC hdc, TRIVERTEX* pVertex, ULONG dwNumVertex, void* pMesh, ULONG dwNumMesh, ULONG dwMode);
 	HBITMAP CreateBitmap(int nWidth, int nHeight, UINT cPlanes, UINT cBitsPerPel, const(void*) lpvBits);
 	BOOL Rectangle(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 	BOOL Ellipse(HDC hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);

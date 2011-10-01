@@ -98,7 +98,7 @@ class PictureBox: Control
 	{
 		ccp.ClassName  = WC_DPICTUREBOX;
 		ccp.DefaultCursor = SystemCursors.arrow;
-		ccp.ClassStyle = ClassStyles.PARENTDC | ClassStyles.HREDRAW | ClassStyles.VREDRAW;
+		ccp.ClassStyle = ClassStyles.PARENTDC;
 
 		super.createControlParams(ccp);
 	}

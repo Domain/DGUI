@@ -313,7 +313,6 @@ class Form: LayoutControl
 		ccp.DefaultCursor = SystemCursors.arrow;
 
 		this.doFormStartPosition();
-
 		super.createControlParams(ccp);
 	}
 

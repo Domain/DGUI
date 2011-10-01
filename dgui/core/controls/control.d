@@ -828,7 +828,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected void createControlParams(ref CreateControlParams ccp)
 	{
-		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.DBLCLKS;
+		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.DBLCLKS | ClassStyles.HREDRAW | ClassStyles.VREDRAW;
 
 		WindowClass.register(ccp.ClassName, cstyle, ccp.DefaultCursor, &Control.msgRouter);
 	}

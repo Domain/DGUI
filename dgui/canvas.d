@@ -293,6 +293,14 @@ struct FontMetrics
  */
 class Canvas: Handle!(HDC), IDisposable
 {
+	private alias extern(Windows) BOOL function(HDC, int, int, int, int, HDC, int, int, int, int, UINT) GdiTransparentBltProc;
+	private alias extern(Windows) BOOL function(HDC, int, int, int, int, HDC, int, int, int, int, BLENDFUNCTION) GdiAlphaBlendProc;
+	private alias extern(Windows) BOOL function(HDC, TRIVERTEX*, ULONG, void*, ULONG, ULONG) GdiGradientFillProc;
+
+	private static GdiTransparentBltProc _gdiTransparentBlt = null;
+	private static GdiAlphaBlendProc _gdiAlphaBlend = null;
+	private static GdiGradientFillProc _gdiGradientFill = null;
+
 	private enum CanvasType: ubyte
 	{
 		NORMAL = 0,
@@ -331,11 +339,26 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public void copyTransparent(Canvas c, Color transpColor)
 	{
+		this.copyTransparent(c, transpColor, NullRect);
+	}
+
+	public void copyTransparent(Canvas c, Color transpColor, Rect r)
+	{
+		if(!_gdiTransparentBlt)
+		{
+			_gdiTransparentBlt = cast(GdiTransparentBltProc)GetProcAddress(getModuleHandle("gdi32.dll"), toStringz("GdiTransparentBlt"));
+		}
+
 		BITMAP bmp;
 		HBITMAP hBitmap = GetCurrentObject(this._handle, OBJ_BITMAP);
-
 		GetObjectW(hBitmap, BITMAP.sizeof, &bmp);
-		GdiTransparentBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, bmp.bmWidth, bmp.bmHeight, transpColor.colorref);
+
+		if(r.empty)
+		{
+			r = Rect(0, 0, bmp.bmWidth, bmp.bmHeight);
+		}
+
+		_gdiTransparentBlt(c.handle, r.x, r.y, r.width, r.height, this._handle, 0, 0, bmp.bmWidth, bmp.bmHeight, transpColor.colorref);
 	}
 
 	public void dispose()
@@ -395,6 +418,11 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public final void fillRectGradient(Rect r, Color startColor, Color endColor, GradientFillRectMode gfrm)
 	{
+		if(!_gdiGradientFill)
+		{
+			_gdiGradientFill = cast(GdiGradientFillProc)GetProcAddress(getModuleHandle("gdi32.dll"), toStringz("GdiGradientFill"));
+		}
+
 		TRIVERTEX[2] tv;
 		static GRADIENT_RECT gr = {UpperLeft: 0, LowerRight: 1};
 
@@ -412,7 +440,7 @@ class Canvas: Handle!(HDC), IDisposable
 		tv[1].Blue =  endColor.blue << 8;
 		tv[1].Alpha = endColor.alpha << 8;
 
-		GdiGradientFill(this._handle, tv.ptr, 2, &gr, 1, gfrm);
+		_gdiGradientFill(this._handle, tv.ptr, 2, &gr, 1, gfrm);
 	}
 
 	public final void fillTriangleGradient(int x1, int y1, int x2, int y2, int x3, int y3, Color color1, Color color2, Color color3)
@@ -422,6 +450,11 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public final void fillTriangleGradient(Point pt1, Point pt2, Point pt3, Color color1, Color color2, Color color3)
 	{
+		if(!_gdiGradientFill)
+		{
+			_gdiGradientFill = cast(GdiGradientFillProc)GetProcAddress(getModuleHandle("gdi32.dll"), toStringz("GdiGradientFill"));
+		}
+
 		TRIVERTEX[3] tv;
 		static GRADIENT_TRIANGLE gt = {Vertex1: 0, Vertex2: 1, Vertex3: 2};
 
@@ -446,7 +479,7 @@ class Canvas: Handle!(HDC), IDisposable
 		tv[2].Blue = color3.blue << 8;
 		tv[2].Alpha = color3.alpha << 8;
 
-		GdiGradientFill(this._handle, tv.ptr, 3, &gt, 1, 2 /* GRADIENT_FILL_TRIANGLE */);
+		_gdiGradientFill(this._handle, tv.ptr, 3, &gt, 1, 2 /* GRADIENT_FILL_TRIANGLE */);
 	}
 
 	public final void drawImage(Image img, Point upLeft, Point upRight, Point lowLeft)
@@ -823,8 +856,16 @@ class Bitmap: Image
 		return hBitmap;
 	}
 
+	/*
+	 *  !!! Is this procedure useful? !!!
+	 *
 	public Bitmap alphaBlend(ubyte alpha)
 	{
+		if(!_gdiAlphaBlend)
+		{
+			_gdiAlphaBlend = cast(GdiAlphaBlendProc)GetProcAddress(getModuleHandle("gdi32.dll"), toStringz("GdiAlphaBlend"));
+		}
+
 		BITMAP b;
 		getInfo!(BITMAP)(this._handle, b);
 
@@ -856,7 +897,7 @@ class Bitmap: Image
 			bf.AlphaFormat = 1; // AC_SRC_ALPHA
 		}
 
-		GdiAlphaBlend(hdc1, 0, 0, b.bmWidth, b.bmHeight, hdc2, 0, 0, b.bmWidth, b.bmHeight, bf);
+		_gdiAlphaBlend(hdc1, 0, 0, b.bmWidth, b.bmHeight, hdc2, 0, 0, b.bmWidth, b.bmHeight, bf);
 
 		SelectObject(hdc2, hOldBitmap2);
 		SelectObject(hdc1, hOldBitmap1);
@@ -866,6 +907,7 @@ class Bitmap: Image
 
 		return Bitmap.fromHBITMAP(hBitmap);
 	}
+	*/
 
 	public Bitmap clone()
 	{
