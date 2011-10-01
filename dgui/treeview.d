@@ -498,7 +498,7 @@ class TreeView: SubclassedControl
 	{
 		ccp.OldClassName = WC_TREEVIEW;
 		ccp.ClassName = WC_DTREEVIEW;
-		ccp.Style |= TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS;
+		this.setStyle(TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS, true);
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
 		TreeView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);

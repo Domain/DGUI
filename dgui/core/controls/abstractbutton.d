@@ -37,18 +37,12 @@ abstract class AbstractButton: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.Style |= WS_TABSTOP;
+		AbstractButton.setBit(this._cBits, ControlBits.OWN_CLICK_MSG, true); // Let Button to handle Click Event itself
+
 		ccp.OldClassName = WC_BUTTON;
+		this.setStyle(WS_TABSTOP, true);
 
 		super.createControlParams(ccp);
-	}
-
-	/** Returns:
-		True if the component handles the click event itself, otherwise False
-	*/
-	@property protected override bool ownClickMsg()
-	{
-		return true;
 	}
 
 	protected override void onReflectedMessage(ref Message m)

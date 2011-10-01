@@ -82,17 +82,17 @@ class TrackBar: SubclassedControl
 	{
 		ccp.OldClassName = WC_TRACKBAR;
 		ccp.ClassName = WC_DTRACKBAR;
-		ccp.Style |= TBS_AUTOTICKS;
+		this.setStyle(TBS_AUTOTICKS, true);
 
 		assert(this._dock is DockStyle.FILL, "TrackBar: Invalid Dock Style");
 
 		if(this._dock is DockStyle.TOP || this._dock is DockStyle.BOTTOM || (this._dock is DockStyle.NONE && this._bounds.width >= this._bounds.height))
 		{
-			ccp.Style |= TBS_HORZ;
+			this.setStyle(TBS_HORZ, true);
 		}
 		else if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT || (this._dock is DockStyle.NONE && this._bounds.height < this._bounds.width))
 		{
-			ccp.Style |= TBS_VERT;
+			this.setStyle(TBS_VERT, true);
 		}
 
 		super.createControlParams(ccp);

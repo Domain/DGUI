@@ -70,7 +70,7 @@ class RichTextBox: TextControl
 			_hRichDll = loadLibrary("RichEd20.dll"); // Load the standard version
 		}
 
-		ccp.Style |= ES_MULTILINE | ES_WANTRETURN;
+		this.setStyle(ES_MULTILINE | ES_WANTRETURN, true);
 		ccp.OldClassName = WC_RICHEDIT;
 		ccp.ClassName = WC_DRICHEDIT;
 

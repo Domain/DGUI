@@ -284,7 +284,7 @@ class ToolBar: SubclassedControl
 	{
 		ccp.OldClassName = WC_TOOLBAR;
 		ccp.ClassName = WC_DTOOLBAR;
-		ccp.Style |= TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN;
+		this.setStyle(TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN, true);
 
 		if(this._dock is DockStyle.NONE)
 		{
@@ -293,7 +293,7 @@ class ToolBar: SubclassedControl
 
 		if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT)
 		{
-			ccp.Style |= CCS_VERT;
+			this.setStyle(CCS_VERT, true);
 		}
 
 		super.createControlParams(ccp);

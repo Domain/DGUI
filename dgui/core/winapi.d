@@ -2167,7 +2167,7 @@ extern(Windows)
 	BOOL GetMessageW(MSG* lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
 	LRESULT DispatchMessageW(MSG* lpmsg);
 	HWND CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam);
-	//HDWP DeferWindowPos(HDWP hWinPosInfo, HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT uFlags);
+	HDWP DeferWindowPos(HDWP hWinPosInfo, HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT uFlags);
 	//LRESULT SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	HANDLE LoadImageW(HINSTANCE hinst, LPCWSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad);
 	LRESULT CallWindowProcA(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
@@ -2197,8 +2197,8 @@ extern(Windows)
 	BOOL EnableWindow(HWND hWnd, BOOL bEnable);
 	DWORD GetClassLongW(HWND hWnd, int nIndex);
 	ATOM RegisterClassExW(WNDCLASSEXW* lpwcx);
-	//HDWP BeginDeferWindowPos(int nNumWindows);
-	//BOOL EndDeferWindowPos(HDWP hWinPosInfo);
+	HDWP BeginDeferWindowPos(int nNumWindows);
+	BOOL EndDeferWindowPos(HDWP hWinPosInfo);
 	BOOL KillTimer(HWND hWnd, UINT uIDEvent);
 	BOOL DrawFocusRect(HDC hDC, RECT* lprc);
 	BOOL OpenClipboard(HWND hWndNewOwner);

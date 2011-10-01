@@ -126,7 +126,7 @@ abstract class TextControl: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.Style |= WS_TABSTOP;
+		this.setStyle(WS_TABSTOP, true);
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
 		super.createControlParams(ccp);

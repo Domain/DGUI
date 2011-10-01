@@ -62,6 +62,7 @@ enum ControlBits: ubyte
 	CAN_NOTIFY   	= 4,
 	MODAL_CONTROL 	= 8,  // For Modal Dialogs
 	ORIGINAL_PAINT 	= 16, // Use standard control routine (not DGui's one)
+	OWN_CLICK_MSG   = 32, // Does the component Handles click itself?
 }
 
 enum BorderStyle: ubyte
@@ -80,8 +81,6 @@ struct CreateControlParams
 	Color DefaultForeColor;
 	Cursor DefaultCursor;
 	ClassStyles ClassStyle;
-	uint ExtendedStyle = 0;
-	uint Style = 0;
 }
 
 abstract class Control: Handle!(HWND), IDisposable
@@ -573,15 +572,6 @@ abstract class Control: Handle!(HWND), IDisposable
 		InvalidateRect(this._handle, r == NullRect ? null : &r.rect, false);
 	}
 
-
-	/** Returns:
-		True if the component handles the click event itself, otherwise False
-	*/
-	@property protected bool ownClickMsg()
-	{
-		return false;
-	}
-
 	public final void sendMessage(ref Message m)
 	{
 		/*
@@ -662,8 +652,6 @@ abstract class Control: Handle!(HWND), IDisposable
 	private void create()
 	{
 		CreateControlParams ccp;
-		ccp.Style = this._style;				 //Copy Actual Style
-		ccp.ExtendedStyle = this._extendedStyle; //Copy Actual ExtendedStyle
 		ccp.DefaultBackColor = SystemColors.colorBtnFace;
 		ccp.DefaultForeColor = SystemColors.colorBtnText;
 
@@ -697,19 +685,19 @@ abstract class Control: Handle!(HWND), IDisposable
 		if(Control.hasBit(this._cBits, ControlBits.MODAL_CONTROL)) //Is Modal ?
 		{
 			hParent = GetActiveWindow();
-			ccp.Style &= ~WS_CHILD;
-			ccp.Style |= WS_POPUP;
+			this.setStyle(WS_CHILD, false);
+			this.setStyle(WS_POPUP, true);
 		}
 		else if(this._parent)
 		{
 			hParent = this._parent.handle;
-			ccp.Style |= WS_CHILD | WS_CLIPSIBLINGS;
+			this.setStyle(WS_CHILD | WS_CLIPSIBLINGS, true);
 		}
 
-		createWindowEx(ccp.ExtendedStyle,
+		createWindowEx(this.getExStyle(),
 					   ccp.ClassName,
 					   this._text,
-					   ccp.Style,
+					   this.getStyle(),
 					   this._bounds.x,
 					   this._bounds.y,
 					   this._bounds.width,
@@ -1236,7 +1224,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 				Control.convertPoint(p, this, null);
 
-				if(m.Msg == WM_LBUTTONUP && !this.ownClickMsg && WindowFromPoint(p.point) == this._handle)
+				if(m.Msg == WM_LBUTTONUP && !Control.hasBit(this._cBits, ControlBits.OWN_CLICK_MSG) && WindowFromPoint(p.point) == this._handle)
 				{
 					this.onClick(EventArgs.empty);
 				}

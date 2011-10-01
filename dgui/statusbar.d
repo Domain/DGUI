@@ -164,7 +164,11 @@ class StatusBar: SubclassedControl
 
 		ccp.OldClassName = WC_STATUSBAR;
 		ccp.ClassName = WC_DSTATUSBAR;
-		ccp.Style |= (this._partsVisible ? SBARS_SIZEGRIP : 0);
+
+		if(this._partsVisible)
+		{
+			this.setStyle(SBARS_SIZEGRIP, true);
+		}
 
 		super.createControlParams(ccp);
 	}

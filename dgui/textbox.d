@@ -108,8 +108,8 @@ class TextBox: TextControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ExtendedStyle |= WS_EX_CLIENTEDGE;
-		ccp.Style |= this._chChasing;
+		this.setExStyle(WS_EX_CLIENTEDGE, true);
+		this.setStyle(this._chChasing, true);
 		ccp.OldClassName = WC_EDIT;
 		ccp.ClassName = WC_DEDIT;
 

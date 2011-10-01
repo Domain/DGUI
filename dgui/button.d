@@ -50,7 +50,7 @@ class Button: AbstractButton
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.Style |= BS_DEFPUSHBUTTON;
+		this.setStyle(BS_DEFPUSHBUTTON, true);
 		ccp.ClassName = WC_DBUTTON;
 
 		super.createControlParams(ccp);
@@ -62,7 +62,7 @@ class CheckBox: CheckedButton
 {
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.Style |= BS_AUTOCHECKBOX;
+		this.setStyle(BS_AUTOCHECKBOX, true);
 		ccp.ClassName = WC_DCHECKBOX;
 
 		super.createControlParams(ccp);
@@ -74,7 +74,7 @@ class RadioButton: CheckedButton
 {
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.Style |= BS_AUTORADIOBUTTON;
+		this.setStyle(BS_AUTORADIOBUTTON, true);
 		ccp.ClassName = WC_DRADIOBUTTON;
 
 		super.createControlParams(ccp);

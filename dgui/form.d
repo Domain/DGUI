@@ -73,7 +73,7 @@ class Form: LayoutControl
 	{
 		if(this.created)
 		{
-			uint style, exStyle;
+			uint style = 0, exStyle = 0;
 
 			makeFormBorderStyle(this._formBorder, style, exStyle); // Vecchio Stile.
 			this.setStyle(style, false);
@@ -304,10 +304,14 @@ class Form: LayoutControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
+		uint style = 0, exStyle = 0;
+		makeFormBorderStyle(this._formBorder, style, exStyle);
+
+		this.setStyle(style, true);
+		this.setExStyle(exStyle, true);
 		ccp.ClassName = WC_FORM;
 		ccp.DefaultCursor = SystemCursors.arrow;
 
-		makeFormBorderStyle(this._formBorder, ccp.Style, ccp.ExtendedStyle);
 		this.doFormStartPosition();
 
 		super.createControlParams(ccp);

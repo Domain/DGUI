@@ -117,7 +117,7 @@ class TabPage: Panel
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ExtendedStyle |= WS_EX_STATICEDGE;
+		this.setExStyle(WS_EX_STATICEDGE, true);
 
 		super.createControlParams(ccp);
 	}
@@ -340,8 +340,8 @@ class TabControl: SubclassedControl, ILayoutControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ExtendedStyle |= WS_EX_CONTROLPARENT;
-		ccp.Style |= WS_CLIPCHILDREN;
+		this.setStyle(WS_CLIPCHILDREN, true);
+		this.setExStyle(WS_EX_CONTROLPARENT, true);
 		ccp.OldClassName = WC_TABCONTROL;
 		ccp.ClassName = WC_DTABCONTROL;
 

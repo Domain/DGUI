@@ -90,8 +90,8 @@ abstract class ContainerControl: Control
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ExtendedStyle |= WS_EX_CONTROLPARENT;
-		ccp.Style |= WS_CLIPCHILDREN;
+		this.setStyle(WS_CLIPCHILDREN, true);
+		this.setExStyle(WS_EX_CONTROLPARENT, true);
 
 		super.createControlParams(ccp);
 	}

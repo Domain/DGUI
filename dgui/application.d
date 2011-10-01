@@ -279,11 +279,10 @@ class Application
 
 	private static int doRun(Form mainForm)
 	{
-		//try
-		//{
+		try
+		{
 			mainForm.show();
-		//}
-		/*
+		}
 		catch(Throwable e)
 		{
 			switch(Application.showExceptionForm(e))
@@ -300,7 +299,6 @@ class Application
 					break;
 			}
 		}
-		*/
 
 		return 0;
 	}

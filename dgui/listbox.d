@@ -130,8 +130,8 @@ class ListBox: OwnerDrawControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ExtendedStyle |= WS_EX_CLIENTEDGE;
-		ccp.Style |=  LBS_NOINTEGRALHEIGHT;
+		this.setStyle(LBS_NOINTEGRALHEIGHT, true);
+		this.setExStyle(WS_EX_CLIENTEDGE, true);
 		ccp.OldClassName = WC_LISTBOX;
 		ccp.ClassName = WC_DLISTBOX;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
@@ -139,11 +139,11 @@ class ListBox: OwnerDrawControl
 		switch(this._drawMode)
 		{
 			case ItemDrawMode.OWNER_DRAW_FIXED:
-				ccp.Style |= LBS_OWNERDRAWFIXED;
+				this.setStyle(LBS_OWNERDRAWFIXED, true);
 				break;
 
 			case ItemDrawMode.OWNER_DRAW_VARIABLE:
-				ccp.Style |= LBS_OWNERDRAWVARIABLE;
+				this.setStyle(LBS_OWNERDRAWVARIABLE, true);
 				break;
 
 			default:

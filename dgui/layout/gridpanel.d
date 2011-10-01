@@ -298,7 +298,17 @@ class GridPanel: LayoutControl
 	{
 		if(this._rows)
 		{
-			int x = 0, y = 0;
+			int x = 0, y = 0, ctrlCount = 0;
+
+			foreach(RowPart rp; this._rows)
+			{
+				if(rp.columns)
+				{
+					ctrlCount += rp.columns.length;
+				}
+			}
+
+			scope ResizeManager rm = new ResizeManager(ctrlCount);
 
 			foreach(RowPart rp; this._rows)
 			{
@@ -330,7 +340,8 @@ class GridPanel: LayoutControl
 								w = cp.control.width;
 							}
 
-							cp.control.bounds = Rect(cp.marginLeft + x, rp.marginTop + y, w, maxCtrlHeight);
+							//cp.control.bounds = Rect(cp.marginLeft + x, rp.marginTop + y, w, maxCtrlHeight);
+							rm.resizeControl(cp.control, cp.marginLeft + x, rp.marginTop + y, w, maxCtrlHeight);
 						}
 
 						x += cp.marginLeft + w + cp.marginRight;

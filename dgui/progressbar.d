@@ -112,7 +112,7 @@ class ProgressBar: SubclassedControl
 
 		if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT)
 		{
-			ccp.Style |= PBS_VERTICAL;
+			this.setStyle(PBS_VERTICAL, true);
 		}
 
 		super.createControlParams(ccp);
