@@ -348,7 +348,7 @@ class ToolBar: SubclassedControl
 					{
 						NMTOOLBARW* pNmToolbar = cast(NMTOOLBARW*)m.lParam;
 
-						Point pt = Cursor.location;
+						Point pt = Cursor.position;
 						convertPoint(pt, null, this);
 						int idx = this.sendMessage(TB_HITTEST, 0, cast(LPARAM)&pt.point);
 
@@ -358,7 +358,7 @@ class ToolBar: SubclassedControl
 
 							if(tbtn && tbtn.contextMenu)
 							{
-								tbtn.contextMenu.popupMenu(this._handle, Cursor.location);
+								tbtn.contextMenu.popupMenu(this._handle, Cursor.position);
 							}
 						}
 					}

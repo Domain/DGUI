@@ -56,12 +56,12 @@ struct Rect
 		return this.left == r.left && this.top == r.top && this.right == r.right && this.bottom == r.bottom;
 	}
 
-	public @property int x()
+	@property public int x()
 	{
 		return this.left;
 	}
 
-	public @property void x(int newX)
+	@property public void x(int newX)
 	{
 		int w = this.width;
 
@@ -69,12 +69,12 @@ struct Rect
 		this.right = newX + w;
 	}
 
-	public @property int y()
+	@property public int y()
 	{
 		return this.top;
 	}
 
-	public @property void y(int newY)
+	@property public void y(int newY)
 	{
 		int h = this.height;
 
@@ -82,32 +82,32 @@ struct Rect
 		this.bottom = newY + h;
 	}
 
-	public @property int width()
+	@property public int width()
 	{
 		return this.right - this.left;
 	}
 
-	public @property void width(int w)
+	@property public void width(int w)
 	{
 		this.right = this.left + w;
 	}
 
-	public @property int height()
+	@property public int height()
 	{
 		return this.bottom - this.top;
 	}
 
-	public @property void height(int h)
+	@property public void height(int h)
 	{
 		this.bottom = this.top + h;
 	}
 
-	public @property Point position()
+	@property public Point position()
 	{
 		return Point(this.left, this.top);
 	}
 
-	public @property void position(Point pt)
+	@property public void position(Point pt)
 	{
 		Size sz = this.size; //Copia dimensioni
 
@@ -117,18 +117,18 @@ struct Rect
 		this.bottom = this.top + sz.height;
 	}
 
-	public @property Size size()
+	@property public Size size()
 	{
 		return Size(this.width, this.height);
 	}
 
-	public @property void size(Size sz)
+	@property public void size(Size sz)
 	{
 		this.right = this.left + sz.width;
 		this.bottom = this.top + sz.height;
 	}
 
-	public @property bool empty()
+	@property public bool empty()
 	{
 		return this.width <= 0 && this.height <= 0;
 	}
@@ -153,6 +153,16 @@ struct Point
 		}
 
 		POINT point;
+	}
+
+	public bool inRect(Rect r)
+	{
+		if(point.x < r.left || point.y < r.top || point.x > r.right || point.y > r.bottom)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	public bool opEquals(ref const Point pt) const

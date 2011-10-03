@@ -21,6 +21,7 @@ public import dgui.core.interfaces.idisposable;
 public import dgui.core.events.scrolleventargs;
 public import dgui.core.events.mouseeventargs;
 public import dgui.core.events.painteventargs;
+public import dgui.core.events.focuseventargs;
 public import dgui.core.events.keyeventargs;
 public import dgui.core.events.keyeventargs;
 public import dgui.core.events.event;
@@ -101,20 +102,21 @@ abstract class Control: Handle!(HWND), IDisposable
 	protected DockStyle _dock = DockStyle.NONE;
 	protected ControlBits _cBits = ControlBits.CAN_NOTIFY;
 
+	public Event!(Control, PaintEventArgs) paint;
+	public Event!(Control, FocusEventArgs) focusChanged;
 	public Event!(Control, KeyCharEventArgs) keyChar;
 	public Event!(Control, KeyEventArgs) keyDown;
 	public Event!(Control, KeyEventArgs) keyUp;
-	public Event!(Control, EventArgs) click;
 	public Event!(Control, MouseEventArgs) doubleClick;
 	public Event!(Control, MouseEventArgs) mouseKeyDown;
 	public Event!(Control, MouseEventArgs) mouseKeyUp;
 	public Event!(Control, MouseEventArgs) mouseMove;
 	public Event!(Control, MouseEventArgs) mouseEnter;
 	public Event!(Control, MouseEventArgs) mouseLeave;
-	public Event!(Control, PaintEventArgs) paint;
+	public Event!(Control, EventArgs) visibleChanged;
 	public Event!(Control, EventArgs) handleCreated;
 	public Event!(Control, EventArgs) resize;
-	public Event!(Control, EventArgs) visibleChanged;
+	public Event!(Control, EventArgs) click;
 
     mixin TagProperty; // Insert tag() property in Control
 
@@ -543,33 +545,20 @@ abstract class Control: Handle!(HWND), IDisposable
 	}
 
 	public final void redraw()
-	in
-	{
-		assert(this.created);
-	}
-	body
 	{
 		SetWindowPos(this._handle, null, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
 
 	public final void invalidate()
-	in
-	{
-		assert(this.created);
-	}
-	body
 	{
 		this.invalidate(NullRect);
+		UpdateWindow(this._handle);
 	}
 
 	public final void invalidate(Rect r)
-	in
-	{
-		assert(this.created);
-	}
-	body
 	{
 		InvalidateRect(this._handle, r == NullRect ? null : &r.rect, false);
+		//UpdateWindow(this._handle); Here?
 	}
 
 	public final void sendMessage(ref Message m)
@@ -1001,6 +990,11 @@ abstract class Control: Handle!(HWND), IDisposable
 		this.mouseLeave(this, e);
 	}
 
+	protected void onFocusChanged(FocusEventArgs e)
+	{
+		this.focusChanged(this, e);
+	}
+
 	protected void wndProc(ref Message m)
 	{
 		switch(m.Msg)
@@ -1261,8 +1255,17 @@ abstract class Control: Handle!(HWND), IDisposable
 			{
 				if(this._ctxMenu)
 				{
-					this._ctxMenu.popupMenu(this._handle, Cursor.location);
+					this._ctxMenu.popupMenu(this._handle, Cursor.position);
 				}
+
+				this.originalWndProc(m);
+			}
+			break;
+
+			case WM_SETFOCUS, WM_KILLFOCUS:
+			{
+				scope FocusEventArgs e = new FocusEventArgs(m.Msg == WM_SETFOCUS ? true : false);
+				this.onFocusChanged(e);
 
 				this.originalWndProc(m);
 			}

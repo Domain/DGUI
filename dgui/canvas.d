@@ -703,7 +703,6 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public final Canvas createInMemory(Bitmap b)
 	{
-		HBITMAP hBitmap;
 		HDC hdc = CreateCompatibleDC(this._handle);
 		Canvas c = new Canvas(hdc, true, CanvasType.IN_MEMORY);
 
@@ -712,14 +711,21 @@ class Canvas: Handle!(HDC), IDisposable
 			Rect r;
 			HWND hWnd = WindowFromDC(this._handle);
 
-			if(!hWnd)
+			if(hWnd)
 			{
-				throwException!(Win32Exception)("No Window for DC: %08X", cast(uint)this._handle);
+				GetClientRect(hWnd, &r.rect);
+			}
+			else // Try with bitmap's size
+			{
+				BITMAP bmp;
+				HBITMAP hOrgBitmap = GetCurrentObject(this._handle, OBJ_BITMAP);
+				GetObjectW(hOrgBitmap, BITMAP.sizeof, &bmp);
+
+				assert(bmp.bmWidth > 0 && bmp.bmHeight > 0, "Bitmap zero size");
+				r = Rect(0, 0, bmp.bmWidth, bmp.bmHeight);
 			}
 
-			GetClientRect(hWnd, &r.rect);
-
-			hBitmap = CreateCompatibleBitmap(this._handle, r.width, r.height);
+			HBITMAP hBitmap = CreateCompatibleBitmap(this._handle, r.width, r.height);
 			c._hBitmap = hBitmap;
 			SelectObject(hdc, hBitmap);  // Destroyed by Mem Canvas Object
 		}
@@ -1149,7 +1155,7 @@ final class Cursor: Icon
 		}
 	}
 
-	@property public static Point location()
+	@property public static Point position()
 	{
 		Point pt;
 

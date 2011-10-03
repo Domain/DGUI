@@ -58,11 +58,10 @@ class ListBox: OwnerDrawControl
 
 		if(this.created)
 		{
-			return this.insertItem(obj);
+			return this.createItem(obj);
 		}
 
 		return this._items.length - 1;
-
 	}
 
 	public final void removeItem(int idx)
@@ -123,7 +122,7 @@ class ListBox: OwnerDrawControl
 		return null;
 	}
 
-	private int insertItem(Object obj)
+	private int createItem(Object obj)
 	{
 		return this.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTFz!(wchar*)(obj.toString()));
 	}
@@ -159,7 +158,7 @@ class ListBox: OwnerDrawControl
 		{
 			foreach(Object obj; this._items)
 			{
-				this.insertItem(obj);
+				this.createItem(obj);
 			}
 		}
 

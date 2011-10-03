@@ -142,7 +142,7 @@ class SplitPanel: LayoutControl
 	{
 		if(this._downing)
 		{
-			Point pt = Cursor.location;
+			Point pt = Cursor.position;
 			convertPoint(pt, null, this);
 
 			switch(this._splitOrientation)

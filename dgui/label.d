@@ -17,6 +17,7 @@
 
 module dgui.label;
 
+import std.string;
 import dgui.core.controls.control;
 
 enum LabelDrawMode: ubyte
@@ -31,10 +32,22 @@ class Label: Control
 	private TextAlignment _textAlign = TextAlignment.MIDDLE | TextAlignment.LEFT;
 
 	alias @property Control.text text;
+	private bool _multiLine = false;
 
 	@property public override void text(string s)
 	{
 		super.text = s;
+
+		this._multiLine = false;
+
+		foreach(char ch; s)
+		{
+			if(ch == '\n' || ch == '\r')
+			{
+				this._multiLine = true;
+				break;
+			}
+		}
 
 		if(this.created)
 		{
@@ -84,7 +97,7 @@ class Label: Control
 			Canvas c = e.canvas;
 			Rect r = Rect(NullPoint, this.clientSize);
 
-			scope TextFormat tf = new TextFormat(TextFormatFlags.SINGLE_LINE);
+			scope TextFormat tf = new TextFormat(this._multiLine ? TextFormatFlags.WORD_BREAK : TextFormatFlags.SINGLE_LINE);
 			tf.alignment = this._textAlign;
 
 			scope SolidBrush sb = new SolidBrush(this._backColor);
