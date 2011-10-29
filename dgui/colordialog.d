@@ -23,9 +23,12 @@ class ColorDialog: CommonDialog!(CHOOSECOLORW, Color)
 {
 	public override bool showDialog()
 	{
+		static COLORREF[16] custColors;
+		custColors[] = RGB(255, 255, 255);
+
 		this._dlgStruct.lStructSize = CHOOSECOLORW.sizeof;
+		this._dlgStruct.lpCustColors = custColors.ptr; // Must be defined !!!
 		this._dlgStruct.hwndOwner = GetActiveWindow();
-		this._dlgStruct.Flags = CC_FULLOPEN;
 
 		if(ChooseColorW(&this._dlgStruct))
 		{

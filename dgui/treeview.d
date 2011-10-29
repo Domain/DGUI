@@ -496,7 +496,7 @@ class TreeView: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.OldClassName = WC_TREEVIEW;
+		ccp.SuperclassName = WC_TREEVIEW;
 		ccp.ClassName = WC_DTREEVIEW;
 		this.setStyle(TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS, true);
 		ccp.DefaultBackColor = SystemColors.colorWindow;

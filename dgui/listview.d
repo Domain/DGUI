@@ -567,17 +567,18 @@ class ListView: OwnerDrawControl
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		this.setStyle(LVS_ALIGNLEFT | LVS_ALIGNTOP | LVS_AUTOARRANGE | LVS_SHAREIMAGELISTS, true);
-		ccp.OldClassName = WC_LISTVIEW;
+
+		ccp.SuperclassName = WC_LISTVIEW;
 		ccp.ClassName = WC_DLISTVIEW;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
 		switch(this._drawMode)
 		{
-			case ItemDrawMode.OWNER_DRAW_FIXED:
+			case OwnerDrawMode.FIXED:
 				this.setStyle(LVS_OWNERDRAWFIXED, true);
 				break;
 
-			case ItemDrawMode.OWNER_DRAW_VARIABLE:
+			case OwnerDrawMode.VARIABLE:
 				assert(false, "ListView: Owner Draw Variable Style not allowed");
 
 			default:

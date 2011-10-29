@@ -20,11 +20,11 @@ module dgui.core.controls.ownerdrawcontrol;
 public import dgui.core.controls.subclassedcontrol;
 public import dgui.core.events.eventargs;
 
-enum ItemDrawMode: ubyte
+enum OwnerDrawMode: ubyte
 {
 	NORMAL = 0,
-	OWNER_DRAW_FIXED = 1,
-	OWNER_DRAW_VARIABLE = 2,
+	FIXED = 1,
+	VARIABLE = 2,
 }
 
 enum DrawItemState: uint
@@ -152,14 +152,14 @@ abstract class OwnerDrawControl: SubclassedControl
 	public Event!(Control, MeasureItemEventArgs) measureItem;
 	public Event!(Control, DrawItemEventArgs) drawItem;
 
-	protected ItemDrawMode _drawMode = ItemDrawMode.NORMAL;
+	protected OwnerDrawMode _drawMode = OwnerDrawMode.NORMAL;
 
-	@property public ItemDrawMode drawMode()
+	@property public OwnerDrawMode drawMode()
 	{
 		return this._drawMode;
 	}
 
-	@property public void drawMode(ItemDrawMode dm)
+	@property public void drawMode(OwnerDrawMode dm)
 	{
 		this._drawMode = dm;
 	}

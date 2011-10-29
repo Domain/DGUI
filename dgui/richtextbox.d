@@ -71,7 +71,7 @@ class RichTextBox: TextControl
 		}
 
 		this.setStyle(ES_MULTILINE | ES_WANTRETURN, true);
-		ccp.OldClassName = WC_RICHEDIT;
+		ccp.SuperclassName = WC_RICHEDIT;
 		ccp.ClassName = WC_DRICHEDIT;
 
 		// Probably the RichTextbox ignores the wParam parameter in WM_PAINT

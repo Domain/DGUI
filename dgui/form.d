@@ -25,7 +25,7 @@ import dgui.core.events.eventargs;
 
 alias CancelEventArgs!(Form) CancelFormEventArgs;
 
-enum FormBits: ubyte
+enum FormBits: ulong
 {
 	NONE 		 	= 0,
 	MODAL_COMPLETED = 1,
@@ -150,6 +150,11 @@ class Form: LayoutControl
 		}
 
 		this._formIcon = ico;
+	}
+
+	@property public final void topMost(bool b)
+	{
+		this.setExStyle(WS_EX_TOPMOST, b);
 	}
 
 	@property public final void startPosition(FormStartPosition fsp)

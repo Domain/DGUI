@@ -162,7 +162,7 @@ class StatusBar: SubclassedControl
 	{
 		this._dock = DockStyle.BOTTOM; //Force dock
 
-		ccp.OldClassName = WC_STATUSBAR;
+		ccp.SuperclassName = WC_STATUSBAR;
 		ccp.ClassName = WC_DSTATUSBAR;
 
 		if(this._partsVisible)

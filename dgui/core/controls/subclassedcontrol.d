@@ -17,15 +17,15 @@
 
 module dgui.core.controls.subclassedcontrol;
 
-public import dgui.core.controls.control;
+public import dgui.core.controls.reflectedcontrol;
 
-abstract class SubclassedControl: Control
+abstract class SubclassedControl: ReflectedControl
 {
 	private WNDPROC _oldWndProc; // Original Window Procedure
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this._oldWndProc = WindowClass.superclass(ccp.OldClassName, ccp.ClassName, &SubclassedControl.msgRouter);
+		this._oldWndProc = WindowClass.superclass(ccp.SuperclassName, ccp.ClassName, &SubclassedControl.msgRouter);
 	}
 
 	protected override uint originalWndProc(ref Message m)

@@ -110,7 +110,7 @@ class TextBox: TextControl
 	{
 		this.setExStyle(WS_EX_CLIENTEDGE, true);
 		this.setStyle(this._chChasing, true);
-		ccp.OldClassName = WC_EDIT;
+		ccp.SuperclassName = WC_EDIT;
 		ccp.ClassName = WC_DEDIT;
 
 		this.height = 20; //E questo cos'è?

@@ -17,11 +17,11 @@
 
 module dgui.core.controls.scrollablecontrol;
 
-public import dgui.core.controls.control;
+public import dgui.core.controls.reflectedcontrol;
 public import dgui.core.events.mouseeventargs;
 public import dgui.core.events.scrolleventargs;
 
-abstract class ScrollableControl: Control
+abstract class ScrollableControl: ReflectedControl
 {
 	public Event!(Control, ScrollEventArgs) scroll;
 	public Event!(Control, MouseWheelEventArgs) mouseWheel;

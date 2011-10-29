@@ -342,7 +342,7 @@ class TabControl: SubclassedControl, ILayoutControl
 	{
 		this.setStyle(WS_CLIPCHILDREN, true);
 		this.setExStyle(WS_EX_CONTROLPARENT, true);
-		ccp.OldClassName = WC_TABCONTROL;
+		ccp.SuperclassName = WC_TABCONTROL;
 		ccp.ClassName = WC_DTABCONTROL;
 
 		super.createControlParams(ccp);

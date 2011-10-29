@@ -18,11 +18,10 @@
 module dgui.core.controls.control;
 
 public import dgui.core.interfaces.idisposable;
+public import dgui.core.events.controlcodeeventargs;
 public import dgui.core.events.scrolleventargs;
 public import dgui.core.events.mouseeventargs;
 public import dgui.core.events.painteventargs;
-public import dgui.core.events.focuseventargs;
-public import dgui.core.events.keyeventargs;
 public import dgui.core.events.keyeventargs;
 public import dgui.core.events.event;
 public import dgui.core.windowclass;
@@ -55,15 +54,17 @@ enum PositionSpecified
 	ALL      = 2,
 }
 
-enum ControlBits: ubyte
+enum ControlBits: ulong
 {
-	NONE          	= 0,
-	ERASED        	= 1,
-	MOUSE_ENTER   	= 2,
-	CAN_NOTIFY   	= 4,
-	MODAL_CONTROL 	= 8,  // For Modal Dialogs
-	ORIGINAL_PAINT 	= 16, // Use standard control routine (not DGui's one)
-	OWN_CLICK_MSG   = 32, // Does the component Handles click itself?
+	NONE          		= 0,
+	ERASED        		= 1,
+	MOUSE_ENTER   		= 2,
+	CAN_NOTIFY   		= 4,
+	MODAL_CONTROL 		= 8,   // For Modal Dialogs
+	ORIGINAL_PAINT 		= 16,  // Use standard control routine (not DGui's one)
+	OWN_CLICK_MSG 	    = 32,  // Does the component Handles click itself?
+	CANNOT_ADD_CHILD	= 64,  // The child window will not be added to the parent's child controls' list
+	USE_CACHED_TEXT		= 128, // Does not send WM_SETTEXT / WM_GETTEXT messages, but it uses it's internal variable only.
 }
 
 enum BorderStyle: ubyte
@@ -77,7 +78,7 @@ enum BorderStyle: ubyte
 struct CreateControlParams
 {
 	string ClassName;
-	string OldClassName; //Used in Superlassing
+	string SuperclassName; //Used in Superlassing
 	Color DefaultBackColor;
 	Color DefaultForeColor;
 	Cursor DefaultCursor;
@@ -103,8 +104,9 @@ abstract class Control: Handle!(HWND), IDisposable
 	protected ControlBits _cBits = ControlBits.CAN_NOTIFY;
 
 	public Event!(Control, PaintEventArgs) paint;
-	public Event!(Control, FocusEventArgs) focusChanged;
+	public Event!(Control, EventArgs) focusChanged;
 	public Event!(Control, KeyCharEventArgs) keyChar;
+	public Event!(Control, ControlCodeEventArgs) controlCode;
 	public Event!(Control, KeyEventArgs) keyDown;
 	public Event!(Control, KeyEventArgs) keyUp;
 	public Event!(Control, MouseEventArgs) doubleClick;
@@ -236,10 +238,14 @@ abstract class Control: Handle!(HWND), IDisposable
 		return this._parent;
 	}
 
-	@property public final void parent(Control c)
+	@property public void parent(Control c)
 	{
 		this._parent = c;
-		c.sendMessage(DGUI_ADDCHILDCONTROL, winCast!(WPARAM)(this), 0);
+
+		if(!Control.hasBit(this._cBits, ControlBits.CANNOT_ADD_CHILD))
+		{
+			c.sendMessage(DGUI_ADDCHILDCONTROL, winCast!(WPARAM)(this), 0);
+		}
 	}
 
 	public final Control topLevelControl()
@@ -265,6 +271,16 @@ abstract class Control: Handle!(HWND), IDisposable
 		{
 			SetFocus(this._handle);
 		}
+	}
+
+	@property public bool focused()
+	{
+		if(this.created)
+		{
+			return GetFocus() == this._handle;
+		}
+
+		return false;
 	}
 
 	@property public final Color backColor()
@@ -319,9 +335,9 @@ abstract class Control: Handle!(HWND), IDisposable
 		this.setStyle(WS_VSCROLL | WS_HSCROLL, true);
 	}
 
-	@property public final string text()
+	@property public string text()
 	{
-		if(this.created)
+		if(this.created && !Control.hasBit(this._cBits, ControlBits.USE_CACHED_TEXT))
 		{
 			return getWindowText(this._handle);
 		}
@@ -329,11 +345,11 @@ abstract class Control: Handle!(HWND), IDisposable
 		return this._text;
 	}
 
-	@property public void text(string s) //Overvritten in TabPage
+	@property public void text(string s) //Overwritten in TabPage
 	{
 		this._text = s;
 
-		if(this.created)
+		if(this.created && !Control.hasBit(this._cBits, ControlBits.USE_CACHED_TEXT))
 		{
 			Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, false); //Do not trigger TextChanged Event
 			setWindowText(this._handle, s);
@@ -343,6 +359,12 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	@property public final Font font()
 	{
+		if(!this._defaultFont)
+		{
+			/* Font is not set, use Windows Font */
+			this._defaultFont = SystemFonts.windowsFont;
+		}
+
 		return this._defaultFont;
 	}
 
@@ -551,14 +573,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	public final void invalidate()
 	{
-		this.invalidate(NullRect);
-		UpdateWindow(this._handle);
-	}
-
-	public final void invalidate(Rect r)
-	{
-		InvalidateRect(this._handle, r == NullRect ? null : &r.rect, false);
-		//UpdateWindow(this._handle); Here?
+		RedrawWindow(this._handle, null, null, RDW_ERASE | RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 
 	public final void sendMessage(ref Message m)
@@ -568,18 +583,16 @@ abstract class Control: Handle!(HWND), IDisposable
 		 * it is useful in order to send custom messages to components.
 		 */
 
-		Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, false);
-
 		if(m.Msg >= DGUI_BASE) /* DGui's Custom Message Handling */
 		{
 			this.onDGuiMessage(m);
 		}
 		else /* Window Procedure Message Handling */
 		{
+			//Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, false);
 			this.wndProc(m);
+			//Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, true);
 		}
-
-		Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, true);
 	}
 
 	public final uint sendMessage(uint msg, WPARAM wParam, LPARAM lParam)
@@ -680,7 +693,16 @@ abstract class Control: Handle!(HWND), IDisposable
 		else if(this._parent)
 		{
 			hParent = this._parent.handle;
-			this.setStyle(WS_CHILD | WS_CLIPSIBLINGS, true);
+
+			/* As MSDN says:
+			    WS_POPUP: The windows is a pop-up window. *** This style cannot be used with the WS_CHILD style. *** */
+
+			if(!(this.getStyle() & WS_POPUP)) //The windows doesn't have WS_POPUP style, set WS_CHILD style.
+			{
+				this.setStyle(WS_CHILD, true);
+			}
+
+			this.setStyle(WS_CLIPSIBLINGS, true);
 		}
 
 		createWindowEx(this.getExStyle(),
@@ -778,12 +800,12 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	protected static final void setBit(ref ubyte rBits, ubyte rBit, bool set)
+	protected static final void setBit(ref ulong rBits, ulong rBit, bool set)
 	{
 		set ? (rBits |= rBit) : (rBits &= ~rBit);
 	}
 
-	protected static final bool hasBit(ref ubyte rBits, ubyte rBit)
+	protected static final bool hasBit(ref ulong rBits, ulong rBit)
 	{
 		return cast(bool)(rBits & rBit);
 	}
@@ -990,9 +1012,14 @@ abstract class Control: Handle!(HWND), IDisposable
 		this.mouseLeave(this, e);
 	}
 
-	protected void onFocusChanged(FocusEventArgs e)
+	protected void onFocusChanged(EventArgs e)
 	{
 		this.focusChanged(this, e);
+	}
+
+	protected void onControlCode(ControlCodeEventArgs e)
+	{
+		this.controlCode(this, e);
 	}
 
 	protected void wndProc(ref Message m)
@@ -1089,9 +1116,12 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 				else if(pWndPos.flags & SWP_SHOWWINDOW || pWndPos.flags & SWP_HIDEWINDOW)
 				{
-					if(pWndPos.flags & SWP_SHOWWINDOW && this._parent)
+					if(pWndPos.flags & SWP_SHOWWINDOW)
 					{
-						this._parent.sendMessage(DGUI_DOLAYOUT, 0, 0);
+						if(this._parent)
+						{
+							this._parent.sendMessage(DGUI_DOLAYOUT, 0, 0);
+						}
 					}
 
 					this.onVisibleChanged(EventArgs.empty);
@@ -1159,6 +1189,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				this.originalWndProc(m);
 			}
 			break;
+
 
 			case WM_MOUSEMOVE:
 			{
@@ -1264,10 +1295,24 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			case WM_SETFOCUS, WM_KILLFOCUS:
 			{
-				scope FocusEventArgs e = new FocusEventArgs(m.Msg == WM_SETFOCUS ? true : false);
-				this.onFocusChanged(e);
-
+				this.onFocusChanged(EventArgs.empty);
 				this.originalWndProc(m);
+			}
+			break;
+
+			case WM_GETDLGCODE:
+			{
+				scope ControlCodeEventArgs e = new ControlCodeEventArgs();
+				this.onControlCode(e);
+
+				if(e.controlCode is ControlCode.IGNORE)
+				{
+					this.originalWndProc(m);
+				}
+				else
+				{
+					m.Result = e.controlCode;
+				}
 			}
 			break;
 

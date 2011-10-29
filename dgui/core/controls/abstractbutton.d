@@ -18,7 +18,7 @@
 module dgui.core.controls.abstractbutton;
 
 public import dgui.core.dialogs.dialogresult;
-public import dgui.core.controls.subclassedcontrol;
+public import dgui.core.controls.ownerdrawcontrol;
 
 /**
   Enum that contain the check state of a _CheckBox or similar component
@@ -31,7 +31,7 @@ enum CheckState: uint
 }
 
 /// Abstract class of a _Button/_CheckBox/_RadioButton
-abstract class AbstractButton: SubclassedControl
+abstract class AbstractButton: OwnerDrawControl
 {
 	protected DialogResult _dr = DialogResult.NONE;
 
@@ -39,7 +39,7 @@ abstract class AbstractButton: SubclassedControl
 	{
 		AbstractButton.setBit(this._cBits, ControlBits.OWN_CLICK_MSG, true); // Let Button to handle Click Event itself
 
-		ccp.OldClassName = WC_BUTTON;
+		ccp.SuperclassName = WC_BUTTON;
 		this.setStyle(WS_TABSTOP, true);
 
 		super.createControlParams(ccp);

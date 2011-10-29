@@ -76,6 +76,52 @@ enum EdgeType: uint
 	SUNKEN = EDGE_SUNKEN,			/// Sunken Edge
 }
 
+enum FrameType: uint
+{
+	BUTTON		= DFC_BUTTON,
+	CAPTION		= DFC_CAPTION,
+	MENU 		= DFC_MENU,
+	POPUPMENU	= DFC_POPUPMENU,
+	SCROLL		= DFC_SCROLL,
+}
+
+enum FrameMode: uint
+{
+	BUTTON_3STATE				= DFCS_BUTTON3STATE,
+	BUTTON_CHECK				= DFCS_BUTTONCHECK,
+	BUTTON_PUSH					= DFCS_BUTTONPUSH,
+	BUTTON_RADIO				= DFCS_BUTTONRADIO,
+	BUTTON_RADIOIMAGE			= DFCS_BUTTONRADIOIMAGE,
+	BUTTON_RADIOMASK			= DFCS_BUTTONRADIOMASK,
+
+	CAPTION_CLOSE				= DFCS_CAPTIONCLOSE,
+	CAPTION_HELP				= DFCS_CAPTIONHELP,
+	CAPTION_MAX					= DFCS_CAPTIONMAX,
+	CAPTION_MIN					= DFCS_CAPTIONMIN,
+	CAPTION_RESTORE 			= DFCS_CAPTIONRESTORE,
+
+	MENU_ARROW					= DFCS_MENUARROW,
+	MENU_ARROWRIGHT 			= DFCS_MENUARROWRIGHT,
+	MENU_BULLET					= DFCS_MENUBULLET,
+	MENU_CHECK					= DFCS_MENUCHECK,
+
+	SCROLL_COMBOBOX				= DFCS_SCROLLCOMBOBOX,
+	SCROLL_DOWN					= DFCS_SCROLLDOWN,
+	SCROLL_LEFT					= DFCS_SCROLLLEFT,
+	SCROLL_RIGHT				= DFCS_SCROLLRIGHT,
+	SCROLL_SIZEGRIP				= DFCS_SCROLLSIZEGRIP,
+	SCROLL_SIZEGRIPRIGHT		= DFCS_SCROLLSIZEGRIPRIGHT,
+	SCROLL_UP					= DFCS_SCROLLUP,
+
+	CHECKED						= DFCS_CHECKED,
+	FLAT						= DFCS_FLAT,
+	HOT							= DFCS_HOT,
+	INACTIVE					= DFCS_INACTIVE,
+	MONO						= DFCS_MONO,
+	PUSHED						= DFCS_PUSHED,
+	TRANSPARENT					= DFCS_TRANSPARENT,
+}
+
 /**
   Enum that specify the draw border mode  (used in a Canvas.drawEdge() call).
   */
@@ -548,6 +594,11 @@ class Canvas: Handle!(HDC), IDisposable
 			default:
 				break;
 		}
+	}
+
+	public final void drawFrameControl(Rect r, FrameType frameType, FrameMode frameMode)
+	{
+		DrawFrameControl(this._handle, &r.rect, frameType, frameMode);
 	}
 
 	public final void drawEdge(Rect r, EdgeType edgeType, EdgeMode edgeMode)
@@ -1216,7 +1267,8 @@ final class Font: GraphicObject
 		LOGFONTW lf;
 
 		getInfo!(LOGFONTW)(this._handle, lf);
-		return to!(string)(lf.lfFaceName);
+		int idx = indexOf(lf.lfFaceName, '\0');
+		return to!(string)(lf.lfFaceName[0..idx]);
 	}
 
 	@property public int height()

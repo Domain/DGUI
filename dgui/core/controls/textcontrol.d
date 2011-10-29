@@ -149,16 +149,6 @@ abstract class TextControl: SubclassedControl
 		super.onHandleCreated(e);
 	}
 
-	protected override void onVisibleChanged(EventArgs e)
-	{
-		if(this.visible)
-		{
-			this.focus();
-		}
-
-		super.onVisibleChanged(e);
-	}
-
 	protected void onTextChanged(EventArgs e)
 	{
 		this.textChanged(this, e);

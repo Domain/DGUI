@@ -17,9 +17,9 @@
 
 module dgui.core.controls.containercontrol;
 
-public import dgui.core.controls.control;
+public import dgui.core.controls.reflectedcontrol;
 
-abstract class ContainerControl: Control
+abstract class ContainerControl: ReflectedControl
 {
 	protected Collection!(Control) _childControls;
 
@@ -38,22 +38,6 @@ abstract class ContainerControl: Control
 		if(this._childControls)
 		{
 			return this._childControls.get();
-		}
-
-		return null;
-	}
-
-	private Control getChildControl(HWND hWnd)
-	{
-		if(this._childControls && hWnd)
-		{
-			foreach(Control c; this._childControls)
-			{
-				if(c.handle == hWnd)
-				{
-					return c;
-				}
-			}
 		}
 
 		return null;
@@ -115,92 +99,5 @@ abstract class ContainerControl: Control
 	{
 		this.doChildControls();
 		super.onHandleCreated(e);
-	}
-
-	private void reflectMessageToChild(ref Message m)
-	{
-		HWND hFrom = void; //Inizializzata sotto
-
-		switch(m.Msg)
-		{
-			case WM_NOTIFY:
-				NMHDR* pNotify = cast(NMHDR*)m.lParam;
-				hFrom = pNotify.hwndFrom;
-				break;
-
-			case WM_MEASUREITEM:
-			{
-				MEASUREITEMSTRUCT* pMeasureItem = cast(MEASUREITEMSTRUCT*)m.lParam;
-
-				switch(pMeasureItem.CtlType)
-				{
-					case ODT_COMBOBOX:
-						hFrom = GetParent(cast(HWND)pMeasureItem.CtlID);
-						break;
-
-					case ODT_MENU:
-						hFrom = this._handle; // Set the owner of the menu (this window)
-						break;
-
-					default:
-						hFrom = cast(HWND)pMeasureItem.CtlID;
-						break;
-				}
-			}
-			break;
-
-			case WM_DRAWITEM:
-			{
-				DRAWITEMSTRUCT* pDrawItem = cast(DRAWITEMSTRUCT*)m.lParam;
-
-				switch(pDrawItem.CtlType)
-				{
-					case ODT_COMBOBOX:
-						hFrom = GetParent(pDrawItem.hwndItem);
-						break;
-
-					case ODT_MENU:
-						hFrom = this._handle; // Set the owner of the menu (this window)
-						break;
-
-					default:
-						hFrom = cast(HWND)pDrawItem.hwndItem;
-						break;
-				}
-			}
-			break;
-
-			default: // WM_COMMAND
-				hFrom = cast(HWND)m.lParam;
-				break;
-		}
-
-		Control c = hFrom != this._handle ? this.getChildControl(hFrom) : this; //Checks if 'hFrom' is this window (useful for menus)
-
-		if(c)
-		{
-			c.sendMessage(DGUI_REFLECTMESSAGE, cast(WPARAM)&m, 0);
-		}
-	}
-
-	protected override void wndProc(ref Message m)
-	{
-		switch(m.Msg)
-		{
-			case WM_NOTIFY, WM_COMMAND, WM_MEASUREITEM, WM_DRAWITEM, WM_CTLCOLOREDIT, WM_CTLCOLORBTN:
-			{
-				//this.originalWndProc(m);
-
-				if(ContainerControl.hasBit(this._cBits, ControlBits.CAN_NOTIFY)) //Avoid fake notification messages caused by component's properties (like text(), checked(), ...)
-				{
-					this.reflectMessageToChild(m);
-				}
-			}
-			break;
-
-			default:
-				super.wndProc(m);
-				break;
-		}
 	}
 }

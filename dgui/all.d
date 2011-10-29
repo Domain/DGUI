@@ -92,4 +92,5 @@ public import dgui.toolbar, dgui.statusbar, dgui.progressbar, dgui.trackbar;
 public import dgui.core.geometry, dgui.core.events.event, dgui.core.utils;
 public import dgui.colordialog, dgui.fontdialog, dgui.filebrowserdialog, dgui.folderbrowserdialog;
 public import dgui.form, dgui.button, dgui.label, dgui.textbox, dgui.richtextbox, dgui.tabcontrol,
-			  dgui.combobox, dgui.listbox, dgui.listview, dgui.treeview, dgui.picturebox, dgui.scrollbar;
+			  dgui.combobox, dgui.listbox, dgui.listview, dgui.treeview, dgui.picturebox,
+			  dgui.scrollbar, dgui.tooltip;

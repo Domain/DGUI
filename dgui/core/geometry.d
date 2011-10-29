@@ -23,7 +23,7 @@ struct Rect
 {
 	public union
 	{
-		struct
+		align(1)  struct
 		{
 			uint left = 0;
 			uint top = 0;
@@ -84,7 +84,12 @@ struct Rect
 
 	@property public int width()
 	{
-		return this.right - this.left;
+		if(this.right != CW_USEDEFAULT)
+		{
+			return this.right - this.left;
+		}
+
+		return CW_USEDEFAULT;
 	}
 
 	@property public void width(int w)
@@ -94,7 +99,12 @@ struct Rect
 
 	@property public int height()
 	{
-		return this.bottom - this.top;
+		if(this.bottom != CW_USEDEFAULT)
+		{
+			return this.bottom - this.top;
+		}
+
+		return CW_USEDEFAULT;
 	}
 
 	@property public void height(int h)
@@ -146,7 +156,7 @@ struct Point
 {
 	public union
 	{
-		struct
+		align(1) struct
 		{
 			uint x = 0;
 			uint y = 0;
@@ -184,7 +194,7 @@ struct Size
 {
 	public union
 	{
-		struct
+		align(1) struct
 		{
 			uint width = 0;
 			uint height = 0;

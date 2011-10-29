@@ -80,7 +80,7 @@ class TrackBar: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.OldClassName = WC_TRACKBAR;
+		ccp.SuperclassName = WC_TRACKBAR;
 		ccp.ClassName = WC_DTRACKBAR;
 		this.setStyle(TBS_AUTOTICKS, true);
 

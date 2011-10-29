@@ -38,6 +38,7 @@ enum
 	WC_EDIT			= "EDIT",
 	WC_TOOLBAR 		= "ToolBarWindow32",
 	WC_TRACKBAR		= "msctls_trackbar32",
+	WC_TOOLTIP      = "tooltips_class32",
 	WC_TREEVIEW 	= "SysTreeView32",
 	//WC_STATIC 		= "STATIC",
 
@@ -59,6 +60,7 @@ enum
 	WC_DEDIT 		= "DTextBox",
 	WC_DTOOLBAR 	= "DToolBar",
 	WC_DTRACKBAR 	= "DTrackBar",
+	WC_DTOOLTIP     = "DToolTip",
 	WC_DTREEVIEW 	= "DTreeView",
 	WC_DGRIDPANEL   = "DGridPanel",
 	WC_DSPLITPANEL  = "DSplitPanel",
@@ -85,9 +87,6 @@ enum ClassStyles: uint
 
 final class WindowClass
 {
-	private alias WNDPROC[string] ClassMap; //Keeps original window procedure addresses: [OrgClassName | OrgWndProc]
-	private static ClassMap _classMap;
-
 	public static void register(string className, ClassStyles classStyle, Cursor cursor, WNDPROC wndProc)
 	{
 		WNDCLASSEXW wc;
@@ -110,15 +109,10 @@ final class WindowClass
 		newWc.cbSize = WNDCLASSEXW.sizeof;
 
 		const(wchar)* pNewClassName = toUTFz!(const(wchar)*)(newClassName);
+		getClassInfoEx(oldClassName, &oldWc);
 
 		if(!getClassInfoEx(newClassName, &newWc)) // IF Class Non Found THEN
 		{
-			// Super Classing
-			getClassInfoEx(oldClassName, &oldWc);
-
-			//Keep the original window procedure in a map
-			WindowClass._classMap[oldClassName] = oldWc.lpfnWndProc;
-
 			newWc = oldWc;
 			newWc.style &= ~ClassStyles.GLOBALCLASS; // Remove Global Class
 			newWc.style |= ClassStyles.PARENTDC;
@@ -133,6 +127,6 @@ final class WindowClass
 			}
 		}
 
-		return WindowClass._classMap[oldClassName]; //Back to the original window procedure
+		return oldWc.lpfnWndProc;; //Back to the original window procedure
 	}
 }

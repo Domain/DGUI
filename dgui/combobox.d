@@ -113,7 +113,6 @@ class ComboBox: SubclassedControl
 	public Event!(Control, EventArgs) itemChanged;
 
 	private Collection!(ComboBoxItem) _items;
-
 	private DropDownStyles _oldDdStyle = DropDownStyles.NONE;
 	private int _selectedIndex;
 	private ImageList _imgList;
@@ -205,6 +204,16 @@ class ComboBox: SubclassedControl
 		return null;
 	}
 
+	@property public override bool focused()
+	{
+		if(this.created)
+		{
+			return GetFocus() == cast(HWND)this.sendMessage(CBEM_GETCOMBOCONTROL, 0, 0);
+		}
+
+		return false;
+	}
+
 	@property public final ImageList imageList()
 	{
 		return this._imgList;
@@ -264,13 +273,15 @@ class ComboBox: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.OldClassName = WC_COMBOBOXEX;
+		ccp.SuperclassName = WC_COMBOBOXEX;
 		ccp.ClassName = WC_DCOMBOBOX;
+
+		this.setStyle(CBS_NOINTEGRALHEIGHT, true);
 
 		if(!this.height)
 		{
 			// If this row is removed, the dropdown list is not displayed
-			this.height = this.topLevelControl.height;
+			this.height = CW_USEDEFAULT;
 		}
 
 		/* Use Original Paint Routine, the double buffered one causes some issues */
@@ -307,15 +318,10 @@ class ComboBox: SubclassedControl
 		{
 			case WM_COMMAND:
 			{
-				switch(HIWORD(m.wParam))
+				if(HIWORD(m.wParam) == CBN_SELCHANGE)
 				{
-					case CBN_SELCHANGE:
-						this._selectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
-						this.onItemChanged(EventArgs.empty);
-						break;
-
-					default:
-						break;
+					this._selectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
+					this.onItemChanged(EventArgs.empty);
 				}
 			}
 			break;
@@ -325,5 +331,31 @@ class ComboBox: SubclassedControl
 		}
 
 		super.onReflectedMessage(m);
+	}
+
+	protected override void wndProc(ref Message m)
+	{
+		switch(m.Msg)
+		{
+			case WM_COMMAND:
+			{
+				/* Retrieve focus notifications from child ComboBox  */
+				if(HIWORD(m.wParam) == CBN_SETFOCUS || HIWORD(m.wParam) == CBN_KILLFOCUS)
+				{
+					this.onFocusChanged(EventArgs.empty);
+				}
+
+				super.wndProc(m);
+			}
+			break;
+
+			case WM_SETFOCUS, WM_KILLFOCUS:
+				this.originalWndProc(m); //Don't send focusChanged event here!
+				break;
+
+			default:
+				super.wndProc(m);
+				break;
+		}
 	}
 }

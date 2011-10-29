@@ -50,7 +50,20 @@ class Button: AbstractButton
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this.setStyle(BS_DEFPUSHBUTTON, true);
+		switch(this._drawMode)
+		{
+			case OwnerDrawMode.NORMAL:
+				this.setStyle(BS_DEFPUSHBUTTON, true);
+				break;
+
+			case OwnerDrawMode.FIXED, OwnerDrawMode.VARIABLE:
+				this.setStyle(BS_OWNERDRAW, true);
+				break;
+
+			default:
+				break;
+		}
+
 		ccp.ClassName = WC_DBUTTON;
 
 		super.createControlParams(ccp);
@@ -62,7 +75,20 @@ class CheckBox: CheckedButton
 {
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this.setStyle(BS_AUTOCHECKBOX, true);
+		switch(this._drawMode)
+		{
+			case OwnerDrawMode.NORMAL:
+				this.setStyle(BS_AUTOCHECKBOX, true);
+				break;
+
+			case OwnerDrawMode.FIXED, OwnerDrawMode.VARIABLE:
+				this.setStyle(BS_OWNERDRAW, true);
+				break;
+
+			default:
+				break;
+		}
+
 		ccp.ClassName = WC_DCHECKBOX;
 
 		super.createControlParams(ccp);
@@ -74,7 +100,20 @@ class RadioButton: CheckedButton
 {
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this.setStyle(BS_AUTORADIOBUTTON, true);
+		switch(this._drawMode)
+		{
+			case OwnerDrawMode.NORMAL:
+				this.setStyle(BS_AUTORADIOBUTTON, true);
+				break;
+
+			case OwnerDrawMode.FIXED, OwnerDrawMode.VARIABLE:
+				this.setStyle(BS_OWNERDRAW, true);
+				break;
+
+			default:
+				break;
+		}
+
 		ccp.ClassName = WC_DRADIOBUTTON;
 
 		super.createControlParams(ccp);

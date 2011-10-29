@@ -282,7 +282,7 @@ class ToolBar: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.OldClassName = WC_TOOLBAR;
+		ccp.SuperclassName = WC_TOOLBAR;
 		ccp.ClassName = WC_DTOOLBAR;
 		this.setStyle(TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN, true);
 

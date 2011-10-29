@@ -30,12 +30,89 @@ extern(Windows)
 {
 	enum: int
 	{
-		I_CHILDRENCALLBACK = -1,
+		I_CHILDRENCALLBACK  = -1,
+		LPSTR_TEXTCALLBACKW = -1,
 	}
 
 	enum
 	{
 		SW_INVALIDATE = 2,
+	}
+
+	/* Dialog codes */
+	enum: uint
+	{
+		DLGC_WANTARROWS 	 = 1,
+		DLGC_WANTTAB 		 = 2,
+		DLGC_WANTALLKEYS 	 = 4,
+		DLGC_WANTMESSAGE 	 = 4,
+		DLGC_HASSETSEL 		 = 8,
+		DLGC_DEFPUSHBUTTON	 = 16,
+		DLGC_UNDEFPUSHBUTTON = 32,
+		DLGC_RADIOBUTTON	 = 64,
+		DLGC_WANTCHARS 		 = 128,
+		DLGC_STATIC 		 = 256,
+		DLGC_BUTTON 		 = 0x2000,
+	}
+
+	/* Frame Control Constants */
+	enum: uint
+	{
+		DFC_CAPTION		= 1,
+		DFC_MENU		= 2,
+		DFC_SCROLL		= 3,
+		DFC_BUTTON		= 4,
+		DFC_POPUPMENU	= 5,
+	}
+
+	enum: uint
+	{
+		DFCS_CAPTIONCLOSE   = 0,
+		DFCS_CAPTIONMIN     = 1,
+		DFCS_CAPTIONMAX     = 2,
+		DFCS_CAPTIONRESTORE = 3,
+		DFCS_CAPTIONHELP    = 4,
+	}
+
+	enum: uint
+	{
+		DFCS_SCROLLUP            = 0,
+		DFCS_SCROLLDOWN          = 1,
+		DFCS_SCROLLLEFT          = 2,
+		DFCS_SCROLLRIGHT         = 3,
+		DFCS_SCROLLCOMBOBOX      = 5,
+		DFCS_SCROLLSIZEGRIP      = 8,
+		DFCS_SCROLLSIZEGRIPRIGHT = 16,
+	}
+
+	enum: uint
+	{
+		DFCS_MENUARROW      = 0,
+		DFCS_MENUCHECK      = 1,
+		DFCS_MENUBULLET     = 2,
+		DFCS_MENUARROWRIGHT = 4,
+	}
+
+	enum: uint
+	{
+		DFCS_BUTTONCHECK         = 0,
+		DFCS_BUTTONRADIOIMAGE    = 1,
+		DFCS_BUTTONRADIOMASK     = 2,
+		DFCS_BUTTONRADIO         = 4,
+		DFCS_BUTTON3STATE        = 8,
+		DFCS_BUTTONPUSH          = 16,
+		DFCS_INACTIVE            = 256,
+		DFCS_PUSHED              = 512,
+		DFCS_CHECKED             = 1024,
+	}
+
+	enum: uint
+	{
+		DFCS_TRANSPARENT         = 0x800,
+		DFCS_HOT                 = 0x1000,
+		DFCS_ADJUSTRECT          = 0x2000,
+		DFCS_FLAT                = 0x4000,
+		DFCS_MONO                = 0x8000,
 	}
 
 	/* Windows Generic Messages */
@@ -272,26 +349,6 @@ extern(Windows)
 		BF_FLAT                    = 0x4000,
 		BF_MONO                    = 0x8000,
 	}
-
-	/+
-	/* ToolTip Messages */
-	enum: uint
-	{
-		TTM_ACTIVATE = WM_USER + 1,
-		TTM_SETDELAYTIME = WM_USER + 3,
-		TTM_ADDTOOLA = WM_USER + 4,
-		TTM_DELTOOLA = WM_USER + 5,
-		TTM_GETTOOLINFOA = WM_USER + 8,
-		TTM_GETTEXTA = WM_USER + 11,
-		TTM_UPDATETIPTEXTA = WM_USER + 12,
-		TTM_ENUMTOOLSA = WM_USER + 14,
-		TTM_GETCURRENTTOOLA = WM_USER + 15,
-		TTM_ADDTOOLW = WM_USER + 50,
-		TTM_GETTEXTW = WM_USER + 56,
-		TTM_UPDATETIPTEXTW = WM_USER + 57,
-	}
-	+/
-
 
 	/* Rich Edit Messages */
 	enum: uint
@@ -530,32 +587,68 @@ extern(Windows)
 		WS_EX_STATICEDGE		 = 0x20000,
 		WS_EX_TOOLWINDOW		 = 128,
 		WS_EX_TOPMOST 			 = 8,
-		//WS_EX_TRANSPARENT		 = 32,
 		WS_EX_WINDOWEDGE 		 = 256,
+		//WS_EX_TRANSPARENT		 = 32,
 	}
 
-	/*
-	enum: DWORD
+	/* ToolTip Messages */
+	enum: uint
+	{
+		TTM_ACTIVATE 	   = WM_USER + 1,
+		TTM_SETDELAYTIME   = WM_USER + 3,
+		TTM_ADDTOOLW 	   = WM_USER + 50,
+		TTM_DELTOOLW  	   = WM_USER + 51,
+		TTM_GETTEXTW 	   = WM_USER + 56,
+		TTM_UPDATETIPTEXTW = WM_USER + 57,
+		TTM_SETTITLEW 	   = WM_USER + 33,
+
+		TTN_FIRST 		 = -520u,
+		TTN_GETDISPINFOW = TTN_FIRST - 10,
+
+		//TTN_SHOW         = TTN_FIRST - 1,
+		//TTN_POP          = TTN_FIRST - 2,
+		//TTM_ADDTOOLA              = WM_USER + 4,
+		//TTM_DELTOOLA               = WM_USER + 5,
+		//TTM_GETTOOLINFOA      = WM_USER + 8,
+		//TTM_GETTEXTA 		 = WM_USER + 11,
+		//TTM_UPDATETIPTEXTA    = WM_USER + 12,
+		//TTM_ENUMTOOLSA 	 = WM_USER + 14,
+		//TTM_GETCURRENTTOOLA = WM_USER + 15,
+	}
+
+	/* ToolTip Icons */
+	enum: uint
+	{
+		TTI_NONE    = 0,
+		TTI_INFO    = 1,
+		TTI_WARNING = 2,
+		TTI_ERROR   = 3,
+	}
+
+	/* ToolTip Styles */
+	enum: uint
 	{
 		TTS_ALWAYSTIP = 0x01,
-		TTS_NOPREFIX = 0x02,
+		TTS_NOPREFIX  = 0x02,
 		TTS_NOANIMATE = 0x10, // IE5+
-		TTS_NOFADE = 0x20, // IE5+
-		TTS_BALLOON = 0x40, // IE5+
+		TTS_NOFADE    = 0x20, // IE5+
+		TTS_BALLOON   = 0x40, // IE5+
+		TTS_CLOSE     = 0x80,
 	}
 
-	enum
+	/* ToolTip Flags */
+	enum: uint
 	{
-		TTF_IDISHWND = 0x0001,
-		TTF_CENTERTIP = 0x0002,
-		TTF_RTLREADING = 0x0004,
-		TTF_SUBCLASS = 0x0010,
-		TTF_TRACK = 0x0020, // IE3+
-		TTF_ABSOLUTE = 0x0080, // IE3+
+		TTF_IDISHWND    = 0x0001,
+		TTF_CENTERTIP   = 0x0002,
+		TTF_RTLREADING  = 0x0004,
+		TTF_SUBCLASS    = 0x0010,
+		TTF_TRACK       = 0x0020, // IE3+
+		TTF_ABSOLUTE    = 0x0080, // IE3+
 		TTF_TRANSPARENT = 0x0100, // IE3+
-		TTF_DI_SETITEM = 0x8000, // IE3+
+		TTF_PARSELINKS  = 0x1000,
+		TTF_DI_SETITEM  = 0x8000, // IE3+
 	}
-	*/
 
 	enum: uint
 	{
@@ -1766,6 +1859,16 @@ extern(Windows)
 		LPARAM lParam;
 	}
 
+	align(1) struct NMTTDISPINFOW
+	{
+		NMHDR hdr;
+		wchar* lpszText;
+		wchar[80] szText;
+		HINSTANCE hinst;
+		UINT uFlags;
+		LPARAM lParam;
+	}
+
 	struct LVDISPINFOW
 	{
 		NMHDR hdr;
@@ -1919,7 +2022,7 @@ extern(Windows)
 		int cchText;
 	}
 
-	struct CHOOSECOLORW
+	align(1) struct CHOOSECOLORW
 	{
 		DWORD lStructSize;
 		HWND hwndOwner;
@@ -1969,9 +2072,8 @@ extern(Windows)
 		LOGFONTW lfMessageFont;
 	}
 
-	struct CHOOSEFONTW
+	align(1) struct CHOOSEFONTW
 	{
-		align(1):
 		DWORD lStructSize;
 		HWND hwndOwner;
 		HDC hDC;
@@ -2024,6 +2126,8 @@ extern(Windows)
 		RECT rect;
 		HINSTANCE hinst;
 		LPWSTR lpszText;
+		LPARAM lParam;
+		//void* lpReserved; <-- From XP/Vista/7
 	}
 
 	struct TRACKMOUSEEVENT
@@ -2174,6 +2278,7 @@ extern(Windows)
 	LRESULT CallWindowProcW(WNDPROC lpPrevWndFunc, HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
 	BOOL GetTextExtentPoint32W(HDC hdc, LPCWSTR lpString, int c, SIZE* lpSize);
+	BOOL DrawFrameControl(HDC hdc, RECT* lprc, uint uType, uint uState);
 	BOOL SetMenuItemInfoW(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOW* lpmii);
 	BOOL InsertMenuItemW(HMENU hMenu, UINT uItem, BOOL fByPosition, MENUITEMINFOW* lpmii);
 	BOOL SystemParametersInfoW(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);

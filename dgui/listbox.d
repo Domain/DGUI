@@ -38,6 +38,8 @@ class ListBox: OwnerDrawControl
 		}
 	}
 
+	public Event!(Control, EventArgs) itemChanged;
+
 	private Collection!(Object) _items;
 	private Object _selectedItem;
 	private int _selectedIndex;
@@ -127,21 +129,28 @@ class ListBox: OwnerDrawControl
 		return this.sendMessage(LB_ADDSTRING, 0, cast(LPARAM)toUTFz!(wchar*)(obj.toString()));
 	}
 
+	protected void onItemChanged(EventArgs e)
+	{
+		this.itemChanged(this, e);
+	}
+
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this.setStyle(LBS_NOINTEGRALHEIGHT, true);
+		/* LBN_SELCHANGE: This notification code is sent only by a list box that has the LBS_NOTIFY style (by MSDN) */
+		this.setStyle(LBS_NOINTEGRALHEIGHT | LBS_NOTIFY, true);
 		this.setExStyle(WS_EX_CLIENTEDGE, true);
-		ccp.OldClassName = WC_LISTBOX;
+
+		ccp.SuperclassName = WC_LISTBOX;
 		ccp.ClassName = WC_DLISTBOX;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
 		switch(this._drawMode)
 		{
-			case ItemDrawMode.OWNER_DRAW_FIXED:
+			case OwnerDrawMode.FIXED:
 				this.setStyle(LBS_OWNERDRAWFIXED, true);
 				break;
 
-			case ItemDrawMode.OWNER_DRAW_VARIABLE:
+			case OwnerDrawMode.VARIABLE:
 				this.setStyle(LBS_OWNERDRAWVARIABLE, true);
 				break;
 
@@ -150,6 +159,17 @@ class ListBox: OwnerDrawControl
 		}
 
 		super.createControlParams(ccp);
+	}
+
+	protected override void onReflectedMessage(ref Message m)
+	{
+		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == LBN_SELCHANGE)
+		{
+			this._selectedIndex = this.sendMessage(LB_GETCURSEL, 0, 0);
+			this.onItemChanged(EventArgs.empty);
+		}
+
+		super.onReflectedMessage(m);
 	}
 
 	protected override void onHandleCreated(EventArgs e)
