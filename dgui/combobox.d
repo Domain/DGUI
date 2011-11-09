@@ -35,7 +35,6 @@ class ComboBoxItem
 	private ComboBox _owner;
 	private string _text;
 	private int _imgIndex = -1;
-	private int _idx;
 
 	mixin TagProperty;
 
@@ -47,12 +46,18 @@ class ComboBoxItem
 
 	@property public final int index()
 	{
-		return this._idx;
-	}
+		if(this._owner.items)
+		{
+			foreach(int i, ComboBoxItem cbi; this._owner.items)
+			{
+				if(cbi is this)
+				{
+					return i;
+				}
+			}
+		}
 
-	@property package void index(int idx)
-	{
-		this._idx = idx;
+		return -1;
 	}
 
 	@property public final ComboBox comboBox()
@@ -80,7 +85,7 @@ class ComboBoxItem
 
 			cbei.mask = CBEIF_IMAGE;
 			cbei.iImage = idx;
-			cbei.iItem = this._idx;
+			cbei.iItem = this.index;
 
 			this._owner.sendMessage(CBEM_SETITEMW, 0, cast(LPARAM)&cbei);
 		}
@@ -101,7 +106,7 @@ class ComboBoxItem
 
 			cbei.mask = CBEIF_TEXT;
 			cbei.pszText = toUTFz!(wchar*)(txt);
-			cbei.iItem = this._idx;
+			cbei.iItem = this.index;
 
 			this._owner.sendMessage(CBEM_SETITEMW, 0, cast(LPARAM)&cbei);
 		}
@@ -126,7 +131,7 @@ class ComboBox: SubclassedControl
 	{
 		if(!this._items)
 		{
-			this._items = new Collection!(ComboBoxItem)();
+			this._items = new Collection!(ComboBoxItem);
 		}
 
 		ComboBoxItem cbi = new ComboBoxItem(s, imgIndex);
@@ -261,7 +266,7 @@ class ComboBox: SubclassedControl
 		cbei.pszText = toUTFz!(wchar*)(cbi.text);
 		cbei.lParam = winCast!(LPARAM)(cbi);
 
-		cbi.index = this.sendMessage(CBEM_INSERTITEMW, 0, cast(LPARAM)&cbei);
+		this.sendMessage(CBEM_INSERTITEMW, 0, cast(LPARAM)&cbei);
 		cbi.comboBox = this;
 		return cbi;
 	}
@@ -276,7 +281,8 @@ class ComboBox: SubclassedControl
 		ccp.SuperclassName = WC_COMBOBOXEX;
 		ccp.ClassName = WC_DCOMBOBOX;
 
-		this.setStyle(CBS_NOINTEGRALHEIGHT, true);
+		this.setStyle(WS_CLIPCHILDREN | WS_CLIPSIBLINGS, true); //Clip child ComboBox
+		//this.setStyle(CBS_NOINTEGRALHEIGHT, true);
 
 		if(!this.height)
 		{
@@ -306,7 +312,7 @@ class ComboBox: SubclassedControl
 
 		if(this._selectedIndex != -1)
 		{
-			this.selectedIndex = this._selectedIndex;
+			this.sendMessage(CB_SETCURSEL, this._selectedIndex, 0);
 		}
 
 		super.onHandleCreated(e);
@@ -314,20 +320,10 @@ class ComboBox: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == CBN_SELCHANGE)
 		{
-			case WM_COMMAND:
-			{
-				if(HIWORD(m.wParam) == CBN_SELCHANGE)
-				{
-					this._selectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
-					this.onItemChanged(EventArgs.empty);
-				}
-			}
-			break;
-
-			default:
-				break;
+			this._selectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
+			this.onItemChanged(EventArgs.empty);
 		}
 
 		super.onReflectedMessage(m);

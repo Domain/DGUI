@@ -937,7 +937,7 @@ abstract class Control: Handle!(HWND), IDisposable
 			break;
 
 			default:
-				Control.defWindowProc(m);
+				//Control.defWindowProc(m);
 				break;
 		}
 	}
@@ -1116,12 +1116,9 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 				else if(pWndPos.flags & SWP_SHOWWINDOW || pWndPos.flags & SWP_HIDEWINDOW)
 				{
-					if(pWndPos.flags & SWP_SHOWWINDOW)
+					if(pWndPos.flags & SWP_SHOWWINDOW && this._parent)
 					{
-						if(this._parent)
-						{
-							this._parent.sendMessage(DGUI_DOLAYOUT, 0, 0);
-						}
+						this._parent.sendMessage(DGUI_DOLAYOUT, 0, 0);
 					}
 
 					this.onVisibleChanged(EventArgs.empty);
@@ -1189,7 +1186,6 @@ abstract class Control: Handle!(HWND), IDisposable
 				this.originalWndProc(m);
 			}
 			break;
-
 
 			case WM_MOUSEMOVE:
 			{

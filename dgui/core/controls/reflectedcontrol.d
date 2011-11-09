@@ -94,7 +94,7 @@ abstract class ReflectedControl: Control
 		{
 			case WM_NOTIFY, WM_COMMAND, WM_MEASUREITEM, WM_DRAWITEM, WM_CTLCOLOREDIT, WM_CTLCOLORBTN:
 			{
-				//this.originalWndProc(m);
+				this.originalWndProc(m); //Components like: ComboBoxEx need this one!
 
 				if(ReflectedControl.hasBit(this._cBits, ControlBits.CAN_NOTIFY)) //Avoid fake notification messages caused by component's properties (like text(), checked(), ...)
 				{

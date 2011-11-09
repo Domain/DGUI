@@ -96,24 +96,37 @@ class SplitPanel: LayoutControl
 
 		scope ResizeManager rm = new ResizeManager(2); //Fixed Panel
 
+		bool changed = false;
+
 		switch(this._splitOrientation)
 		{
 			case SplitOrientation.VERTICAL:
-				rm.setSize(this._panel1, this._splitPos, this.height);
-				rm.resizeControl(this._panel2, this._splitPos + SPLITTER_SIZE, 0, this.width - (this._splitPos + SPLITTER_SIZE), this.height);
-				//this._panel1.bounds = Rect(0, 0, this._splitPos, this.height);
-				//this._panel2.bounds = Rect(this._splitPos + SPLITTER_SIZE, 0, this.width - (this._splitPos + SPLITTER_SIZE), this.height);
-				break;
+			{
+				if(this._splitPos >= 0 && (this._splitPos + SPLITTER_SIZE) < this.width)
+				{
+					rm.setSize(this._panel1, this._splitPos, this.height);
+					rm.resizeControl(this._panel2, this._splitPos + SPLITTER_SIZE, 0, this.width - (this._splitPos + SPLITTER_SIZE), this.height);
+					changed = true;
+				}
+			}
+			break;
 
 			default: // SplitOrientation.HORIZONTAL
-				rm.setSize(this._panel1, this.width, this._splitPos);
-				rm.resizeControl(this._panel2, 0, this._splitPos + SPLITTER_SIZE, this.width, this.height - (this._splitPos + SPLITTER_SIZE));
-				//this._panel1.bounds = Rect(0, 0, this.width, this._splitPos);
-				//this._panel2.bounds = Rect(0, this._splitPos + SPLITTER_SIZE, this.width, this.height - (this._splitPos + SPLITTER_SIZE));
-				break;
+			{
+				if(this._splitPos >= 0 && (this._splitPos + SPLITTER_SIZE) < this.height)
+				{
+					rm.setSize(this._panel1, this.width, this._splitPos);
+					rm.resizeControl(this._panel2, 0, this._splitPos + SPLITTER_SIZE, this.width, this.height - (this._splitPos + SPLITTER_SIZE));
+					changed = true;
+				}
+			}
+			break;
 		}
 
-		this.invalidate();
+		if(changed)
+		{
+			this.invalidate();
+		}
 	}
 
 	protected override void onMouseKeyDown(MouseEventArgs e)
