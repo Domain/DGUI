@@ -100,9 +100,9 @@ class Label: Control
 			scope TextFormat tf = new TextFormat(this._multiLine ? TextFormatFlags.WORD_BREAK : TextFormatFlags.SINGLE_LINE);
 			tf.alignment = this._textAlign;
 
-			scope SolidBrush sb = new SolidBrush(this._backColor);
+			scope SolidBrush sb = new SolidBrush(this.backColor);
 			c.fillRectangle(sb, r);
-			c.drawText(this.text, r, this._foreColor, this.font, tf);
+			c.drawText(this.text, r, this.foreColor, this.font, tf);
 		}
 	}
 }

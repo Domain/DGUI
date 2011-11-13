@@ -300,7 +300,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			this.redraw();
+			this.invalidate();
 		}
 	}
 
@@ -321,7 +321,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(this.created)
 		{
-			this.redraw();
+			this.invalidate();
 		}
 	}
 

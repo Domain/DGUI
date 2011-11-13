@@ -80,20 +80,6 @@ class SplitPanel: LayoutControl
 
 	public override void updateLayout()
 	{
-		if(!this._splitPos && !this._downing)
-		{
-			switch(this._splitOrientation)
-			{
-				case SplitOrientation.VERTICAL:
-					this._splitPos = this.width / 3;
-					break;
-
-				default: // SplitOrientation.HORIZONTAL
-					this._splitPos = this.height / 3;
-					break;
-			}
-		}
-
 		scope ResizeManager rm = new ResizeManager(2); //Fixed Panel
 
 		bool changed = false;
@@ -190,6 +176,20 @@ class SplitPanel: LayoutControl
 				break;
 		}
 
+		if(!this._splitPos)
+		{
+			switch(this._splitOrientation)
+			{
+				case SplitOrientation.VERTICAL:
+					this._splitPos = this.width / 3;
+					break;
+
+				default: // SplitOrientation.HORIZONTAL
+					this._splitPos = this.height - (this.height / 3);
+					break;
+			}
+		}
+
 		super.createControlParams(ccp);
 	}
 
@@ -270,5 +270,35 @@ class SplitPanel: LayoutControl
 		}
 
 		super.onPaint(e);
+	}
+
+	protected override void wndProc(ref Message m)
+	{
+		if(m.Msg == WM_WINDOWPOSCHANGING)
+		{
+			WINDOWPOS* pWndPos = cast(WINDOWPOS*)m.lParam;
+
+			if(!(pWndPos.flags & SWP_NOSIZE))
+			{
+				switch(this._splitOrientation)
+				{
+					case SplitOrientation.VERTICAL:
+					{
+						if(this.width) // Avoid division by 0
+							this._splitPos = MulDiv(pWndPos.cx, this._splitPos, this.width);
+					}
+					break;
+
+					default: // SplitOrientation.HORIZONTAL
+					{
+						if(this.height) // Avoid division by 0
+							this._splitPos = MulDiv(pWndPos.cy, this._splitPos, this.height);
+					}
+					break;
+				}
+			}
+		}
+
+		super.wndProc(m);
 	}
 }

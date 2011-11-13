@@ -101,12 +101,10 @@ class ToolTip: SubclassedControl
 		this.setStyle(TTS_BALLOON, b);
 	}
 
-	/*
 	@property public void closeButton(bool b)
 	{
 		this.setStyle(TTS_CLOSE, b);
 	}
-	*/
 
 	@property public void alwaysTip(bool b)
 	{

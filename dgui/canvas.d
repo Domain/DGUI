@@ -1736,7 +1736,7 @@ final class SystemFonts
 
 			if(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, NONCLIENTMETRICSW.sizeof, &ncm, 0))
 			{
-				f = Font.fromHFONT(createFontIndirect(&ncm.lfMessageFont));
+				f = Font.fromHFONT(createFontIndirect(&ncm.lfMessageFont), false);
 			}
 			else
 			{
@@ -1753,7 +1753,7 @@ final class SystemFonts
 
 		if(!f)
 		{
-			f = Font.fromHFONT(GetStockObject(ANSI_FIXED_FONT));
+			f = Font.fromHFONT(GetStockObject(ANSI_FIXED_FONT), false);
 		}
 
 		return f;
@@ -1765,7 +1765,7 @@ final class SystemFonts
 
 		if(!f)
 		{
-			f = Font.fromHFONT(GetStockObject(ANSI_VAR_FONT));
+			f = Font.fromHFONT(GetStockObject(ANSI_VAR_FONT), false);
 		}
 
 		return f;
@@ -1777,7 +1777,7 @@ final class SystemFonts
 
 		if(!f)
 		{
-			f = Font.fromHFONT(GetStockObject(DEVICE_DEFAULT_FONT));
+			f = Font.fromHFONT(GetStockObject(DEVICE_DEFAULT_FONT), false);
 		}
 
 		return f;
@@ -1789,7 +1789,7 @@ final class SystemFonts
 
 		if(!f)
 		{
-			f = Font.fromHFONT(GetStockObject(OEM_FIXED_FONT));
+			f = Font.fromHFONT(GetStockObject(OEM_FIXED_FONT), false);
 		}
 
 		return f;
@@ -1801,7 +1801,7 @@ final class SystemFonts
 
 		if(!f)
 		{
-			f = Font.fromHFONT(GetStockObject(SYSTEM_FONT));
+			f = Font.fromHFONT(GetStockObject(SYSTEM_FONT), false);
 		}
 
 		return f;
@@ -1813,7 +1813,7 @@ final class SystemFonts
 
 		if(!f)
 		{
-			f = Font.fromHFONT(GetStockObject(SYSTEM_FIXED_FONT));
+			f = Font.fromHFONT(GetStockObject(SYSTEM_FIXED_FONT), false);
 		}
 
 		return f;

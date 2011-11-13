@@ -568,6 +568,12 @@ class ListView: OwnerDrawControl
 	{
 		this.setStyle(LVS_ALIGNLEFT | LVS_ALIGNTOP | LVS_AUTOARRANGE | LVS_SHAREIMAGELISTS, true);
 
+		/* WS_CLIPSIBLINGS | WS_CLIPCHILDREN: There is a SysHeader Component inside a list view in Report Mode */
+		if(this.getStyle() & ViewStyle.REPORT)
+		{
+			this.setStyle(WS_CLIPSIBLINGS | WS_CLIPCHILDREN, true);
+		}
+
 		ccp.SuperclassName = WC_LISTVIEW;
 		ccp.ClassName = WC_DLISTVIEW;
 		ccp.DefaultBackColor = SystemColors.colorWindow;
@@ -585,7 +591,7 @@ class ListView: OwnerDrawControl
 				break;
 		}
 
-		ListView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
+		//ListView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 
