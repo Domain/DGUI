@@ -370,12 +370,34 @@ class Canvas: Handle!(HDC), IDisposable
 		this.dispose();
 	}
 
-	public void copyTo(Canvas c, BitmapCopyMode bcm)
+	public void copyTo(Canvas c, BitmapCopyMode bcm, Rect destRect, Point posSrc)
 	{
 		BITMAP bmp;
-		GetObjectW(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
 
-		BitBlt(c.handle, 0, 0, bmp.bmWidth, bmp.bmHeight, this._handle, 0, 0, bcm);
+		if(!destRect.width && destRect.height)
+		{
+			GetObjectW(GetCurrentObject(this._handle, OBJ_BITMAP), BITMAP.sizeof, &bmp);
+		}
+
+		BitBlt(c.handle, destRect.x, destRect.y,
+			   destRect.width ? destRect.width : bmp.bmWidth,
+			   destRect.height ? destRect.height : bmp.bmHeight,
+			   this._handle, posSrc.x, posSrc.y, bcm);
+	}
+
+	public void copyTo(Canvas c, Rect destRect, Point posSrc)
+	{
+		this.copyTo(c, BitmapCopyMode.NORMAL, destRect, posSrc);
+	}
+
+	public void copyTo(Canvas c, BitmapCopyMode bcm, Rect destRect)
+	{
+		this.copyTo(c, bcm, destRect, NullPoint);
+	}
+
+	public void copyTo(Canvas c, BitmapCopyMode bcm)
+	{
+		this.copyTo(c, bcm, NullRect, NullPoint);
 	}
 
 	public void copyTo(Canvas c)

@@ -63,6 +63,8 @@ class RichTextBox: TextControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
+		// Probably the RichTextbox ignores the wParam parameter in WM_PAINT
+
 		++_refCount;
 
 		if(!_hRichDll)
@@ -74,8 +76,6 @@ class RichTextBox: TextControl
 		ccp.SuperclassName = WC_RICHEDIT;
 		ccp.ClassName = WC_DRICHEDIT;
 
-		// Probably the RichTextbox ignores the wParam parameter in WM_PAINT
-		RichTextBox.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 

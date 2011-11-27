@@ -501,7 +501,8 @@ class TreeView: SubclassedControl
 		this.setStyle(TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS, true);
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
-		TreeView.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
+		// Tree view is Double buffered in DGui
+		TreeView.setBit(this._cBits, ControlBits.DOUBLE_BUFFERED, true);
 		super.createControlParams(ccp);
 	}
 

@@ -115,7 +115,6 @@ final class WindowClass
 		{
 			newWc = oldWc;
 			newWc.style &= ~ClassStyles.GLOBALCLASS; // Remove Global Class
-			newWc.style |= ClassStyles.PARENTDC;
 			newWc.lpfnWndProc = newWndProc;
 			newWc.lpszClassName = pNewClassName;
 			newWc.hInstance = getHInstance();

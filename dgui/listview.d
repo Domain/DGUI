@@ -355,6 +355,9 @@ class ListView: OwnerDrawControl
 
 	@property public final void viewStyle(ViewStyle vs)
 	{
+		/* Remove flickering in Report Mode */
+		ListView.setBit(this._cBits, ControlBits.DOUBLE_BUFFERED, vs is ViewStyle.REPORT);
+
 		this.setStyle(vs, true);
 	}
 
@@ -674,6 +677,9 @@ class ListView: OwnerDrawControl
 					ListView.insertColumn(lvc);
 				}
 			}
+
+			/* Remove flickering in Report Mode */
+			ListView.setBit(this._cBits, ControlBits.DOUBLE_BUFFERED, true);
 		}
 
 		if(this._items)

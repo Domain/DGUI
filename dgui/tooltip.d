@@ -175,7 +175,7 @@ class ToolTip: SubclassedControl
 		    The width varies based on the length of the string currently in the tooltip window. */
 		this.bounds = Rect(CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT);
 
-		ToolTip.setBit(this._cBits, ControlBits.ORIGINAL_PAINT | ControlBits.CANNOT_ADD_CHILD | ControlBits.USE_CACHED_TEXT, true);
+		ToolTip.setBit(this._cBits, ControlBits.CANNOT_ADD_CHILD | ControlBits.USE_CACHED_TEXT, true);
 		super.createControlParams(ccp);
 	}
 

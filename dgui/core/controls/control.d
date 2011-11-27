@@ -61,7 +61,7 @@ enum ControlBits: ulong
 	MOUSE_ENTER   		= 2,
 	CAN_NOTIFY   		= 4,
 	MODAL_CONTROL 		= 8,   // For Modal Dialogs
-	ORIGINAL_PAINT 		= 16,  // Use standard control routine (not DGui's one)
+	DOUBLE_BUFFERED		= 16,  // Use DGui's double buffered routine to draw components (be careful with this one!)
 	OWN_CLICK_MSG 	    = 32,  // Does the component Handles click itself?
 	CANNOT_ADD_CHILD	= 64,  // The child window will not be added to the parent's child controls' list
 	USE_CACHED_TEXT		= 128, // Does not send WM_SETTEXT / WM_GETTEXT messages, but it uses it's internal variable only.
@@ -722,6 +722,8 @@ abstract class Control: Handle!(HWND), IDisposable
 											ccp.ClassName, this._text);
 		}
 
+		UpdateWindow(this._handle);
+
 		if(this._parent)
 		{
 			this._parent.sendMessage(DGUI_CHILDCONTROLCREATED, winCast!(WPARAM)(this), 0); //Notify the parent window
@@ -839,7 +841,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected void createControlParams(ref CreateControlParams ccp)
 	{
-		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.DBLCLKS | ClassStyles.HREDRAW | ClassStyles.VREDRAW;
+		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.DBLCLKS;
 
 		WindowClass.register(ccp.ClassName, cstyle, ccp.DefaultCursor, &Control.msgRouter);
 	}
@@ -1057,7 +1059,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				scope PaintEventArgs e = new PaintEventArgs(memCanvas, clipRect);
 				this.onPaint(e);
 
-				memCanvas.copyTo(orgCanvas);
+				memCanvas.copyTo(orgCanvas, clipRect, clipRect.position);
 
 				if(!m.wParam)
 				{

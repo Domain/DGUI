@@ -203,6 +203,8 @@ abstract class LayoutControl: ContainerControl, ILayoutControl
 	{
 		this.updateLayout();
 
+		InvalidateRect(this._handle, null, true);
+		UpdateWindow(this._handle);
 		super.onResize(e);
 	}
 }

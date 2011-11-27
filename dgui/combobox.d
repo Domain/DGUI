@@ -278,20 +278,14 @@ class ComboBox: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
+		// Use Original Paint Routine, the double buffered one causes some issues
+
 		ccp.SuperclassName = WC_COMBOBOXEX;
 		ccp.ClassName = WC_DCOMBOBOX;
 
 		this.setStyle(WS_CLIPCHILDREN | WS_CLIPSIBLINGS, true); //Clip child ComboBox
 		//this.setStyle(CBS_NOINTEGRALHEIGHT, true);
 
-		if(!this.height)
-		{
-			// If this row is removed, the dropdown list is not displayed
-			this.height = CW_USEDEFAULT;
-		}
-
-		/* Use Original Paint Routine, the double buffered one causes some issues */
-		ComboBox.setBit(this._cBits, ControlBits.ORIGINAL_PAINT, true);
 		super.createControlParams(ccp);
 	}
 

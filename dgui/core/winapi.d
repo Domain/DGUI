@@ -25,6 +25,7 @@
 module dgui.core.winapi;
 
 public import std.c.windows.windows;
+public import std.c.windows.com;
 
 extern(Windows)
 {
@@ -2178,14 +2179,6 @@ extern(Windows)
 		HBRUSH hbrBack;
 		DWORD dwContextHelpID;
 		ULONG_PTR dwMenuData;
-	}
-
-	align(1) struct GUID
-	{
-		DWORD Data1;
-		WORD Data2;
-		WORD Data3;
-		BYTE[8] Data4;
 	}
 
 	/* *** Win32 Macros *** */
