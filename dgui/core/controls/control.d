@@ -1049,17 +1049,11 @@ abstract class Control: Handle!(HWND), IDisposable
 					GetUpdateRect(this._handle, &clipRect.rect, false);
 				}
 
-				scope Canvas orgCanvas = Canvas.fromHDC(hdc, false); //Owned by BeginPaint -> EndPaint or a wParam's HDC
-				scope Canvas memCanvas = orgCanvas.createInMemory(); // Off Screen Canvas
+				FillRect(hdc, &clipRect.rect, this._backBrush); //Fill with background color;
 
-				SetBkColor(memCanvas.handle, this.backColor.colorref);
-				SetTextColor(memCanvas.handle, this.foreColor.colorref);
-				FillRect(memCanvas.handle, &clipRect.rect, this._backBrush); //Fill with background color;
-
-				scope PaintEventArgs e = new PaintEventArgs(memCanvas, clipRect);
+				scope Canvas c = Canvas.fromHDC(hdc, false);
+				scope PaintEventArgs e = new PaintEventArgs(c, clipRect);
 				this.onPaint(e);
-
-				memCanvas.copyTo(orgCanvas, clipRect, clipRect.position);
 
 				if(!m.wParam)
 				{

@@ -285,17 +285,21 @@ class TabControl: SubclassedControl, ILayoutControl
 	public void updateLayout()
 	{
 		TabPage selPage = this.selectedPage;
-		TabControl tc = selPage.tabControl;
-		Rect adjRect, r = Rect(NullPoint, tc.clientSize);
 
-		tc.sendMessage(TCM_ADJUSTRECT, false, cast(LPARAM)&adjRect.rect);
+		if(selPage)
+		{
+			TabControl tc = selPage.tabControl;
+			Rect adjRect, r = Rect(NullPoint, tc.clientSize);
 
-		r.left += adjRect.left;
-		r.top += adjRect.top;
-		r.right += r.left + adjRect.width;
-		r.bottom += r.top + adjRect.height;
+			tc.sendMessage(TCM_ADJUSTRECT, false, cast(LPARAM)&adjRect.rect);
 
-		selPage.bounds = r; //selPage docks its child components
+			r.left += adjRect.left;
+			r.top += adjRect.top;
+			r.right += r.left + adjRect.width;
+			r.bottom += r.top + adjRect.height;
+
+			selPage.bounds = r; //selPage docks its child componentsS
+		}
 	}
 
 	private void createTabPage(TabPage tp, bool adding = true)
@@ -340,8 +344,9 @@ class TabControl: SubclassedControl, ILayoutControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this.setStyle(WS_CLIPCHILDREN, true);
+		this.setStyle(WS_CLIPCHILDREN | WS_CLIPSIBLINGS, true);
 		this.setExStyle(WS_EX_CONTROLPARENT, true);
+
 		ccp.SuperclassName = WC_TABCONTROL;
 		ccp.ClassName = WC_DTABCONTROL;
 

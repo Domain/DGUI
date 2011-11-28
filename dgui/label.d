@@ -83,7 +83,7 @@ class Label: Control
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		ccp.ClassName = WC_DLABEL;
-		ccp.ClassStyle = ClassStyles.PARENTDC;
+		ccp.ClassStyle = ClassStyles.HREDRAW | ClassStyles.VREDRAW;
 
 		super.createControlParams(ccp);
 	}
