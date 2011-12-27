@@ -16,8 +16,6 @@ class MainForm: Form
 		Canvas c = e.canvas;
 
 		c.fillRectGradient(Rect(NullPoint, this.size), SystemColors.blue, SystemColors.green, GradientFillRectMode.VERTICAL);
-		this.invalidate(); //Force Repaint of the entire window
-
 		super.onPaint(e);
 	}
 }
