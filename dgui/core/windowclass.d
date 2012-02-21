@@ -115,6 +115,9 @@ final class WindowClass
 		{
 			newWc = oldWc;
 			newWc.style &= ~ClassStyles.GLOBALCLASS; // Remove Global Class
+
+			std.stdio.writefln("Name: %s\tWindow Byte: %d\n", newClassName, newWc.cbWndExtra);
+
 			newWc.lpfnWndProc = newWndProc;
 			newWc.lpszClassName = pNewClassName;
 			newWc.hInstance = getHInstance();
@@ -126,6 +129,6 @@ final class WindowClass
 			}
 		}
 
-		return oldWc.lpfnWndProc;; //Back to the original window procedure
+		return oldWc.lpfnWndProc; //Back to the original window procedure
 	}
 }
