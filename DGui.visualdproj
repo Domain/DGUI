@@ -209,7 +209,6 @@
      <File path="dgui\core\events\controlcodeeventargs.d" />
      <File path="dgui\core\events\event.d" />
      <File path="dgui\core\events\eventargs.d" />
-     <File tool="None" path="dgui\core\events\focuseventargs.d" />
      <File path="dgui\core\events\keyeventargs.d" />
      <File path="dgui\core\events\mouseeventargs.d" />
      <File path="dgui\core\events\painteventargs.d" />
