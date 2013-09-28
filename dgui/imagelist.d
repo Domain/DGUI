@@ -85,7 +85,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 		imageList_Destroy(this._handle);
 	}
 
-	public override HIMAGELIST handle()
+	@property public override HIMAGELIST handle()
 	{
 		if(!this.created)
 		{

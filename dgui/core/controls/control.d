@@ -239,7 +239,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	public final Control topLevelControl()
+	@property public final Control topLevelControl()
 	{
 		Control topCtrl = this;
 

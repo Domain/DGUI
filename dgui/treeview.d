@@ -252,7 +252,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 	public final void collapse()
 	{
-		if(this._owner && this._owner.createCanvas && this.created)
+		if(this._owner && this._owner.createCanvas() && this.created)
 		{
 			this._owner.sendMessage(TVM_EXPAND, TVE_COLLAPSE, cast(LPARAM)this._handle);
 		}
@@ -260,7 +260,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 
 	public final void expand()
 	{
-		if(this._owner && this._owner.createCanvas && this.created)
+		if(this._owner && this._owner.createCanvas() && this.created)
 		{
 			this._owner.sendMessage(TVM_EXPAND, TVE_EXPAND, cast(LPARAM)this._handle);
 		}
