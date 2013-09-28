@@ -16,7 +16,7 @@ abstract class SubclassedControl: ReflectedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this._oldWndProc = WindowClass.superclass(ccp.SuperclassName, ccp.ClassName, &SubclassedControl.msgRouter);
+		this._oldWndProc = WindowClass.superclass(ccp.SuperclassName, ccp.ClassName, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
 	}
 
 	protected override uint originalWndProc(ref Message m)

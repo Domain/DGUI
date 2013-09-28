@@ -23,7 +23,7 @@ enum SplitOrientation
 
 class SplitPanel: LayoutControl
 {
-	private const int SPLITTER_SIZE = 8;
+	private enum int SPLITTER_SIZE = 8;
 
 	private SplitOrientation _splitOrientation = SplitOrientation.VERTICAL;
 	private bool _downing = false;
@@ -238,7 +238,7 @@ class SplitPanel: LayoutControl
 		{
 			case SplitOrientation.VERTICAL:
 			{
-				c.drawEdge(Rect(this._splitPos, cr.top, SPLITTER_SIZE, cr.bottom), EdgeType.EDGE_RAISED, EdgeMode.LEFT | EdgeMode.RIGHT);
+				c.drawEdge(Rect(this._splitPos, cr.top, SPLITTER_SIZE, cr.bottom), EdgeType.RAISED, EdgeMode.LEFT | EdgeMode.RIGHT);
 
 				for(int p = (this.height / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
@@ -250,7 +250,7 @@ class SplitPanel: LayoutControl
 
 			default: // SplitOrientation.HORIZONTAL
 			{
-				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, SPLITTER_SIZE), EdgeType.EDGE_RAISED, EdgeMode.TOP | EdgeMode.BOTTOM);
+				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, SPLITTER_SIZE), EdgeType.RAISED, EdgeMode.TOP | EdgeMode.BOTTOM);
 
 				for(int p = (this.width / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{

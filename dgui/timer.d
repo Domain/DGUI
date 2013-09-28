@@ -69,7 +69,7 @@ final class Timer: IDisposable
 	{
 		if(!this._timerId)
 		{
-			this._timerId = SetTimer(null, 0, this._time, &Timer.timerProc);
+			this._timerId = SetTimer(null, 0, this._time, cast(TIMERPROC) /*FIXME may throw*/ &Timer.timerProc);
 
 			if(!this._timerId)
 			{

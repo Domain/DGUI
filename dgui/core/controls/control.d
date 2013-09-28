@@ -594,7 +594,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		return m.Result;
 	}
 
-	extern(Windows) private static LRESULT msgRouter(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
+	extern(Windows) package static LRESULT msgRouter(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
 	{
 		if(msg == WM_NCCREATE)
 		{
@@ -834,7 +834,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.DBLCLKS;
 
-		WindowClass.register(ccp.ClassName, cstyle, ccp.DefaultCursor, &Control.msgRouter);
+		WindowClass.register(ccp.ClassName, cstyle, ccp.DefaultCursor, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
 	}
 
 	protected uint originalWndProc(ref Message m)

@@ -63,7 +63,7 @@ enum EdgeType: uint
 
 	BUMP = EDGE_BUMP,				/// Bump Edge
 	ETCHED = EDGE_ETCHED,			/// Etched Edge
-	EDGE_RAISED = EDGE_RAISED,		/// Edge Raised Edge
+	RAISED = EDGE_RAISED,		/// Edge Raised Edge
 	SUNKEN = EDGE_SUNKEN,			/// Sunken Edge
 }
 
