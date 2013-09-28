@@ -271,5 +271,19 @@
    <File path="dgui\trackbar.d" />
    <File path="dgui\treeview.d" />
   </Folder>
+  <Folder name="dgui_samples">
+   <File tool="None" path="dgui_samples\events.d" />
+   <File tool="None" path="dgui_samples\gradient_rect.d" />
+   <File tool="None" path="dgui_samples\gradient_triangle.d" />
+   <File tool="None" path="dgui_samples\grid.d" />
+   <File tool="None" path="dgui_samples\hello.d" />
+   <File tool="None" path="dgui_samples\menu.d" />
+   <File tool="None" path="dgui_samples\picture.d" />
+   <File tool="None" path="dgui_samples\rawbitmap.d" />
+   <File tool="None" path="dgui_samples\resource.rc" />
+   <File tool="None" path="dgui_samples\resources.d" />
+   <File tool="None" path="dgui_samples\splitter.d" />
+   <File tool="None" path="dgui_samples\toolbar_32_x_32.d" />
+  </Folder>
  </Folder>
 </DProject>
