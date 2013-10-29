@@ -23,7 +23,7 @@ enum
 	WC_LISTBOX 		= "ListBox",
 	WC_LISTVIEW 	= "SysListView32",
 	WC_PROGRESSBAR  = "msctls_progress32",
-	WC_RICHEDIT 	= "RichEdit20A",
+	WC_RICHEDIT 	= "RichEdit20W",
 	WC_STATUSBAR 	= "msctls_statusbar32",
 	WC_TABCONTROL   = "SysTabControl32",
 	WC_EDIT			= "EDIT",
