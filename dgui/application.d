@@ -11,6 +11,7 @@ module dgui.application;
 pragma(lib, "gdi32.lib");
 pragma(lib, "comdlg32.lib");
 
+import std.path;
 private import dgui.core.winapi;
 private import dgui.core.utils;
 private import dgui.richtextbox;

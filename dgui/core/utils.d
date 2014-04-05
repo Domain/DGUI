@@ -8,6 +8,7 @@ Authors: Trogu Antonio Davide
 */
 module dgui.core.utils;
 
+import std.path;
 import dgui.core.winapi;
 import dgui.core.charset;
 

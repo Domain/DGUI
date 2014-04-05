@@ -9,6 +9,7 @@ Authors: Trogu Antonio Davide
 module dgui.canvas;
 
 import std.conv : to;
+import std.path;
 import std.string;
 import core.memory;
 import dgui.core.interfaces.idisposable;
