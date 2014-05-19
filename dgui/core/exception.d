@@ -35,7 +35,7 @@ final class RegistryException: Exception
 	mixin exceptionBody;
 }
 
-final class GdiException: Exception
+final class GDIException: Exception
 {
 	mixin exceptionBody;
 }

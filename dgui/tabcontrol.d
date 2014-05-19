@@ -14,7 +14,7 @@ import dgui.core.interfaces.ilayoutcontrol;
 import dgui.layout.panel;
 import dgui.imagelist;
 
-private struct TcItem
+private struct TCItem
 {
 	TCITEMHEADERW header;
 	TabPage page;
@@ -76,7 +76,7 @@ class TabPage: Panel
 
 		if(this._owner && this._owner.created)
 		{
-			TcItem tci = void;
+			TCItem tci = void;
 
 			tci.header.mask = TCIF_TEXT;
 			tci.header.pszText = toUTFz!(wchar*)(txt);
@@ -97,7 +97,7 @@ class TabPage: Panel
 
 		if(this._owner && this._owner.created)
 		{
-			TcItem tci = void;
+			TCItem tci = void;
 
 			tci.header.mask = TCIF_IMAGE;
 			tci.header.iImage = idx;
@@ -295,7 +295,7 @@ class TabControl: SubclassedControl, ILayoutControl
 
 	private void createTabPage(TabPage tp, bool adding = true)
 	{
-		TcItem tci;
+		TCItem tci;
 		tci.header.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
 		tci.header.iImage = tp.imageIndex;
 		tci.header.pszText = toUTFz!(wchar*)(tp.text);

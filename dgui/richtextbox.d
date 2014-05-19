@@ -33,7 +33,7 @@ public import dgui.core.controls.textcontrol;
 class RichTextBox: TextControl
 {
 	private static int _refCount = 0;
-	private static HMODULE _hRichDll;
+	private static HMODULE _hRichDLL;
 
 	public override void dispose()
 	{
@@ -41,8 +41,8 @@ class RichTextBox: TextControl
 
 		if(!_refCount)
 		{
-			FreeLibrary(_hRichDll);
-			_hRichDll = null;
+			FreeLibrary(_hRichDLL);
+			_hRichDLL = null;
 		}
 
 		super.dispose();
@@ -59,9 +59,9 @@ class RichTextBox: TextControl
 
 		++_refCount;
 
-		if(!_hRichDll)
+		if(!_hRichDLL)
 		{
-			_hRichDll = loadLibrary("RichEd20.dll"); // Load the standard version
+			_hRichDLL = loadLibrary("RichEd20.dll"); // Load the standard version
 		}
 
 		this.setStyle(ES_MULTILINE | ES_WANTRETURN, true);

@@ -35,7 +35,7 @@ final class Resources
 
 		if(!hIcon)
 		{
-			throwException!(GdiException)("Cannot load Icon: '%d'", id);
+			throwException!(GDIException)("Cannot load Icon: '%d'", id);
 		}
 
 		return Icon.fromHICON(hIcon);
@@ -47,7 +47,7 @@ final class Resources
 
 		if(!hBitmap)
 		{
-			throwException!(GdiException)("Cannot load Bitmap: '%d'", id);
+			throwException!(GDIException)("Cannot load Bitmap: '%d'", id);
 		}
 
 		return Bitmap.fromHBITMAP(hBitmap);
@@ -59,7 +59,7 @@ final class Resources
 
 		if(!hRsrc)
 		{
-			throwException!(GdiException)("Cannot load Custom Resource: '%d'", id);
+			throwException!(GDIException)("Cannot load Custom Resource: '%d'", id);
 		}
 
 		return cast(T*)LockResource(LoadResource(null, hRsrc));

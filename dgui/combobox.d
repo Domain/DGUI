@@ -109,7 +109,7 @@ class ComboBox: SubclassedControl
 	public Event!(Control, EventArgs) itemChanged;
 
 	private Collection!(ComboBoxItem) _items;
-	private DropDownStyles _oldDdStyle = DropDownStyles.none;
+	private DropDownStyles _oldDDStyle = DropDownStyles.none;
 	private int _selectedIndex;
 	private ImageList _imgList;
 
@@ -227,12 +227,12 @@ class ComboBox: SubclassedControl
 
 	@property public final void dropDownStyle(DropDownStyles dds)
 	{
-		if(dds !is this._oldDdStyle)
+		if(dds !is this._oldDDStyle)
 		{
-			this.setStyle(this._oldDdStyle, false); //Rimuovo il vecchio
+			this.setStyle(this._oldDDStyle, false); //Rimuovo il vecchio
 			this.setStyle(dds, true); //Aggiungo il nuovo
 
-			this._oldDdStyle = dds;
+			this._oldDDStyle = dds;
 		}
 	}
 
