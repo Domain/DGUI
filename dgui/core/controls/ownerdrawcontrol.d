@@ -205,8 +205,8 @@ abstract class OwnerDrawControl: SubclassedControl
 
 				if(pDrawItem.itemState & ODS_SELECTED)
 				{
-					fc = SystemColors.colorHighLightText;
-					bc = SystemColors.colorHighLight;
+					fc = SystemColors.colorHighlightText;
+					bc = SystemColors.colorHighlight;
 				}
 				else
 				{

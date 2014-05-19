@@ -231,8 +231,8 @@ class SplitPanel: LayoutControl
 		Canvas c = e.canvas;
 		Rect cr = e.clipRectangle;
 		int mid = this._splitPos + (splitterSize / 2);
-		scope Pen dp = new Pen(SystemColors.color3DdarkShadow, 2, PenStyle.dot);
-		scope Pen lp = new Pen(SystemColors.colorBtnFace, 2, PenStyle.dot);
+		scope Pen dp = new Pen(SystemColors.color3DDarkShadow, 2, PenStyle.dot);
+		scope Pen lp = new Pen(SystemColors.colorButtonFace, 2, PenStyle.dot);
 
 		switch(this._splitOrientation)
 		{

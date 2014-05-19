@@ -645,8 +645,8 @@ abstract class Control: Handle!(HWND), IDisposable
 	private void create()
 	{
 		CreateControlParams ccp;
-		ccp.DefaultBackColor = SystemColors.colorBtnFace;
-		ccp.DefaultForeColor = SystemColors.colorBtnText;
+		ccp.DefaultBackColor = SystemColors.colorButtonFace;
+		ccp.DefaultForeColor = SystemColors.colorButtonText;
 
 		this.createControlParams(ccp);
 

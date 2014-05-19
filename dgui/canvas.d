@@ -1611,17 +1611,17 @@ final class SystemBrushes
 		return SolidBrush.fromHBRUSH(GetStockObject(WHITE_BRUSH), false);
 	}
 
-	@property public static SolidBrush brush3DdarkShadow()
+	@property public static SolidBrush brush3DDarkShadow()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DDKSHADOW), false);
 	}
 
-	@property public static SolidBrush brush3Dface()
+	@property public static SolidBrush brush3DFace()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_3DFACE), false);
 	}
 
-	@property public static SolidBrush brushBtnFace()
+	@property public static SolidBrush brushButtonFace()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BTNFACE), false);
 	}
@@ -1656,7 +1656,7 @@ final class SystemBrushes
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BACKGROUND), false);
 	}
 
-	@property public static SolidBrush brushBtnText()
+	@property public static SolidBrush brushButtonText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_BTNTEXT), false);
 	}
@@ -1671,12 +1671,12 @@ final class SystemBrushes
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_GRAYTEXT), false);
 	}
 
-	@property public static SolidBrush brushHighLight()
+	@property public static SolidBrush brushHighlight()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_HIGHLIGHT), false);
 	}
 
-	@property public static SolidBrush brushHighLightText()
+	@property public static SolidBrush brushHighlightText()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_HIGHLIGHTTEXT), false);
 	}
@@ -1696,7 +1696,7 @@ final class SystemBrushes
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INACTIVECAPTIONTEXT), false);
 	}
 
-	@property public static SolidBrush brushInfoBk()
+	@property public static SolidBrush brushInfo()
 	{
 		return SolidBrush.fromHBRUSH(GetSysColorBrush(COLOR_INFOBK), false);
 	}
@@ -1872,7 +1872,7 @@ final class SystemCursors
 		return c;
 	}
 
-	@property public static Cursor ibeam()
+	@property public static Cursor iBeam()
 	{
 		static Cursor c;
 
@@ -1908,7 +1908,7 @@ final class SystemCursors
 		return c;
 	}
 
-	@property public static Cursor sizeALL()
+	@property public static Cursor sizeAll()
 	{
 		static Cursor c;
 
@@ -2085,17 +2085,17 @@ final class SystemColors
 		return Color(0x00, 0x00, 0x00, 0x00);
 	}
 
-	@property public static Color color3DdarkShadow()
+	@property public static Color color3DDarkShadow()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DDKSHADOW));
 	}
 
-	@property public static Color color3Dface()
+	@property public static Color color3DFace()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_3DFACE));
 	}
 
-	@property public static Color colorBtnFace()
+	@property public static Color colorButtonFace()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_BTNFACE));
 	}
@@ -2130,7 +2130,7 @@ final class SystemColors
 		return Color.fromCOLORREF(GetSysColor(COLOR_BACKGROUND));
 	}
 
-	@property public static Color colorBtnText()
+	@property public static Color colorButtonText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_BTNTEXT));
 	}
@@ -2145,12 +2145,12 @@ final class SystemColors
 		return Color.fromCOLORREF(GetSysColor(COLOR_GRAYTEXT));
 	}
 
-	@property public static Color colorHighLight()
+	@property public static Color colorHighlight()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_HIGHLIGHT));
 	}
 
-	@property public static Color colorHighLightText()
+	@property public static Color colorHighlightText()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_HIGHLIGHTTEXT));
 	}
@@ -2170,7 +2170,7 @@ final class SystemColors
 		return Color.fromCOLORREF(GetSysColor(COLOR_INACTIVECAPTIONTEXT));
 	}
 
-	@property public static Color colorInfoBk()
+	@property public static Color colorInfo()
 	{
 		return Color.fromCOLORREF(GetSysColor(COLOR_INFOBK));
 	}

@@ -153,7 +153,7 @@ class ToolTip: SubclassedControl
 	{
 		ccp.SuperclassName = WC_TOOLTIP;
 		ccp.ClassName = WC_DTOOLTIP;
-		ccp.DefaultBackColor = SystemColors.colorInfoBk;
+		ccp.DefaultBackColor = SystemColors.colorInfo;
 		ccp.DefaultForeColor = SystemColors.colorInfoText;
 
 		this.setStyle(WS_POPUP | TTS_NOPREFIX, true);

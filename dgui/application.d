@@ -109,7 +109,7 @@ class Application
 			this._rtfText.borderStyle = BorderStyle.fixed3d;
 			this._rtfText.dock = DockStyle.top;
 			this._rtfText.height = 90;
-			this._rtfText.backColor = SystemColors.colorBtnFace;
+			this._rtfText.backColor = SystemColors.colorButtonFace;
 			this._rtfText.scrollBars = true;
 			this._rtfText.readOnly = true;
 			this._rtfText.text = e.msg;
