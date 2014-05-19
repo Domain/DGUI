@@ -12,7 +12,7 @@ abstract class Handle(T)
 {
 	protected T _handle;
 
-	@property public final bool created()
+	@property public final bool created() const
 	{
 		return cast(bool)this._handle;
 	}
