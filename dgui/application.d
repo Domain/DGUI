@@ -325,7 +325,7 @@ class Application
 	  application or terminate it.
 
 	  Returns:
-		A DialogResult enum that contains the button clicked by the user (IGNORE or EXIT)
+		A DialogResult enum that contains the button clicked by the user (IGNORE or ABORT)
 	  */
 	package static DialogResult showExceptionForm(Throwable e)
 	{
