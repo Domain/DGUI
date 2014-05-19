@@ -209,6 +209,6 @@ struct Size
 	}
 }
 
-public const Rect NullRect; // = Rect.init;
-public const Point NullPoint; // = Point.init;
-public const Size NullSize; // = Size.init;
+public const Rect nullRect; // = Rect.init;
+public const Point nullPoint; // = Point.init;
+public const Size nullSize; // = Size.init;

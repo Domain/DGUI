@@ -118,14 +118,14 @@ abstract class TextControl: SubclassedControl
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		this.setStyle(WS_TABSTOP, true);
-		ccp.DefaultBackColor = SystemColors.colorWindow;
+		ccp.defaultBackColor = SystemColors.colorWindow;
 
 		super.createControlParams(ccp);
 	}
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == EN_CHANGE && TextControl.hasBit(this._cBits, ControlBits.canNotify))
+		if(m.msg == WM_COMMAND && HIWORD(m.wParam) == EN_CHANGE && TextControl.hasBit(this._cBits, ControlBits.canNotify))
 		{
 			this.onTextChanged(EventArgs.empty);
 		}

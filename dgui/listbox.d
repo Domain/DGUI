@@ -131,9 +131,9 @@ class ListBox: OwnerDrawControl
 		this.setStyle(LBS_NOINTEGRALHEIGHT | LBS_NOTIFY, true);
 		this.setExStyle(WS_EX_CLIENTEDGE, true);
 
-		ccp.SuperclassName = WC_LISTBOX;
-		ccp.ClassName = WC_DLISTBOX;
-		ccp.DefaultBackColor = SystemColors.colorWindow;
+		ccp.superclassName = WC_LISTBOX;
+		ccp.className = WC_DLISTBOX;
+		ccp.defaultBackColor = SystemColors.colorWindow;
 
 		switch(this._drawMode)
 		{
@@ -154,7 +154,7 @@ class ListBox: OwnerDrawControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == LBN_SELCHANGE)
+		if(m.msg == WM_COMMAND && HIWORD(m.wParam) == LBN_SELCHANGE)
 		{
 			this._selectedIndex = this.sendMessage(LB_GETCURSEL, 0, 0);
 			this.onItemChanged(EventArgs.empty);

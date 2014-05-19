@@ -89,7 +89,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 	{
 		if(!this.created)
 		{
-			if(this._size == NullSize)
+			if(this._size == nullSize)
 			{
 				this._size.width = 16;
 				this._size.height = 16;
@@ -118,7 +118,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 
 		if(!this.created)
 		{
-			if(this._size == NullSize)
+			if(this._size == nullSize)
 			{
 				this._size.width = 16;
 				this._size.height = 16;

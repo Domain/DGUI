@@ -103,7 +103,7 @@ abstract class LayoutControl: ContainerControl, ILayoutControl
 		if(this._childControls && this.created && this.visible)
 		{
 			scope ResizeManager rm = new ResizeManager(this._childControls.length);
-			Rect da = Rect(NullPoint, this.clientSize);
+			Rect da = Rect(nullPoint, this.clientSize);
 
 			foreach(Control c; this._childControls)
 			{
@@ -144,7 +144,7 @@ abstract class LayoutControl: ContainerControl, ILayoutControl
 						case DockStyle.fill:
 							//c.bounds = da;
 							rm.resizeControl(c, da);
-							da.size = NullSize;
+							da.size = nullSize;
 							break;
 
 						default:
@@ -159,7 +159,7 @@ abstract class LayoutControl: ContainerControl, ILayoutControl
 
 	protected override void onDGuiMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case DGUI_DOLAYOUT:
 				this.updateLayout();

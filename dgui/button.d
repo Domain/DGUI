@@ -55,7 +55,7 @@ class Button: AbstractButton
 				break;
 		}
 
-		ccp.ClassName = WC_DBUTTON;
+		ccp.className = WC_DBUTTON;
 
 		super.createControlParams(ccp);
 	}
@@ -80,7 +80,7 @@ class CheckBox: CheckedButton
 				break;
 		}
 
-		ccp.ClassName = WC_DCHECKBOX;
+		ccp.className = WC_DCHECKBOX;
 
 		super.createControlParams(ccp);
 	}
@@ -105,7 +105,7 @@ class RadioButton: CheckedButton
 				break;
 		}
 
-		ccp.ClassName = WC_DRADIOBUTTON;
+		ccp.className = WC_DRADIOBUTTON;
 
 		super.createControlParams(ccp);
 	}

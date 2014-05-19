@@ -96,8 +96,8 @@ class ProgressBar: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.SuperclassName = WC_PROGRESSBAR;
-		ccp.ClassName = WC_DPROGRESSBAR;
+		ccp.superclassName = WC_PROGRESSBAR;
+		ccp.className = WC_DPROGRESSBAR;
 
 		assert(this._dock !is DockStyle.fill, "ProgressBar: Invalid Dock Style");
 

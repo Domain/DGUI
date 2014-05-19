@@ -216,25 +216,25 @@ struct BitmapBit
 	union
 	{
 		ubyte rgbBlue;
-		ubyte Blue;			/// _Blue color.
+		ubyte blue;			/// Blue color.
 	}
 
 	union
 	{
 		ubyte rgbGreen;
-		ubyte Green;	    /// _Green color.
+		ubyte green;	    /// Green color.
 	}
 
 	union
 	{
 		ubyte rgbRed;
-		ubyte Red;			/// _Red color.
+		ubyte red;			/// Red color.
 	}
 
 	union
 	{
 		ubyte rgbReserved;
-		ubyte Alpha; 		/// _Alpha channel (if available).
+		ubyte alpha; 		/// Alpha channel (if available).
 	}
 }
 
@@ -243,10 +243,10 @@ struct BitmapBit
   */
 struct BitmapData
 {
-	BITMAPINFO* Info;	/// BITMAPINFO structure (usually, it is used internally).
-	uint ImageSize;		/// The size of the _Bitmap.
-	uint BitsCount;		/// Number of BitmapBits structure of the _Bitmap (is the _Bits field length).
-	BitmapBit* Bits;	/// Pointer to the _Bitmap's bits (it allows direct modification of the colors)
+	BITMAPINFO* info;	/// BITMAPINFO structure (usually, it is used internally).
+	uint imageSize;		/// The size of the _Bitmap.
+	uint bitsCount;		/// Number of BitmapBits structure of the _Bitmap (is the _Bits field length).
+	BitmapBit* bits;	/// Pointer to the _Bitmap's bits (it allows direct modification of the colors)
 }
 
 /**
@@ -315,13 +315,13 @@ struct Color
 
 struct FontMetrics
 {
-	int Height;
-	int Ascent;
-	int Descent;
-	int InternalLeading;
-	int ExternalLeading;
-	int AverageCharWidth;
-	int MaxCharWidth;
+	int height;
+	int ascent;
+	int descent;
+	int internalLeading;
+	int externalLeading;
+	int averageCharWidth;
+	int maxCharWidth;
 }
 
 /**
@@ -384,12 +384,12 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public void copyTo(Canvas c, BitmapCopyMode bcm, Rect destRect)
 	{
-		this.copyTo(c, bcm, destRect, NullPoint);
+		this.copyTo(c, bcm, destRect, nullPoint);
 	}
 
 	public void copyTo(Canvas c, BitmapCopyMode bcm)
 	{
-		this.copyTo(c, bcm, NullRect, NullPoint);
+		this.copyTo(c, bcm, nullRect, nullPoint);
 	}
 
 	public void copyTo(Canvas c)
@@ -399,7 +399,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public void copyTransparent(Canvas c, Color transpColor)
 	{
-		this.copyTransparent(c, transpColor, NullRect);
+		this.copyTransparent(c, transpColor, nullRect);
 	}
 
 	public void copyTransparent(Canvas c, Color transpColor, Rect r)
@@ -956,11 +956,11 @@ class Bitmap: Image
 			BitmapData bd;
 			Bitmap.getData(hBitmap, bd);
 
-			for(int i = 0; i < bd.BitsCount; i++)
+			for(int i = 0; i < bd.bitsCount; i++)
 			{
-				bd.Bits[i].Red = cast(ubyte)(bd.Bits[i].Red * (alpha / 0xFF));
-				bd.Bits[i].Green = cast(ubyte)(bd.Bits[i].Green * (alpha / 0xFF));
-				bd.Bits[i].Blue = cast(ubyte)(bd.Bits[i].Blue * (alpha / 0xFF));
+				bd.bits[i].red = cast(ubyte)(bd.bits[i].red * (alpha / 0xFF));
+				bd.bits[i].green = cast(ubyte)(bd.bits[i].green * (alpha / 0xFF));
+				bd.bits[i].blue = cast(ubyte)(bd.bits[i].blue * (alpha / 0xFF));
 			}
 
 			Bitmap.setData(hBitmap, bd);
@@ -1014,27 +1014,27 @@ class Bitmap: Image
 		HDC hdc = GetWindowDC(null);
 		GetDIBits(hdc, hBitmap, 0, 0, null, &bi, DIB_RGB_COLORS); // Get Bitmap Info
 
-		bd.ImageSize = bi.bmiHeader.biSizeImage;
-		bd.BitsCount = bi.bmiHeader.biSizeImage / RGBQUAD.sizeof;
-		bd.Bits = cast(BitmapBit*)GC.malloc(bi.bmiHeader.biSizeImage);
+		bd.imageSize = bi.bmiHeader.biSizeImage;
+		bd.bitsCount = bi.bmiHeader.biSizeImage / RGBQUAD.sizeof;
+		bd.bits = cast(BitmapBit*)GC.malloc(bi.bmiHeader.biSizeImage);
 
 		switch(bi.bmiHeader.biBitCount) // Calculate color table size (if needed)
 		{
 			case 24:
-				bd.Info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize);
+				bd.info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize);
 				break;
 
 			case 16, 32:
-				bd.Info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize + uint.sizeof * 3); // Needs Investigation
+				bd.info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize + uint.sizeof * 3); // Needs Investigation
 				break;
 
 			default:
-				bd.Info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
+				bd.info = cast(BITMAPINFO*)GC.malloc(bi.bmiHeader.biSize + RGBQUAD.sizeof * (1 << bi.bmiHeader.biBitCount));
 				break;
 		}
 
-		bd.Info.bmiHeader = bi.bmiHeader;
-		GetDIBits(hdc, hBitmap, 0, bd.Info.bmiHeader.biHeight, cast(RGBQUAD*)bd.Bits, bd.Info, DIB_RGB_COLORS);
+		bd.info.bmiHeader = bi.bmiHeader;
+		GetDIBits(hdc, hBitmap, 0, bd.info.bmiHeader.biHeight, cast(RGBQUAD*)bd.bits, bd.info, DIB_RGB_COLORS);
 		ReleaseDC(null, hdc);
 	}
 
@@ -1047,7 +1047,7 @@ class Bitmap: Image
 	private static void setData(HBITMAP hBitmap, ref BitmapData bd)
 	{
 		HDC hdc = GetWindowDC(null);
-		SetDIBits(hdc, hBitmap, 0, bd.Info.bmiHeader.biHeight, cast(RGBQUAD*)bd.Bits, bd.Info, DIB_RGB_COLORS);
+		SetDIBits(hdc, hBitmap, 0, bd.info.bmiHeader.biHeight, cast(RGBQUAD*)bd.bits, bd.info, DIB_RGB_COLORS);
 
 		ReleaseDC(null, hdc);
 		Bitmap.freeData(bd);
@@ -1060,8 +1060,8 @@ class Bitmap: Image
 
 	public static void freeData(ref BitmapData bd)
 	{
-		GC.free(bd.Bits);
-		GC.free(bd.Info);
+		GC.free(bd.bits);
+		GC.free(bd.info);
 	}
 
 	@property public override Size size()
@@ -1175,7 +1175,7 @@ class Icon: Image
 		HBITMAP hBitmap = CreateCompatibleBitmap(hwdc, sz.width, sz.height);
 		HBITMAP hOldBitmap = SelectObject(hdc1, hBitmap);
 
-		Rect r = Rect(NullPoint, sz);
+		Rect r = Rect(nullPoint, sz);
 		HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
 		FillRect(hdc1, &r.rect, hBrush);
 		DeleteObject(hBrush);
@@ -1307,13 +1307,13 @@ final class Font: GraphicObject
 			SelectObject(hdc, hOldFont);
 			DeleteDC(hdc);
 
-			this._metrics.Height = tm.tmHeight;
-			this._metrics.Ascent = tm.tmAscent;
-			this._metrics.Descent = tm.tmDescent;
-			this._metrics.InternalLeading = tm.tmInternalLeading;
-			this._metrics.ExternalLeading = tm.tmExternalLeading;
-			this._metrics.AverageCharWidth = tm.tmAveCharWidth;
-			this._metrics.MaxCharWidth = tm.tmMaxCharWidth;
+			this._metrics.height = tm.tmHeight;
+			this._metrics.ascent = tm.tmAscent;
+			this._metrics.descent = tm.tmDescent;
+			this._metrics.internalLeading = tm.tmInternalLeading;
+			this._metrics.externalLeading = tm.tmExternalLeading;
+			this._metrics.averageCharWidth = tm.tmAveCharWidth;
+			this._metrics.maxCharWidth = tm.tmMaxCharWidth;
 
 			this._metricsDone = true;
 		}

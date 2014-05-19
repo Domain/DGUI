@@ -254,15 +254,15 @@ class GridPanel: LayoutControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ClassName = WC_DGRIDPANEL;
-		ccp.DefaultCursor = SystemCursors.arrow;
+		ccp.className = WC_DGRIDPANEL;
+		ccp.defaultCursor = SystemCursors.arrow;
 
 		super.createControlParams(ccp);
 	}
 
 	protected override void onDGuiMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case DGUI_ADDCHILDCONTROL:
 			{

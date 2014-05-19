@@ -16,26 +16,26 @@ abstract class SubclassedControl: ReflectedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this._oldWndProc = WindowClass.superclass(ccp.SuperclassName, ccp.ClassName, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
+		this._oldWndProc = WindowClass.superclass(ccp.superclassName, ccp.className, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
 	}
 
 	protected override uint originalWndProc(ref Message m)
 	{
 		if(IsWindowUnicode(this._handle))
 		{
-			m.Result = CallWindowProcW(this._oldWndProc, this._handle, m.Msg, m.wParam, m.lParam);
+			m.result = CallWindowProcW(this._oldWndProc, this._handle, m.msg, m.wParam, m.lParam);
 		}
 		else
 		{
-			m.Result = CallWindowProcA(this._oldWndProc, this._handle, m.Msg, m.wParam, m.lParam);
+			m.result = CallWindowProcA(this._oldWndProc, this._handle, m.msg, m.wParam, m.lParam);
 		}
 
-		return m.Result;
+		return m.result;
 	}
 
 	protected override void wndProc(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_ERASEBKGND:
 			{
@@ -49,11 +49,11 @@ abstract class SubclassedControl: ReflectedControl
 
 					Message rm = m;
 
-					rm.Msg = WM_ERASEBKGND;
+					rm.msg = WM_ERASEBKGND;
 					rm.wParam = cast(WPARAM)memCanvas.handle;
 					this.originalWndProc(rm);
 
-					rm.Msg = WM_PAINT;
+					rm.msg = WM_PAINT;
 					//rm.wParam = cast(WPARAM)memCanvas.handle;
 					this.originalWndProc(rm);
 
@@ -62,7 +62,7 @@ abstract class SubclassedControl: ReflectedControl
 
 					memCanvas.copyTo(orgCanvas, r, r.position);
 					SubclassedControl.setBit(this._cBits, ControlBits.erased, true);
-					m.Result = 0;
+					m.result = 0;
 				}
 				else
 				{
@@ -76,7 +76,7 @@ abstract class SubclassedControl: ReflectedControl
 				if(SubclassedControl.hasBit(this._cBits, ControlBits.doubleBuffered) && SubclassedControl.hasBit(this._cBits, ControlBits.erased))
 				{
 					SubclassedControl.setBit(this._cBits, ControlBits.erased, false);
-					m.Result = 0;
+					m.result = 0;
 				}
 				else
 				{

@@ -16,8 +16,8 @@ import dgui.imagelist;
 
 private struct TcItem
 {
-	TCITEMHEADERW Header;
-	TabPage Page;
+	TCITEMHEADERW header;
+	TabPage page;
 }
 
 enum TabAlignment
@@ -78,8 +78,8 @@ class TabPage: Panel
 		{
 			TcItem tci = void;
 
-			tci.Header.mask = TCIF_TEXT;
-			tci.Header.pszText = toUTFz!(wchar*)(txt);
+			tci.header.mask = TCIF_TEXT;
+			tci.header.pszText = toUTFz!(wchar*)(txt);
 
 			this._owner.sendMessage(TCM_SETITEMW, this.index, cast(LPARAM)&tci);
 			this.redraw();
@@ -99,8 +99,8 @@ class TabPage: Panel
 		{
 			TcItem tci = void;
 
-			tci.Header.mask = TCIF_IMAGE;
-			tci.Header.iImage = idx;
+			tci.header.mask = TCIF_IMAGE;
+			tci.header.iImage = idx;
 
 			this._owner.sendMessage(TCM_SETITEMW, this.index, cast(LPARAM)&tci);
 		}
@@ -280,7 +280,7 @@ class TabControl: SubclassedControl, ILayoutControl
 		if(selPage)
 		{
 			TabControl tc = selPage.tabControl;
-			Rect adjRect, r = Rect(NullPoint, tc.clientSize);
+			Rect adjRect, r = Rect(nullPoint, tc.clientSize);
 
 			tc.sendMessage(TCM_ADJUSTRECT, false, cast(LPARAM)&adjRect.rect);
 
@@ -296,10 +296,10 @@ class TabControl: SubclassedControl, ILayoutControl
 	private void createTabPage(TabPage tp, bool adding = true)
 	{
 		TcItem tci;
-		tci.Header.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
-		tci.Header.iImage = tp.imageIndex;
-		tci.Header.pszText = toUTFz!(wchar*)(tp.text);
-		tci.Page = tp;
+		tci.header.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
+		tci.header.iImage = tp.imageIndex;
+		tci.header.pszText = toUTFz!(wchar*)(tp.text);
+		tci.page = tp;
 
 		tp.sendMessage(DGUI_CREATEONLY, 0, 0); //Calls Control.create()
 
@@ -338,8 +338,8 @@ class TabControl: SubclassedControl, ILayoutControl
 		this.setStyle(WS_CLIPCHILDREN | WS_CLIPSIBLINGS, true);
 		this.setExStyle(WS_EX_CONTROLPARENT, true);
 
-		ccp.SuperclassName = WC_TABCONTROL;
-		ccp.ClassName = WC_DTABCONTROL;
+		ccp.superclassName = WC_TABCONTROL;
+		ccp.className = WC_DTABCONTROL;
 
 		super.createControlParams(ccp);
 	}
@@ -357,7 +357,7 @@ class TabControl: SubclassedControl, ILayoutControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_NOTIFY)
+		if(m.msg == WM_NOTIFY)
 		{
 			NMHDR* pNotify = cast(NMHDR*)m.lParam;
 
@@ -366,7 +366,7 @@ class TabControl: SubclassedControl, ILayoutControl
 				case TCN_SELCHANGING:
 					scope CancelTabPageEventArgs e = new CancelTabPageEventArgs(this.selectedPage);
 					this.onTabPageChanging(e);
-					m.Result = e.cancel;
+					m.result = e.cancel;
 					break;
 
 				case TCN_SELCHANGE:

@@ -73,7 +73,7 @@ abstract class ContainerControl: ReflectedControl
 
 	protected override void onDGuiMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case DGUI_ADDCHILDCONTROL:
 				this.addChildControl(winCast!(Control)(m.wParam));

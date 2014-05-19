@@ -101,8 +101,8 @@ class TextBox: TextControl
 	{
 		this.setExStyle(WS_EX_CLIENTEDGE, true);
 		this.setStyle(this._chChasing, true);
-		ccp.SuperclassName = WC_EDIT;
-		ccp.ClassName = WC_DEDIT;
+		ccp.superclassName = WC_EDIT;
+		ccp.className = WC_DEDIT;
 
 		this.height = 20; //E questo cos'è?
 		super.createControlParams(ccp);

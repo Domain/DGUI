@@ -19,7 +19,7 @@ abstract class ScrollableControl: ReflectedControl
 
 	protected final void scrollWindow(ScrollWindowDirection swd, int amount)
 	{
-		this.scrollWindow(swd, amount, NullRect);
+		this.scrollWindow(swd, amount, nullRect);
 	}
 
 	protected final void scrollWindow(ScrollWindowDirection swd, int amount, Rect rectScroll)
@@ -29,19 +29,19 @@ abstract class ScrollableControl: ReflectedControl
 			switch(swd)
 			{
 				case ScrollWindowDirection.left:
-					ScrollWindowEx(this._handle, amount, 0, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					ScrollWindowEx(this._handle, amount, 0, null, rectScroll == nullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
 				case ScrollWindowDirection.up:
-					ScrollWindowEx(this._handle, 0, amount, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					ScrollWindowEx(this._handle, 0, amount, null, rectScroll == nullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
 				case ScrollWindowDirection.right:
-					ScrollWindowEx(this._handle, -amount, 0, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					ScrollWindowEx(this._handle, -amount, 0, null, rectScroll == nullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
 				case ScrollWindowDirection.down:
-					ScrollWindowEx(this._handle, 0, -amount, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
+					ScrollWindowEx(this._handle, 0, -amount, null, rectScroll == nullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
 				default:
@@ -62,7 +62,7 @@ abstract class ScrollableControl: ReflectedControl
 
 	protected override void wndProc(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_MOUSEWHEEL:
 			{
@@ -76,7 +76,7 @@ abstract class ScrollableControl: ReflectedControl
 
 			case WM_VSCROLL, WM_HSCROLL:
 			{
-				ScrollDirection sd = m.Msg == WM_VSCROLL ? ScrollDirection.vertical : ScrollDirection.horizontal;
+				ScrollDirection sd = m.msg == WM_VSCROLL ? ScrollDirection.vertical : ScrollDirection.horizontal;
 				ScrollMode sm = cast(ScrollMode)m.wParam;
 
 				scope ScrollEventArgs e = new ScrollEventArgs(sd, sm);

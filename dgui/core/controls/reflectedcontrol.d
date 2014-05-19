@@ -16,7 +16,7 @@ abstract class ReflectedControl: Control
 	{
 		HWND hFrom = void; //Inizializzata sotto
 
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_NOTIFY:
 				NMHDR* pNotify = cast(NMHDR*)m.lParam;
@@ -81,7 +81,7 @@ abstract class ReflectedControl: Control
 
 	protected override void wndProc(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_NOTIFY, WM_COMMAND, WM_MEASUREITEM, WM_DRAWITEM, WM_CTLCOLOREDIT, WM_CTLCOLORBTN:
 			{

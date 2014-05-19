@@ -153,8 +153,8 @@ class StatusBar: SubclassedControl
 	{
 		this._dock = DockStyle.bottom; //Force dock
 
-		ccp.SuperclassName = WC_STATUSBAR;
-		ccp.ClassName = WC_DSTATUSBAR;
+		ccp.superclassName = WC_STATUSBAR;
+		ccp.className = WC_DSTATUSBAR;
 
 		if(this._partsVisible)
 		{

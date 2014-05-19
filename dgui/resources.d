@@ -26,12 +26,12 @@ final class Resources
 
 	public Icon getIcon(ushort id)
 	{
-		return getIcon(id, NullSize);
+		return getIcon(id, nullSize);
 	}
 
 	public Icon getIcon(ushort id, Size sz)
 	{
-		HICON hIcon = loadImage(getHInstance(), cast(wchar*)id, IMAGE_ICON, sz.width, sz.height, LR_LOADTRANSPARENT | (sz == NullSize ? LR_DEFAULTSIZE : 0));
+		HICON hIcon = loadImage(getHInstance(), cast(wchar*)id, IMAGE_ICON, sz.width, sz.height, LR_LOADTRANSPARENT | (sz == nullSize ? LR_DEFAULTSIZE : 0));
 
 		if(!hIcon)
 		{

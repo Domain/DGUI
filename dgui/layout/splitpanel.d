@@ -155,16 +155,16 @@ class SplitPanel: LayoutControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ClassName = WC_DSPLITPANEL;
+		ccp.className = WC_DSPLITPANEL;
 
 		switch(this._splitOrientation)
 		{
 			case SplitOrientation.vertical:
-				ccp.DefaultCursor = SystemCursors.sizeWE;
+				ccp.defaultCursor = SystemCursors.sizeWE;
 				break;
 
 			default: // SplitOrientation.horizontal
-				ccp.DefaultCursor = SystemCursors.sizeNS;
+				ccp.defaultCursor = SystemCursors.sizeNS;
 				break;
 		}
 
@@ -187,7 +187,7 @@ class SplitPanel: LayoutControl
 
 	protected override void onDGuiMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case DGUI_ADDCHILDCONTROL:
 			{
@@ -266,7 +266,7 @@ class SplitPanel: LayoutControl
 
 	protected override void wndProc(ref Message m)
 	{
-		if(m.Msg == WM_WINDOWPOSCHANGING)
+		if(m.msg == WM_WINDOWPOSCHANGING)
 		{
 			WINDOWPOS* pWndPos = cast(WINDOWPOS*)m.lParam;
 

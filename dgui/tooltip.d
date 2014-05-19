@@ -151,10 +151,10 @@ class ToolTip: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.SuperclassName = WC_TOOLTIP;
-		ccp.ClassName = WC_DTOOLTIP;
-		ccp.DefaultBackColor = SystemColors.colorInfo;
-		ccp.DefaultForeColor = SystemColors.colorInfoText;
+		ccp.superclassName = WC_TOOLTIP;
+		ccp.className = WC_DTOOLTIP;
+		ccp.defaultBackColor = SystemColors.colorInfo;
+		ccp.defaultForeColor = SystemColors.colorInfoText;
 
 		this.setStyle(WS_POPUP | TTS_NOPREFIX, true);
 		this.setExStyle(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, true);
@@ -172,7 +172,7 @@ class ToolTip: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_NOTIFY)
+		if(m.msg == WM_NOTIFY)
 		{
 			NMHDR* pNotify = cast(NMHDR*)m.lParam;
 

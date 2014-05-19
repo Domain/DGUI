@@ -167,7 +167,7 @@ abstract class OwnerDrawControl: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_MEASUREITEM:
 			{

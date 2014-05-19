@@ -87,9 +87,9 @@ class PictureBox: Control
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ClassName  = WC_DPICTUREBOX;
-		ccp.DefaultCursor = SystemCursors.arrow;
-		ccp.ClassStyle = ClassStyles.parentDC;
+		ccp.className  = WC_DPICTUREBOX;
+		ccp.defaultCursor = SystemCursors.arrow;
+		ccp.classStyle = ClassStyles.parentDC;
 
 		super.createControlParams(ccp);
 	}
@@ -103,7 +103,7 @@ class PictureBox: Control
 			switch(this._sm)
 			{
 				case SizeMode.autoSize:
-					c.drawImage(this._img, Rect(NullPoint, this.size));
+					c.drawImage(this._img, Rect(nullPoint, this.size));
 					break;
 
 				default:

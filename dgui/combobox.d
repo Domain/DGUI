@@ -27,7 +27,7 @@ class ComboBoxItem
 	private string _text;
 	private int _imgIndex = -1;
 
-	mixin TagProperty;
+	mixin tagProperty;
 
 	package this(string txt, int idx = -1)
 	{
@@ -271,8 +271,8 @@ class ComboBox: SubclassedControl
 	{
 		// Use Original Paint Routine, the double buffered one causes some issues
 
-		ccp.SuperclassName = WC_COMBOBOXEX;
-		ccp.ClassName = WC_DCOMBOBOX;
+		ccp.superclassName = WC_COMBOBOXEX;
+		ccp.className = WC_DCOMBOBOX;
 
 		this.setStyle(WS_CLIPCHILDREN | WS_CLIPSIBLINGS, true); //Clip child ComboBox
 		//this.setStyle(CBS_NOINTEGRALHEIGHT, true);
@@ -305,7 +305,7 @@ class ComboBox: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == CBN_SELCHANGE)
+		if(m.msg == WM_COMMAND && HIWORD(m.wParam) == CBN_SELCHANGE)
 		{
 			this._selectedIndex = this.sendMessage(CB_GETCURSEL, 0, 0);
 			this.onItemChanged(EventArgs.empty);
@@ -316,7 +316,7 @@ class ComboBox: SubclassedControl
 
 	protected override void wndProc(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_COMMAND:
 			{

@@ -10,7 +10,7 @@ module dgui.core.tag;
 
 public import std.variant;
 
-mixin template TagProperty()
+mixin template tagProperty()
 {
 	private Variant _tt;
 

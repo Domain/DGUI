@@ -31,7 +31,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 	private int _imgIndex;
 	private int _selImgIndex;
 
-	mixin TagProperty;
+	mixin tagProperty;
 
 	package this(TreeView owner, string txt, int imgIndex, int selImgIndex, NodeInsertMode nim)
 	{
@@ -487,10 +487,10 @@ class TreeView: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.SuperclassName = WC_TREEVIEW;
-		ccp.ClassName = WC_DTREEVIEW;
+		ccp.superclassName = WC_TREEVIEW;
+		ccp.className = WC_DTREEVIEW;
 		this.setStyle(TVS_LINESATROOT | TVS_HASLINES | TVS_HASBUTTONS, true);
-		ccp.DefaultBackColor = SystemColors.colorWindow;
+		ccp.defaultBackColor = SystemColors.colorWindow;
 
 		// Tree view is Double buffered in DGui
 		TreeView.setBit(this._cBits, ControlBits.doubleBuffered, true);
@@ -517,7 +517,7 @@ class TreeView: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_NOTIFY)
+		if(m.msg == WM_NOTIFY)
 		{
 			NMTREEVIEWW* pNotifyTreeView = cast(NMTREEVIEWW*)m.lParam;
 
@@ -551,7 +551,7 @@ class TreeView: SubclassedControl
 						node.doChildNodes();
 					}
 
-					m.Result = e.cancel;
+					m.result = e.cancel;
 				}
 				break;
 
@@ -576,7 +576,7 @@ class TreeView: SubclassedControl
 					TreeNode node = winCast!(TreeNode)(pNotifyTreeView.itemNew.lParam);
 					scope CancelTreeNodeEventArgs e = new CancelTreeNodeEventArgs(node);
 					this.onSelectedNodeChanging(e);
-					m.Result = e.cancel;
+					m.result = e.cancel;
 				}
 				break;
 
@@ -594,7 +594,7 @@ class TreeView: SubclassedControl
 				case NM_RCLICK: //Trigger a WM_CONTEXMENU Message (Fixes the double click/context menu bug, probably it's a windows bug).
 					Message sm = Message(this._handle, WM_CONTEXTMENU, 0, 0);
 					this.wndProc(sm);
-					m.Result = sm.Result;
+					m.result = sm.result;
 					break;
 
 				default:

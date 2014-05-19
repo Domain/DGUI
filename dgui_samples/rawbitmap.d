@@ -58,9 +58,9 @@ class MainForm: Form
 
 		for(int i = 0; i < bd.BitsCount; i++) // Invert Colors!
 		{
-			bd.Bits[i].rgbRed = ~bd.Bits[i].rgbRed;
-			bd.Bits[i].rgbGreen = ~bd.Bits[i].rgbGreen;
-			bd.Bits[i].rgbBlue = ~bd.Bits[i].rgbBlue;
+			bd.bits[i].rgbRed = ~bd.bits[i].rgbRed;
+			bd.bits[i].rgbGreen = ~bd.bits[i].rgbGreen;
+			bd.bits[i].rgbBlue = ~bd.bits[i].rgbBlue;
 		}
 
 		this._bmp.setData(bd); //Set the original bitmap data
@@ -74,11 +74,11 @@ class MainForm: Form
 
 		for(int i = 0; i < bd.BitsCount; i++) // Gray Scale!
 		{
-			ubyte mid = cast(ubyte)((bd.Bits[i].rgbRed + bd.Bits[i].rgbGreen + bd.Bits[i].rgbBlue) / 3);
+			ubyte mid = cast(ubyte)((bd.bits[i].rgbRed + bd.bits[i].rgbGreen + bd.bits[i].rgbBlue) / 3);
 
-			bd.Bits[i].rgbRed = mid;
-			bd.Bits[i].rgbGreen = mid;
-			bd.Bits[i].rgbBlue = mid;
+			bd.bits[i].rgbRed = mid;
+			bd.bits[i].rgbGreen = mid;
+			bd.bits[i].rgbBlue = mid;
 		}
 
 		this._bmp.setData(bd); //Set the original bitmap data

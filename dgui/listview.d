@@ -45,7 +45,7 @@ class ListViewItem
 	private string _text;
 	private int _imgIdx;
 
-	mixin TagProperty;
+	mixin tagProperty;
 
 	package this(ListView owner, string txt, int imgIdx, bool check)
 	{
@@ -568,9 +568,9 @@ class ListView: OwnerDrawControl
 			this.setStyle(WS_CLIPSIBLINGS | WS_CLIPCHILDREN, true);
 		}
 
-		ccp.SuperclassName = WC_LISTVIEW;
-		ccp.ClassName = WC_DLISTVIEW;
-		ccp.DefaultBackColor = SystemColors.colorWindow;
+		ccp.superclassName = WC_LISTVIEW;
+		ccp.className = WC_DLISTVIEW;
+		ccp.defaultBackColor = SystemColors.colorWindow;
 
 		switch(this._drawMode)
 		{
@@ -591,7 +591,7 @@ class ListView: OwnerDrawControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_NOTIFY:
 			{

@@ -16,11 +16,11 @@ import dgui.core.exception;
 
 final class Timer: IDisposable
 {
-	private alias Timer[uint] TimerMap;
+	private alias Timer[uint] timerMap;
 
 	public Event!(Timer, EventArgs) tick;
 
-	private static TimerMap _timers;
+	private static timerMap _timers;
 	private uint _timerId = 0;
 	private uint _time = 0;
 

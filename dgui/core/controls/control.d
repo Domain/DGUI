@@ -68,12 +68,12 @@ enum BorderStyle: ubyte
 
 struct CreateControlParams
 {
-	string ClassName;
-	string SuperclassName; //Used in Superlassing
-	Color DefaultBackColor;
-	Color DefaultForeColor;
-	Cursor DefaultCursor;
-	ClassStyles ClassStyle;
+	string className;
+	string superclassName; //Used in Superlassing
+	Color defaultBackColor;
+	Color defaultForeColor;
+	Cursor defaultCursor;
+	ClassStyles classStyle;
 }
 
 abstract class Control: Handle!(HWND), IDisposable
@@ -111,7 +111,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	public Event!(Control, EventArgs) resize;
 	public Event!(Control, EventArgs) click;
 
-    mixin TagProperty; // Insert tag() property in Control
+    mixin tagProperty; // Insert tag() property in Control
 
 	public this()
 	{
@@ -574,7 +574,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		 * it is useful in order to send custom messages to components.
 		 */
 
-		if(m.Msg >= DGUI_BASE) /* DGui's Custom Message Handling */
+		if(m.msg >= DGUI_BASE) /* DGui's Custom Message Handling */
 		{
 			this.onDGuiMessage(m);
 		}
@@ -591,7 +591,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		Message m = Message(this._handle, msg, wParam, lParam);
 		this.sendMessage(m);
 
-		return m.Result;
+		return m.result;
 	}
 
 	extern(Windows) package static LRESULT msgRouter(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
@@ -625,7 +625,7 @@ abstract class Control: Handle!(HWND), IDisposable
 			Control.defWindowProc(m);
 		}
 
-		return m.Result;
+		return m.result;
 	}
 
 	private void onMenuCommand(WPARAM wParam, LPARAM lParam)
@@ -645,17 +645,17 @@ abstract class Control: Handle!(HWND), IDisposable
 	private void create()
 	{
 		CreateControlParams ccp;
-		ccp.DefaultBackColor = SystemColors.colorButtonFace;
-		ccp.DefaultForeColor = SystemColors.colorButtonText;
+		ccp.defaultBackColor = SystemColors.colorButtonFace;
+		ccp.defaultForeColor = SystemColors.colorButtonText;
 
 		this.createControlParams(ccp);
 
-		this._backBrush = CreateSolidBrush(ccp.DefaultBackColor.colorref);
-		this._foreBrush = CreateSolidBrush(ccp.DefaultForeColor.colorref);
+		this._backBrush = CreateSolidBrush(ccp.defaultBackColor.colorref);
+		this._foreBrush = CreateSolidBrush(ccp.defaultForeColor.colorref);
 
-		if(ccp.DefaultCursor)
+		if(ccp.defaultCursor)
 		{
-			this._defaultCursor = ccp.DefaultCursor;
+			this._defaultCursor = ccp.defaultCursor;
 		}
 
 		if(!this._defaultFont)
@@ -665,12 +665,12 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		if(!this._backColor.valid) // Invalid Color
 		{
-			this.backColor = ccp.DefaultBackColor;
+			this.backColor = ccp.defaultBackColor;
 		}
 
 		if(!this._foreColor.valid) // Invalid Color
 		{
-			this.foreColor = ccp.DefaultForeColor;
+			this.foreColor = ccp.defaultForeColor;
 		}
 
 		HWND hParent = null;
@@ -697,7 +697,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 
 		createWindowEx(this.getExStyle(),
-					   ccp.ClassName,
+					   ccp.className,
 					   this._text,
 					   this.getStyle(),
 					   this._bounds.x,
@@ -710,7 +710,7 @@ abstract class Control: Handle!(HWND), IDisposable
 		if(!this._handle)
 		{
 			throwException!(Win32Exception)("Control Creation failed: (ClassName: '%s', Text: '%s')",
-											ccp.ClassName, this._text);
+											ccp.className, this._text);
 		}
 
 		UpdateWindow(this._handle);
@@ -832,9 +832,9 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected void createControlParams(ref CreateControlParams ccp)
 	{
-		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.doubleClicks;
+		ClassStyles cstyle = ccp.classStyle | ClassStyles.doubleClicks;
 
-		WindowClass.register(ccp.ClassName, cstyle, ccp.DefaultCursor, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
+		WindowClass.register(ccp.className, cstyle, ccp.defaultCursor, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
 	}
 
 	protected uint originalWndProc(ref Message m)
@@ -846,25 +846,25 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		if(IsWindowUnicode(m.hWnd))
 		{
-			m.Result = DefWindowProcW(m.hWnd, m.Msg, m.wParam, m.lParam);
+			m.result = DefWindowProcW(m.hWnd, m.msg, m.wParam, m.lParam);
 		}
 		else
 		{
-			m.Result = DefWindowProcA(m.hWnd, m.Msg, m.wParam, m.lParam);
+			m.result = DefWindowProcA(m.hWnd, m.msg, m.wParam, m.lParam);
 		}
 
-		return m.Result;
+		return m.result;
 	}
 
 	protected void onDGuiMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case DGUI_REFLECTMESSAGE:
 				Message rm = *(cast(Message*)m.wParam);
 				this.onReflectedMessage(rm);
 				*(cast(Message*)m.wParam) = rm; //Copy the result, so the parent can return result.
-				//m.Result = rm.Result; // No result here!
+				//m.result = rm.result; // No result here!
 				break;
 
 			case DGUI_CREATEONLY:
@@ -877,19 +877,19 @@ abstract class Control: Handle!(HWND), IDisposable
 			break;
 
 			default:
-				m.Result = 0;
+				m.result = 0;
 				break;
 		}
 	}
 
 	protected void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_CTLCOLOREDIT, WM_CTLCOLORBTN:
 				SetBkColor(cast(HDC)m.wParam, this.backColor.colorref);
 				SetTextColor(cast(HDC)m.wParam, this.foreColor.colorref);
-				m.Result = cast(LRESULT)this._backBrush;
+				m.result = cast(LRESULT)this._backBrush;
 				break;
 
 			case WM_MEASUREITEM:
@@ -907,7 +907,7 @@ abstract class Control: Handle!(HWND), IDisposable
 							FontMetrics fm = this.font.metrics;
 
 							int icoSize = GetSystemMetrics(SM_CYMENU);
-							pMeasureItem.itemWidth = icoSize + fm.MaxCharWidth;
+							pMeasureItem.itemWidth = icoSize + fm.maxCharWidth;
 						}
 						else
 						{
@@ -1017,10 +1017,10 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected void wndProc(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_ERASEBKGND:
-				m.Result = 0; // Do nothing here, handle it in WM_PAINT
+				m.result = 0; // Do nothing here, handle it in WM_PAINT
 				break;
 
 			case WM_PAINT:
@@ -1051,7 +1051,7 @@ abstract class Control: Handle!(HWND), IDisposable
 					EndPaint(this._handle, &ps);
 				}
 
-				m.Result = 0;
+				m.result = 0;
 			}
 			break;
 
@@ -1072,7 +1072,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 
 				this.onHandleCreated(EventArgs.empty);
-				m.Result = 0; //Continue..
+				m.result = 0; //Continue..
 			}
 			break;
 
@@ -1126,7 +1126,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 				else
 				{
-					m.Result = 0;
+					m.result = 0;
 				}
 			}
 			break;
@@ -1142,7 +1142,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 				else
 				{
-					m.Result = 0;
+					m.result = 0;
 				}
 			}
 			break;
@@ -1158,7 +1158,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 				else
 				{
-					m.Result = 0;
+					m.result = 0;
 				}
 			}
 			break;
@@ -1232,7 +1232,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 				Control.convertPoint(p, this, null);
 
-				if(m.Msg == WM_LBUTTONUP && !Control.hasBit(this._cBits, ControlBits.ownClickMsg) && WindowFromPoint(p.point) == this._handle)
+				if(m.msg == WM_LBUTTONUP && !Control.hasBit(this._cBits, ControlBits.ownClickMsg) && WindowFromPoint(p.point) == this._handle)
 				{
 					this.onClick(EventArgs.empty);
 				}
@@ -1294,7 +1294,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				}
 				else
 				{
-					m.Result = e.controlCode;
+					m.result = e.controlCode;
 				}
 			}
 			break;
@@ -1306,7 +1306,7 @@ abstract class Control: Handle!(HWND), IDisposable
 					this._ctxMenu.onPopup(EventArgs.empty);
 				}
 
-				m.Result = 0;
+				m.result = 0;
 			}
 			break;
 

@@ -278,7 +278,7 @@ class Form: LayoutControl
 
 	protected override void onDGuiMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case DGUI_SETDIALOGRESULT:
 			{
@@ -305,8 +305,8 @@ class Form: LayoutControl
 
 		this.setStyle(style, true);
 		this.setExStyle(exStyle, true);
-		ccp.ClassName = WC_FORM;
-		ccp.DefaultCursor = SystemCursors.arrow;
+		ccp.className = WC_FORM;
+		ccp.defaultCursor = SystemCursors.arrow;
 
 		this.doFormStartPosition();
 		super.createControlParams(ccp);
@@ -326,7 +326,7 @@ class Form: LayoutControl
 			Message m = Message(this._handle, WM_SETICON, ICON_BIG, cast(LPARAM)this._formIcon.handle);
 			this.originalWndProc(m);
 
-			m.Msg = ICON_SMALL;
+			m.msg = ICON_SMALL;
 			this.originalWndProc(m);
 		}
 
@@ -335,7 +335,7 @@ class Form: LayoutControl
 
 	protected override void wndProc(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_CLOSE:
 			{
@@ -355,7 +355,7 @@ class Form: LayoutControl
 					super.wndProc(m);
 				}
 
-				m.Result = 0;
+				m.result = 0;
 			}
 			break;
 

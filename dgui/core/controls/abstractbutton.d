@@ -30,7 +30,7 @@ abstract class AbstractButton: OwnerDrawControl
 	{
 		AbstractButton.setBit(this._cBits, ControlBits.ownClickMsg, true); // Let Button to handle Click Event itself
 
-		ccp.SuperclassName = WC_BUTTON;
+		ccp.superclassName = WC_BUTTON;
 		this.setStyle(WS_TABSTOP, true);
 
 		super.createControlParams(ccp);
@@ -38,7 +38,7 @@ abstract class AbstractButton: OwnerDrawControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_COMMAND:
 			{
@@ -158,7 +158,7 @@ abstract class CheckedButton: AbstractButton
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_COMMAND:
 			{

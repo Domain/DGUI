@@ -23,7 +23,7 @@ class MainForm: Form
 	{
 		Canvas c = e.canvas;
 
-		c.fillRectGradient(Rect(NullPoint, this.size), SystemColors.blue, SystemColors.green, GradientFillRectMode.vertical);
+		c.fillRectGradient(Rect(nullPoint, this.size), SystemColors.blue, SystemColors.green, GradientFillRectMode.vertical);
 		super.onPaint(e);
 	}
 }

@@ -71,8 +71,8 @@ class TrackBar: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.SuperclassName = WC_TRACKBAR;
-		ccp.ClassName = WC_DTRACKBAR;
+		ccp.superclassName = WC_TRACKBAR;
+		ccp.className = WC_DTRACKBAR;
 		this.setStyle(TBS_AUTOTICKS, true);
 
 		assert(this._dock is DockStyle.fill, "TrackBar: Invalid Dock Style");
@@ -100,8 +100,8 @@ class TrackBar: SubclassedControl
 
 	protected override void wndProc(ref Message m)
 	{
-		if(m.Msg == WM_MOUSEMOVE && (cast(MouseKeys)m.wParam) is MouseKeys.left ||
-		   m.Msg == WM_KEYDOWN && ((cast(Keys)m.wParam) is Keys.left ||
+		if(m.msg == WM_MOUSEMOVE && (cast(MouseKeys)m.wParam) is MouseKeys.left ||
+		   m.msg == WM_KEYDOWN && ((cast(Keys)m.wParam) is Keys.left ||
 		   (cast(Keys)m.wParam) is Keys.up ||
 		   (cast(Keys)m.wParam) is Keys.right ||
 		   (cast(Keys)m.wParam) is Keys.down))

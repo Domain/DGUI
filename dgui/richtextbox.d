@@ -65,8 +65,8 @@ class RichTextBox: TextControl
 		}
 
 		this.setStyle(ES_MULTILINE | ES_WANTRETURN, true);
-		ccp.SuperclassName = WC_RICHEDIT;
-		ccp.ClassName = WC_DRICHEDIT;
+		ccp.superclassName = WC_RICHEDIT;
+		ccp.className = WC_DRICHEDIT;
 
 		super.createControlParams(ccp);
 	}

@@ -73,8 +73,8 @@ class Label: Control
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.ClassName = WC_DLABEL;
-		ccp.ClassStyle = ClassStyles.hRedraw | ClassStyles.vRedraw;
+		ccp.className = WC_DLABEL;
+		ccp.classStyle = ClassStyles.hRedraw | ClassStyles.vRedraw;
 
 		super.createControlParams(ccp);
 	}
@@ -86,7 +86,7 @@ class Label: Control
 		if(this._drawMode is LabelDrawMode.normal)
 		{
 			Canvas c = e.canvas;
-			Rect r = Rect(NullPoint, this.clientSize);
+			Rect r = Rect(nullPoint, this.clientSize);
 
 			scope TextFormat tf = new TextFormat(this._multiLine ? TextFormatFlags.wordBreak : TextFormatFlags.singleLine);
 			tf.alignment = this._textAlign;

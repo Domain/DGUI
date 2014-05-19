@@ -273,8 +273,8 @@ class ToolBar: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		ccp.SuperclassName = WC_TOOLBAR;
-		ccp.ClassName = WC_DTOOLBAR;
+		ccp.superclassName = WC_TOOLBAR;
+		ccp.className = WC_DTOOLBAR;
 		this.setStyle(TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN, true);
 
 		if(this._dock is DockStyle.none)
@@ -315,7 +315,7 @@ class ToolBar: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		switch(m.Msg)
+		switch(m.msg)
 		{
 			case WM_NOTIFY:
 			{
@@ -370,7 +370,7 @@ class ToolBar: SubclassedControl
 
 	protected override void wndProc(ref Message m)
 	{
-		if(m.Msg == WM_WINDOWPOSCHANGING)
+		if(m.msg == WM_WINDOWPOSCHANGING)
 		{
 			/*
 			 * HACK: Forza il ridimensionamento della barra strumenti.
