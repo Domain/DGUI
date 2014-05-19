@@ -23,7 +23,7 @@ enum SplitOrientation
 
 class SplitPanel: LayoutControl
 {
-	private enum int SPLITTER_SIZE = 8;
+	private enum int splitterSize = 8;
 
 	private SplitOrientation _splitOrientation = SplitOrientation.vertical;
 	private bool _downing = false;
@@ -80,10 +80,10 @@ class SplitPanel: LayoutControl
 		{
 			case SplitOrientation.vertical:
 			{
-				if(this._splitPos >= 0 && (this._splitPos + SPLITTER_SIZE) < this.width)
+				if(this._splitPos >= 0 && (this._splitPos + splitterSize) < this.width)
 				{
 					rm.setSize(this._panel1, this._splitPos, this.height);
-					rm.resizeControl(this._panel2, this._splitPos + SPLITTER_SIZE, 0, this.width - (this._splitPos + SPLITTER_SIZE), this.height);
+					rm.resizeControl(this._panel2, this._splitPos + splitterSize, 0, this.width - (this._splitPos + splitterSize), this.height);
 					changed = true;
 				}
 			}
@@ -91,10 +91,10 @@ class SplitPanel: LayoutControl
 
 			default: // SplitOrientation.horizontal
 			{
-				if(this._splitPos >= 0 && (this._splitPos + SPLITTER_SIZE) < this.height)
+				if(this._splitPos >= 0 && (this._splitPos + splitterSize) < this.height)
 				{
 					rm.setSize(this._panel1, this.width, this._splitPos);
-					rm.resizeControl(this._panel2, 0, this._splitPos + SPLITTER_SIZE, this.width, this.height - (this._splitPos + SPLITTER_SIZE));
+					rm.resizeControl(this._panel2, 0, this._splitPos + splitterSize, this.width, this.height - (this._splitPos + splitterSize));
 					changed = true;
 				}
 			}
@@ -230,7 +230,7 @@ class SplitPanel: LayoutControl
 	{
 		Canvas c = e.canvas;
 		Rect cr = e.clipRectangle;
-		int mid = this._splitPos + (SPLITTER_SIZE / 2);
+		int mid = this._splitPos + (splitterSize / 2);
 		scope Pen dp = new Pen(SystemColors.color3DdarkShadow, 2, PenStyle.dot);
 		scope Pen lp = new Pen(SystemColors.colorBtnFace, 2, PenStyle.dot);
 
@@ -238,7 +238,7 @@ class SplitPanel: LayoutControl
 		{
 			case SplitOrientation.vertical:
 			{
-				c.drawEdge(Rect(this._splitPos, cr.top, SPLITTER_SIZE, cr.bottom), EdgeType.raised, EdgeMode.left | EdgeMode.right);
+				c.drawEdge(Rect(this._splitPos, cr.top, splitterSize, cr.bottom), EdgeType.raised, EdgeMode.left | EdgeMode.right);
 
 				for(int p = (this.height / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
@@ -250,7 +250,7 @@ class SplitPanel: LayoutControl
 
 			default: // SplitOrientation.horizontal
 			{
-				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, SPLITTER_SIZE), EdgeType.raised, EdgeMode.top | EdgeMode.bottom);
+				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, splitterSize), EdgeType.raised, EdgeMode.top | EdgeMode.bottom);
 
 				for(int p = (this.width / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
