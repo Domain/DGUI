@@ -28,19 +28,19 @@ abstract class ScrollableControl: ReflectedControl
 		{
 			switch(swd)
 			{
-				case ScrollWindowDirection.LEFT:
+				case ScrollWindowDirection.left:
 					ScrollWindowEx(this._handle, amount, 0, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
-				case ScrollWindowDirection.UP:
+				case ScrollWindowDirection.up:
 					ScrollWindowEx(this._handle, 0, amount, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
-				case ScrollWindowDirection.RIGHT:
+				case ScrollWindowDirection.right:
 					ScrollWindowEx(this._handle, -amount, 0, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
-				case ScrollWindowDirection.DOWN:
+				case ScrollWindowDirection.down:
 					ScrollWindowEx(this._handle, 0, -amount, null, rectScroll == NullRect ? null : &rectScroll.rect, null, null, SW_INVALIDATE);
 					break;
 
@@ -68,7 +68,7 @@ abstract class ScrollableControl: ReflectedControl
 			{
 				short delta = GetWheelDelta(m.wParam);
 				scope MouseWheelEventArgs e = new MouseWheelEventArgs(Point(LOWORD(m.lParam), HIWORD(m.lParam)),
-																      cast(MouseKeys)m.wParam, delta > 0 ? MouseWheel.UP : MouseWheel.DOWN);
+																      cast(MouseKeys)m.wParam, delta > 0 ? MouseWheel.up : MouseWheel.down);
 				this.onMouseWheel(e);
 				this.originalWndProc(m);
 			}
@@ -76,7 +76,7 @@ abstract class ScrollableControl: ReflectedControl
 
 			case WM_VSCROLL, WM_HSCROLL:
 			{
-				ScrollDirection sd = m.Msg == WM_VSCROLL ? ScrollDirection.VERTICAL : ScrollDirection.HORIZONTAL;
+				ScrollDirection sd = m.Msg == WM_VSCROLL ? ScrollDirection.vertical : ScrollDirection.horizontal;
 				ScrollMode sm = cast(ScrollMode)m.wParam;
 
 				scope ScrollEventArgs e = new ScrollEventArgs(sd, sm);

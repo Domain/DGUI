@@ -25,11 +25,11 @@ class MainForm: Form
 		this.size = Size(400, 400);
 		this.maximizeBox = false;
 		this.minimizeBox = false;
-		this.startPosition = FormStartPosition.CENTER_SCREEN;
-		this.formBorderStyle = FormBorderStyle.FIXED_DIALOG;
+		this.startPosition = FormStartPosition.centerScreen;
+		this.formBorderStyle = FormBorderStyle.fixedDialog;
 
 		this._gridPanel = new GridPanel();
-		this._gridPanel.dock = DockStyle.FILL;
+		this._gridPanel.dock = DockStyle.fill;
 		this._gridPanel.parent = this;
 
 		this._labels = new Collection!(Label);
@@ -48,7 +48,7 @@ class MainForm: Form
 			/* COLUMN 1 */
 			Label lbl = new Label();
 			lbl.text = s;
-			lbl.alignment = TextAlignment.MIDDLE | TextAlignment.LEFT;
+			lbl.alignment = TextAlignment.middle | TextAlignment.left;
 
 			ColumnPart col1 = row.addColumn(lbl); //Add the component in the column 1, this parameter can be 'null' if you want to add an empty space
 			col1.width = 60; //If you don't set the column's width, it will be used the component's width (if set)

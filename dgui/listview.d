@@ -15,25 +15,25 @@ import dgui.imagelist;
 
 enum ColumnTextAlign: int
 {
-	LEFT = LVCFMT_LEFT,
-	CENTER = LVCFMT_CENTER,
-	RIGHT = LVCFMT_RIGHT,
+	left = LVCFMT_LEFT,
+	center = LVCFMT_CENTER,
+	right = LVCFMT_RIGHT,
 }
 
 enum ViewStyle: uint
 {
-	LIST = LVS_LIST,
-	REPORT = LVS_REPORT,
-	LARGE_ICON = LVS_ICON,
-	SMALL_ICON = LVS_SMALLICON,
+	list = LVS_LIST,
+	report = LVS_REPORT,
+	largeIcon = LVS_ICON,
+	smallIcon = LVS_SMALLICON,
 }
 
 enum ListViewBits: ubyte
 {
-	NONE 			   = 0,
-	GRID_LINES  	   = 1,
-	FULL_ROW_SELECT    = 2,
-	CHECK_BOXES 	   = 4,
+	none 			   = 0,
+	gridLines  	   = 1,
+	fullRowSelect    = 2,
+	checkBoxes 	   = 4,
 }
 
 class ListViewItem
@@ -302,7 +302,7 @@ class ListView: OwnerDrawControl
 
 	private Collection!(ListViewColumn) _columns;
 	private Collection!(ListViewItem) _items;
-	private ListViewBits _lBits = ListViewBits.NONE;
+	private ListViewBits _lBits = ListViewBits.none;
 	private ListViewItem _selectedItem;
 	private ImageList _imgList;
 
@@ -324,21 +324,21 @@ class ListView: OwnerDrawControl
 
 	@property public final ViewStyle viewStyle()
 	{
-		if(this.getStyle() & ViewStyle.LARGE_ICON)
+		if(this.getStyle() & ViewStyle.largeIcon)
 		{
-			return ViewStyle.LARGE_ICON;
+			return ViewStyle.largeIcon;
 		}
-		else if(this.getStyle() & ViewStyle.SMALL_ICON)
+		else if(this.getStyle() & ViewStyle.smallIcon)
 		{
-			return ViewStyle.SMALL_ICON;
+			return ViewStyle.smallIcon;
 		}
-		else if(this.getStyle() & ViewStyle.LIST)
+		else if(this.getStyle() & ViewStyle.list)
 		{
-			return ViewStyle.LIST;
+			return ViewStyle.list;
 		}
-		else if(this.getStyle() & ViewStyle.REPORT)
+		else if(this.getStyle() & ViewStyle.report)
 		{
-			return ViewStyle.REPORT;
+			return ViewStyle.report;
 		}
 
 		assert(false, "Unknwown ListView Style");
@@ -347,19 +347,19 @@ class ListView: OwnerDrawControl
 	@property public final void viewStyle(ViewStyle vs)
 	{
 		/* Remove flickering in Report Mode */
-		ListView.setBit(this._cBits, ControlBits.DOUBLE_BUFFERED, vs is ViewStyle.REPORT);
+		ListView.setBit(this._cBits, ControlBits.doubleBuffered, vs is ViewStyle.report);
 
 		this.setStyle(vs, true);
 	}
 
 	@property public final bool fullRowSelect()
 	{
-		return cast(bool)(this._lBits & ListViewBits.FULL_ROW_SELECT);
+		return cast(bool)(this._lBits & ListViewBits.fullRowSelect);
 	}
 
 	@property public final void fullRowSelect(bool b)
 	{
-		this._lBits |= ListViewBits.FULL_ROW_SELECT;
+		this._lBits |= ListViewBits.fullRowSelect;
 
 		if(this.created)
 		{
@@ -369,12 +369,12 @@ class ListView: OwnerDrawControl
 
 	@property public final bool gridLines()
 	{
-		return cast(bool)(this._lBits & ListViewBits.GRID_LINES);
+		return cast(bool)(this._lBits & ListViewBits.gridLines);
 	}
 
 	@property public final void gridLines(bool b)
 	{
-		this._lBits |= ListViewBits.GRID_LINES;
+		this._lBits |= ListViewBits.gridLines;
 
 		if(this.created)
 		{
@@ -384,12 +384,12 @@ class ListView: OwnerDrawControl
 
 	@property public final bool checkBoxes()
 	{
-		return cast(bool)(this._lBits & ListViewBits.CHECK_BOXES);
+		return cast(bool)(this._lBits & ListViewBits.checkBoxes);
 	}
 
 	@property public final void checkBoxes(bool b)
 	{
-		this._lBits |= ListViewBits.CHECK_BOXES;
+		this._lBits |= ListViewBits.checkBoxes;
 
 		if(this.created)
 		{
@@ -402,7 +402,7 @@ class ListView: OwnerDrawControl
 		return this._selectedItem;
 	}
 
-	public final ListViewColumn addColumn(string txt, int w, ColumnTextAlign cta = ColumnTextAlign.LEFT)
+	public final ListViewColumn addColumn(string txt, int w, ColumnTextAlign cta = ColumnTextAlign.left)
 	{
 		if(!this._columns)
 		{
@@ -563,7 +563,7 @@ class ListView: OwnerDrawControl
 		this.setStyle(LVS_ALIGNLEFT | LVS_ALIGNTOP | LVS_AUTOARRANGE | LVS_SHAREIMAGELISTS, true);
 
 		/* WS_CLIPSIBLINGS | WS_CLIPCHILDREN: There is a SysHeader Component inside a list view in Report Mode */
-		if(this.getStyle() & ViewStyle.REPORT)
+		if(this.getStyle() & ViewStyle.report)
 		{
 			this.setStyle(WS_CLIPSIBLINGS | WS_CLIPCHILDREN, true);
 		}
@@ -574,11 +574,11 @@ class ListView: OwnerDrawControl
 
 		switch(this._drawMode)
 		{
-			case OwnerDrawMode.FIXED:
+			case OwnerDrawMode.fixed:
 				this.setStyle(LVS_OWNERDRAWFIXED, true);
 				break;
 
-			case OwnerDrawMode.VARIABLE:
+			case OwnerDrawMode.variable:
 				assert(false, "ListView: Owner Draw Variable Style not allowed");
 
 			default:
@@ -638,17 +638,17 @@ class ListView: OwnerDrawControl
 
 	protected override void onHandleCreated(EventArgs e)
 	{
-		if(this._lBits & ListViewBits.GRID_LINES)
+		if(this._lBits & ListViewBits.gridLines)
 		{
 			this.sendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_GRIDLINES, LVS_EX_GRIDLINES);
 		}
 
-		if(this._lBits & ListViewBits.FULL_ROW_SELECT)
+		if(this._lBits & ListViewBits.fullRowSelect)
 		{
 			this.sendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
 		}
 
-		if(this._lBits & ListViewBits.CHECK_BOXES)
+		if(this._lBits & ListViewBits.checkBoxes)
 		{
 			this.sendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 		}
@@ -659,7 +659,7 @@ class ListView: OwnerDrawControl
 			this.sendMessage(LVM_SETIMAGELIST, LVSIL_SMALL, cast(LPARAM)this._imgList.handle);
 		}
 
-		if(this.getStyle() & ViewStyle.REPORT)
+		if(this.getStyle() & ViewStyle.report)
 		{
 			if(this._columns)
 			{
@@ -670,7 +670,7 @@ class ListView: OwnerDrawControl
 			}
 
 			/* Remove flickering in Report Mode */
-			ListView.setBit(this._cBits, ControlBits.DOUBLE_BUFFERED, true);
+			ListView.setBit(this._cBits, ControlBits.doubleBuffered, true);
 		}
 
 		if(this._items)

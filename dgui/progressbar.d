@@ -99,9 +99,9 @@ class ProgressBar: SubclassedControl
 		ccp.SuperclassName = WC_PROGRESSBAR;
 		ccp.ClassName = WC_DPROGRESSBAR;
 
-		assert(this._dock !is DockStyle.FILL, "ProgressBar: Invalid Dock Style");
+		assert(this._dock !is DockStyle.fill, "ProgressBar: Invalid Dock Style");
 
-		if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT)
+		if(this._dock is DockStyle.left || this._dock is DockStyle.right)
 		{
 			this.setStyle(PBS_VERTICAL, true);
 		}

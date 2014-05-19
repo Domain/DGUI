@@ -14,21 +14,21 @@ public import dgui.core.dialogs.dialogresult;
 
 enum MsgBoxButtons: uint
 {
-	OK = MB_OK,
-	YES_NO = MB_YESNO,
-	OK_CANCEL = MB_OKCANCEL,
-	RETRY_CANCEL = MB_RETRYCANCEL,
-	YES_NO_CANCEL = MB_YESNOCANCEL,
-	ABORT_RETRY_IGNORE = MB_ABORTRETRYIGNORE,
+	ok = MB_OK,
+	yesNo = MB_YESNO,
+	okCancel = MB_OKCANCEL,
+	retryCancel = MB_RETRYCANCEL,
+	yesNoCancel = MB_YESNOCANCEL,
+	abortRetryIgnore = MB_ABORTRETRYIGNORE,
 }
 
 enum MsgBoxIcons: uint
 {
-	NONE = 0,
-	WARNING = MB_ICONWARNING,
-	INFORMATION = MB_ICONINFORMATION,
-	QUESTION = MB_ICONQUESTION,
-	ERROR = MB_ICONERROR,
+	none = 0,
+	warning = MB_ICONWARNING,
+	information = MB_ICONINFORMATION,
+	question = MB_ICONQUESTION,
+	error = MB_ICONERROR,
 }
 
 final class MsgBox
@@ -45,16 +45,16 @@ final class MsgBox
 
 	public static DialogResult show(string title, string text, MsgBoxButtons button)
 	{
-		return MsgBox.show(title, text, button, MsgBoxIcons.NONE);
+		return MsgBox.show(title, text, button, MsgBoxIcons.none);
 	}
 
 	public static DialogResult show(string title, string text, MsgBoxIcons icon)
 	{
-		return MsgBox.show(title, text, MsgBoxButtons.OK, icon);
+		return MsgBox.show(title, text, MsgBoxButtons.ok, icon);
 	}
 
 	public static DialogResult show(string title, string text)
 	{
-		return MsgBox.show(title, text, MsgBoxButtons.OK, MsgBoxIcons.NONE);
+		return MsgBox.show(title, text, MsgBoxButtons.ok, MsgBoxIcons.none);
 	}
 }

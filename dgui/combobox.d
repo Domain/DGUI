@@ -15,10 +15,10 @@ public import dgui.imagelist;
 
 enum DropDownStyles: uint
 {
-	NONE 		  = 0, // Internal Use
-	SIMPLE 		  = CBS_SIMPLE,
-	DROPDOWN 	  = CBS_DROPDOWN,
-	DROPDOWN_LIST = CBS_DROPDOWNLIST,
+	none 		  = 0, // Internal Use
+	simple 		  = CBS_SIMPLE,
+	dropdown 	  = CBS_DROPDOWN,
+	dropdownList = CBS_DROPDOWNLIST,
 }
 
 class ComboBoxItem
@@ -109,13 +109,13 @@ class ComboBox: SubclassedControl
 	public Event!(Control, EventArgs) itemChanged;
 
 	private Collection!(ComboBoxItem) _items;
-	private DropDownStyles _oldDdStyle = DropDownStyles.NONE;
+	private DropDownStyles _oldDdStyle = DropDownStyles.none;
 	private int _selectedIndex;
 	private ImageList _imgList;
 
 	public this()
 	{
-		this.setStyle(DropDownStyles.DROPDOWN, true);
+		this.setStyle(DropDownStyles.dropdown, true);
 	}
 
 	public final ComboBoxItem addItem(string s, int imgIndex = -1)

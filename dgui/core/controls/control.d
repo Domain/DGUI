@@ -30,40 +30,40 @@ public import dgui.canvas;
 
 enum DockStyle: ubyte
 {
-	NONE 	= 0,
-	LEFT 	= 1,
-	TOP 	= 2,
-	RIGHT 	= 4,
-	BOTTOM 	= 8,
-	FILL 	= 16,
+	none 	= 0,
+	left 	= 1,
+	top 	= 2,
+	right 	= 4,
+	bottom 	= 8,
+	fill 	= 16,
 }
 
 enum PositionSpecified
 {
-	POSITION = 0,
-	SIZE     = 1,
-	ALL      = 2,
+	position = 0,
+	size     = 1,
+	all      = 2,
 }
 
 enum ControlBits: ulong
 {
-	NONE          		= 0,
-	ERASED        		= 1,
-	MOUSE_ENTER   		= 2,
-	CAN_NOTIFY   		= 4,
-	MODAL_CONTROL 		= 8,   // For Modal Dialogs
-	DOUBLE_BUFFERED		= 16,  // Use DGui's double buffered routine to draw components (be careful with this one!)
-	OWN_CLICK_MSG 	    = 32,  // Does the component Handles click itself?
-	CANNOT_ADD_CHILD	= 64,  // The child window will not be added to the parent's child controls' list
-	USE_CACHED_TEXT		= 128, // Does not send WM_SETTEXT / WM_GETTEXT messages, but it uses it's internal variable only.
+	none          		= 0,
+	erased        		= 1,
+	mouseEnter   		= 2,
+	canNotify   		= 4,
+	modalControl 		= 8,   // For Modal Dialogs
+	doubleBuffered		= 16,  // Use DGui's double buffered routine to draw components (be careful with this one!)
+	ownClickMsg 	    = 32,  // Does the component Handles click itself?
+	cannotAddChild	= 64,  // The child window will not be added to the parent's child controls' list
+	useCachedText		= 128, // Does not send WM_SETTEXT / WM_GETTEXT messages, but it uses it's internal variable only.
 }
 
 enum BorderStyle: ubyte
 {
-	NONE 		 = 0,
-	MANUAL 		 = 1, // Internal Use
-	FIXED_SINGLE = 2,
-	FIXED_3D	 = 4,
+	none 		 = 0,
+	manual 		 = 1, // Internal Use
+	fixedSingle = 2,
+	fixed3d	 = 4,
 }
 
 struct CreateControlParams
@@ -91,8 +91,8 @@ abstract class Control: Handle!(HWND), IDisposable
 	protected Rect _bounds;
 	protected Color _foreColor;
 	protected Color _backColor;
-	protected DockStyle _dock = DockStyle.NONE;
-	protected ControlBits _cBits = ControlBits.CAN_NOTIFY;
+	protected DockStyle _dock = DockStyle.none;
+	protected ControlBits _cBits = ControlBits.canNotify;
 
 	public Event!(Control, PaintEventArgs) paint;
 	public Event!(Control, EventArgs) focusChanged;
@@ -189,31 +189,31 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		if(this.getExStyle() & WS_EX_CLIENTEDGE)
 		{
-			return BorderStyle.FIXED_3D;
+			return BorderStyle.fixed3d;
 		}
 		else if(this.getStyle() & WS_BORDER)
 		{
-			return BorderStyle.FIXED_SINGLE;
+			return BorderStyle.fixedSingle;
 		}
 
-		return BorderStyle.NONE;
+		return BorderStyle.none;
 	}
 
 	@property public final void borderStyle(BorderStyle bs)
 	{
 		switch(bs)
 		{
-			case BorderStyle.FIXED_3D:
+			case BorderStyle.fixed3d:
 				this.setStyle(WS_BORDER, false);
 				this.setExStyle(WS_EX_CLIENTEDGE, true);
 				break;
 
-			case BorderStyle.FIXED_SINGLE:
+			case BorderStyle.fixedSingle:
 				this.setStyle(WS_BORDER, true);
 				this.setExStyle(WS_EX_CLIENTEDGE, false);
 				break;
 
-			case BorderStyle.NONE:
+			case BorderStyle.none:
 				this.setStyle(WS_BORDER, false);
 				this.setExStyle(WS_EX_CLIENTEDGE, false);
 				break;
@@ -233,7 +233,7 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		this._parent = c;
 
-		if(!Control.hasBit(this._cBits, ControlBits.CANNOT_ADD_CHILD))
+		if(!Control.hasBit(this._cBits, ControlBits.cannotAddChild))
 		{
 			c.sendMessage(DGUI_ADDCHILDCONTROL, winCast!(WPARAM)(this), 0);
 		}
@@ -328,7 +328,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	@property public string text()
 	{
-		if(this.created && !Control.hasBit(this._cBits, ControlBits.USE_CACHED_TEXT))
+		if(this.created && !Control.hasBit(this._cBits, ControlBits.useCachedText))
 		{
 			return getWindowText(this._handle);
 		}
@@ -340,11 +340,11 @@ abstract class Control: Handle!(HWND), IDisposable
 	{
 		this._text = s;
 
-		if(this.created && !Control.hasBit(this._cBits, ControlBits.USE_CACHED_TEXT))
+		if(this.created && !Control.hasBit(this._cBits, ControlBits.useCachedText))
 		{
-			Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, false); //Do not trigger TextChanged Event
+			Control.setBit(this._cBits, ControlBits.canNotify, false); //Do not trigger TextChanged Event
 			setWindowText(this._handle, s);
-			Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, true);
+			Control.setBit(this._cBits, ControlBits.canNotify, true);
 		}
 	}
 
@@ -580,9 +580,9 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 		else /* Window Procedure Message Handling */
 		{
-			//Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, false);
+			//Control.setBit(this._cBits, ControlBits.canNotify, false);
 			this.wndProc(m);
-			//Control.setBit(this._cBits, ControlBits.CAN_NOTIFY, true);
+			//Control.setBit(this._cBits, ControlBits.canNotify, true);
 		}
 	}
 
@@ -675,7 +675,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 		HWND hParent = null;
 
-		if(Control.hasBit(this._cBits, ControlBits.MODAL_CONTROL)) //Is Modal ?
+		if(Control.hasBit(this._cBits, ControlBits.modalControl)) //Is Modal ?
 		{
 			hParent = GetActiveWindow();
 			this.setStyle(WS_CHILD, false);
@@ -723,25 +723,25 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	private void setPosition(int x, int y)
 	{
-		this.setWindowPos(x, y, 0, 0, PositionSpecified.POSITION);
+		this.setWindowPos(x, y, 0, 0, PositionSpecified.position);
 	}
 
 	private void setSize(int w, int h)
 	{
-		this.setWindowPos(0, 0, w, h, PositionSpecified.SIZE);
+		this.setWindowPos(0, 0, w, h, PositionSpecified.size);
 	}
 
-	private void setWindowPos(int x, int y, int w, int h, PositionSpecified ps = PositionSpecified.ALL)
+	private void setWindowPos(int x, int y, int w, int h, PositionSpecified ps = PositionSpecified.all)
 	{
 		uint wpf = SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOMOVE | SWP_NOSIZE;
 
-		if(ps !is PositionSpecified.ALL)
+		if(ps !is PositionSpecified.all)
 		{
-			if(ps is PositionSpecified.POSITION)
+			if(ps is PositionSpecified.position)
 			{
 				wpf &= ~SWP_NOMOVE;
 			}
-			else //if(ps is PositionSpecified.SIZE)
+			else //if(ps is PositionSpecified.size)
 			{
 				wpf &= ~SWP_NOSIZE;
 			}
@@ -832,7 +832,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 	protected void createControlParams(ref CreateControlParams ccp)
 	{
-		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.DBLCLKS;
+		ClassStyles cstyle = ccp.ClassStyle | ClassStyles.doubleClicks;
 
 		WindowClass.register(ccp.ClassName, cstyle, ccp.DefaultCursor, cast(WNDPROC) /*FIXME may throw*/ &Control.msgRouter);
 	}
@@ -1165,7 +1165,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			case WM_MOUSELEAVE:
 			{
-				Control.setBit(this._cBits, ControlBits.MOUSE_ENTER, false);
+				Control.setBit(this._cBits, ControlBits.mouseEnter, false);
 
 				scope MouseEventArgs e = new MouseEventArgs(Point(LOWORD(m.lParam), HIWORD(m.lParam)), cast(MouseKeys)m.wParam);
 				this.onMouseLeave(e);
@@ -1179,9 +1179,9 @@ abstract class Control: Handle!(HWND), IDisposable
 				scope MouseEventArgs e = new MouseEventArgs(Point(LOWORD(m.lParam), HIWORD(m.lParam)), cast(MouseKeys)m.wParam);
 				this.onMouseMove(e);
 
-				if(!Control.hasBit(this._cBits, ControlBits.MOUSE_ENTER))
+				if(!Control.hasBit(this._cBits, ControlBits.mouseEnter))
 				{
-					Control.setBit(this._cBits, ControlBits.MOUSE_ENTER, true);
+					Control.setBit(this._cBits, ControlBits.mouseEnter, true);
 
 					TRACKMOUSEEVENT tme;
 
@@ -1209,21 +1209,21 @@ abstract class Control: Handle!(HWND), IDisposable
 
 			case WM_LBUTTONUP, WM_MBUTTONUP, WM_RBUTTONUP:
 			{
-				MouseKeys mk = MouseKeys.NONE;
+				MouseKeys mk = MouseKeys.none;
 
 				if(GetAsyncKeyState(MK_LBUTTON))
 				{
-					mk |= MouseKeys.LEFT;
+					mk |= MouseKeys.left;
 				}
 
 				if(GetAsyncKeyState(MK_MBUTTON))
 				{
-					mk |= MouseKeys.MIDDLE;
+					mk |= MouseKeys.middle;
 				}
 
 				if(GetAsyncKeyState(MK_RBUTTON))
 				{
-					mk |= MouseKeys.RIGHT;
+					mk |= MouseKeys.right;
 				}
 
 				Point p = Point(LOWORD(m.lParam), HIWORD(m.lParam));
@@ -1232,7 +1232,7 @@ abstract class Control: Handle!(HWND), IDisposable
 
 				Control.convertPoint(p, this, null);
 
-				if(m.Msg == WM_LBUTTONUP && !Control.hasBit(this._cBits, ControlBits.OWN_CLICK_MSG) && WindowFromPoint(p.point) == this._handle)
+				if(m.Msg == WM_LBUTTONUP && !Control.hasBit(this._cBits, ControlBits.ownClickMsg) && WindowFromPoint(p.point) == this._handle)
 				{
 					this.onClick(EventArgs.empty);
 				}
@@ -1288,7 +1288,7 @@ abstract class Control: Handle!(HWND), IDisposable
 				scope ControlCodeEventArgs e = new ControlCodeEventArgs();
 				this.onControlCode(e);
 
-				if(e.controlCode is ControlCode.IGNORE)
+				if(e.controlCode is ControlCode.ignore)
 				{
 					this.originalWndProc(m);
 				}

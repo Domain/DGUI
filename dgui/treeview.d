@@ -15,8 +15,8 @@ import dgui.imagelist;
 
 enum NodeInsertMode
 {
-	HEAD = TVI_FIRST,
-	TAIL = TVI_LAST,
+	head = TVI_FIRST,
+	tail = TVI_LAST,
 }
 
 class TreeNode: Handle!(HTREEITEM)//, IDisposable
@@ -68,7 +68,7 @@ class TreeNode: Handle!(HTREEITEM)//, IDisposable
 	}
 	*/
 
-	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1, NodeInsertMode nim = NodeInsertMode.TAIL)
+	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1, NodeInsertMode nim = NodeInsertMode.tail)
 	{
 		if(!this._nodes)
 		{
@@ -344,7 +344,7 @@ class TreeView: SubclassedControl
 		}
 	}
 
-	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1, NodeInsertMode nim = NodeInsertMode.TAIL)
+	public final TreeNode addNode(string txt, int imgIndex = -1, int selImgIndex = -1, NodeInsertMode nim = NodeInsertMode.tail)
 	{
 		if(!this._nodes)
 		{
@@ -493,7 +493,7 @@ class TreeView: SubclassedControl
 		ccp.DefaultBackColor = SystemColors.colorWindow;
 
 		// Tree view is Double buffered in DGui
-		TreeView.setBit(this._cBits, ControlBits.DOUBLE_BUFFERED, true);
+		TreeView.setBit(this._cBits, ControlBits.doubleBuffered, true);
 		super.createControlParams(ccp);
 	}
 

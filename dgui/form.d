@@ -18,36 +18,36 @@ alias CancelEventArgs!(Form) CancelFormEventArgs;
 
 enum FormBits: ulong
 {
-	NONE 		 	= 0,
-	MODAL_COMPLETED = 1,
+	none 		 	= 0,
+	modalCompleted = 1,
 }
 
 enum FormBorderStyle: ubyte
 {
-	NONE 				= 0,
-	MANUAL 				= 1, // Internal Use
-	FIXED_SINGLE 		= 2,
-	FIXED_3D 			= 4,
-	FIXED_DIALOG		= 8,
-	SIZEABLE 			= 16,
-	FIXED_TOOLWINDOW 	= 32,
-	SIZEABLE_TOOLWINDOW = 64,
+	none 				= 0,
+	manual 				= 1, // Internal Use
+	fixedSingle 		= 2,
+	fixed3d 			= 4,
+	fixedDialog		= 8,
+	sizeable 			= 16,
+	fixedToolWindow 	= 32,
+	sizeableToolWindow = 64,
 }
 
 enum FormStartPosition: ubyte
 {
-	MANUAL 			 = 0,
-	CENTER_PARENT	 = 1,
-	CENTER_SCREEN	 = 2,
-	DEFAULT_LOCATION = 4,
+	manual 			 = 0,
+	centerParent	 = 1,
+	centerScreen	 = 2,
+	defaultLocation = 4,
 }
 
 class Form: LayoutControl
 {
-	private FormBits _fBits = FormBits.NONE;
-	private FormStartPosition _startPosition = FormStartPosition.MANUAL;
-	private FormBorderStyle _formBorder = FormBorderStyle.SIZEABLE;
-	private DialogResult _dlgResult = DialogResult.CANCEL;
+	private FormBits _fBits = FormBits.none;
+	private FormStartPosition _startPosition = FormStartPosition.manual;
+	private FormBorderStyle _formBorder = FormBorderStyle.sizeable;
+	private DialogResult _dlgResult = DialogResult.cancel;
 	private HWND _hActiveWnd;
 	private Icon _formIcon;
 	private MenuBar _menu;
@@ -159,7 +159,7 @@ class Form: LayoutControl
 
 		while(GetMessageW(&m, null, 0, 0))
 		{
-			if(Form.hasBit(this._cBits, ControlBits.MODAL_CONTROL) && Form.hasBit(this._fBits, FormBits.MODAL_COMPLETED))
+			if(Form.hasBit(this._cBits, ControlBits.modalControl) && Form.hasBit(this._fBits, FormBits.modalCompleted))
 			{
 				break;
 			}
@@ -180,7 +180,7 @@ class Form: LayoutControl
 
 	public final DialogResult showDialog()
 	{
-		Form.setBit(this._cBits, ControlBits.MODAL_CONTROL, true);
+		Form.setBit(this._cBits, ControlBits.modalControl, true);
 		this._hActiveWnd = GetActiveWindow();
 		EnableWindow(this._hActiveWnd, false);
 
@@ -190,8 +190,8 @@ class Form: LayoutControl
 
 	private final void doFormStartPosition()
 	{
-		if((this._startPosition is FormStartPosition.CENTER_PARENT && !this.parent) ||
-			this._startPosition is FormStartPosition.CENTER_SCREEN)
+		if((this._startPosition is FormStartPosition.centerParent && !this.parent) ||
+			this._startPosition is FormStartPosition.centerScreen)
 		{
 			Rect wa = Screen.workArea;
 			Rect b = this._bounds;
@@ -199,7 +199,7 @@ class Form: LayoutControl
 			this._bounds.position = Point((wa.width - b.width) / 2,
 										  (wa.height - b.height) / 2);
 		}
-		else if(this._startPosition is FormStartPosition.CENTER_PARENT)
+		else if(this._startPosition is FormStartPosition.centerParent)
 		{
 			Rect pr = this.parent.bounds;
 			Rect b = this._bounds;
@@ -207,7 +207,7 @@ class Form: LayoutControl
 			this._bounds.position = Point(pr.left + (pr.width - b.width) / 2,
 										  pr.top + (pr.height - b.height) / 2);
 		}
-		else if(this._startPosition is FormStartPosition.DEFAULT_LOCATION)
+		else if(this._startPosition is FormStartPosition.defaultLocation)
 		{
 			this._bounds.position = Point(CW_USEDEFAULT, CW_USEDEFAULT);
 		}
@@ -217,7 +217,7 @@ class Form: LayoutControl
 	{
 		switch(fbs)
 		{
-			case FormBorderStyle.FIXED_3D:
+			case FormBorderStyle.fixed3d:
 				style &= ~(WS_BORDER | WS_THICKFRAME | WS_DLGFRAME);
 				exStyle &= ~(WS_EX_TOOLWINDOW | WS_EX_STATICEDGE);
 
@@ -225,7 +225,7 @@ class Form: LayoutControl
 				exStyle |= WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
 				break;
 
-			case FormBorderStyle.FIXED_DIALOG:
+			case FormBorderStyle.fixedDialog:
 				style &= ~(WS_BORDER | WS_THICKFRAME);
 				exStyle &= ~(WS_EX_TOOLWINDOW | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
 
@@ -233,7 +233,7 @@ class Form: LayoutControl
 				exStyle |= WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE;
 				break;
 
-			case FormBorderStyle.FIXED_SINGLE:
+			case FormBorderStyle.fixedSingle:
 				style &= ~(WS_THICKFRAME | WS_DLGFRAME);
 				exStyle &= ~(WS_EX_TOOLWINDOW | WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE | WS_EX_STATICEDGE);
 
@@ -241,7 +241,7 @@ class Form: LayoutControl
 				exStyle |= WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
 				break;
 
-			case FormBorderStyle.FIXED_TOOLWINDOW:
+			case FormBorderStyle.fixedToolWindow:
 				style &= ~(WS_BORDER | WS_THICKFRAME | WS_DLGFRAME);
 				exStyle &= ~(WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
 
@@ -249,7 +249,7 @@ class Form: LayoutControl
 				exStyle |= WS_EX_TOOLWINDOW | WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
 				break;
 
-			case FormBorderStyle.SIZEABLE:
+			case FormBorderStyle.sizeable:
 				style &= ~(WS_BORDER | WS_DLGFRAME);
 				exStyle &= ~(WS_EX_TOOLWINDOW | WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME | WS_EX_STATICEDGE);
 
@@ -257,7 +257,7 @@ class Form: LayoutControl
 				exStyle |= WS_EX_WINDOWEDGE;
 				break;
 
-			case FormBorderStyle.SIZEABLE_TOOLWINDOW:
+			case FormBorderStyle.sizeableToolWindow:
 				style &= ~(WS_BORDER | WS_DLGFRAME);
 				exStyle &= ~(WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME | WS_EX_STATICEDGE);
 
@@ -265,7 +265,7 @@ class Form: LayoutControl
 				exStyle |= WS_EX_TOOLWINDOW | WS_EX_WINDOWEDGE;
 				break;
 
-			case FormBorderStyle.NONE:
+			case FormBorderStyle.none:
 				style &= ~(WS_BORDER | WS_THICKFRAME | WS_CAPTION | WS_DLGFRAME);
 				exStyle &= ~(WS_EX_TOOLWINDOW | WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME | WS_EX_STATICEDGE | WS_EX_WINDOWEDGE);
 				break;
@@ -284,7 +284,7 @@ class Form: LayoutControl
 			{
 				this._dlgResult = cast(DialogResult)m.wParam;
 
-				Form.setBit(this._fBits, FormBits.MODAL_COMPLETED, true);
+				Form.setBit(this._fBits, FormBits.modalCompleted, true);
 				ShowWindow(this._handle, SW_HIDE); // Hide this window (it waits to be destroyed)
 				EnableWindow(this._hActiveWnd, true);
 				SetActiveWindow(this._hActiveWnd); // Restore the previous active window
@@ -346,7 +346,7 @@ class Form: LayoutControl
 				{
 					this.onClose(EventArgs.empty);
 
-					if(Form.hasBit(this._cBits, ControlBits.MODAL_CONTROL))
+					if(Form.hasBit(this._cBits, ControlBits.modalControl))
 					{
 						EnableWindow(this._hActiveWnd, true);
 						SetActiveWindow(this._hActiveWnd);

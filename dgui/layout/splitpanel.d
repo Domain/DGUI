@@ -17,15 +17,15 @@ import dgui.layout.panel;
 
 enum SplitOrientation
 {
-	VERTICAL   = 1,
-	HORIZONTAL = 2,
+	vertical   = 1,
+	horizontal = 2,
 }
 
 class SplitPanel: LayoutControl
 {
 	private enum int SPLITTER_SIZE = 8;
 
-	private SplitOrientation _splitOrientation = SplitOrientation.VERTICAL;
+	private SplitOrientation _splitOrientation = SplitOrientation.vertical;
 	private bool _downing = false;
 	private int _splitPos = 0;
 	private Panel _panel1;
@@ -78,7 +78,7 @@ class SplitPanel: LayoutControl
 
 		switch(this._splitOrientation)
 		{
-			case SplitOrientation.VERTICAL:
+			case SplitOrientation.vertical:
 			{
 				if(this._splitPos >= 0 && (this._splitPos + SPLITTER_SIZE) < this.width)
 				{
@@ -89,7 +89,7 @@ class SplitPanel: LayoutControl
 			}
 			break;
 
-			default: // SplitOrientation.HORIZONTAL
+			default: // SplitOrientation.horizontal
 			{
 				if(this._splitPos >= 0 && (this._splitPos + SPLITTER_SIZE) < this.height)
 				{
@@ -109,7 +109,7 @@ class SplitPanel: LayoutControl
 
 	protected override void onMouseKeyDown(MouseEventArgs e)
 	{
-		if(e.keys == MouseKeys.LEFT)
+		if(e.keys == MouseKeys.left)
 		{
 			this._downing = true;
 			SetCapture(this._handle);
@@ -138,11 +138,11 @@ class SplitPanel: LayoutControl
 
 			switch(this._splitOrientation)
 			{
-				case SplitOrientation.VERTICAL:
+				case SplitOrientation.vertical:
 					this._splitPos = pt.x;
 					break;
 
-				default: // SplitOrientation.HORIZONTAL
+				default: // SplitOrientation.horizontal
 					this._splitPos = pt.y;
 					break;
 			}
@@ -159,11 +159,11 @@ class SplitPanel: LayoutControl
 
 		switch(this._splitOrientation)
 		{
-			case SplitOrientation.VERTICAL:
+			case SplitOrientation.vertical:
 				ccp.DefaultCursor = SystemCursors.sizeWE;
 				break;
 
-			default: // SplitOrientation.HORIZONTAL
+			default: // SplitOrientation.horizontal
 				ccp.DefaultCursor = SystemCursors.sizeNS;
 				break;
 		}
@@ -172,11 +172,11 @@ class SplitPanel: LayoutControl
 		{
 			switch(this._splitOrientation)
 			{
-				case SplitOrientation.VERTICAL:
+				case SplitOrientation.vertical:
 					this._splitPos = this.width / 3;
 					break;
 
-				default: // SplitOrientation.HORIZONTAL
+				default: // SplitOrientation.horizontal
 					this._splitPos = this.height - (this.height / 3);
 					break;
 			}
@@ -214,11 +214,11 @@ class SplitPanel: LayoutControl
 	{
 		switch(this._splitOrientation)
 		{
-			case SplitOrientation.VERTICAL:
+			case SplitOrientation.vertical:
 				this.cursor = SystemCursors.sizeWE;
 				break;
 
-			default: // SplitOrientation.HORIZONTAL
+			default: // SplitOrientation.horizontal
 				this.cursor = SystemCursors.sizeNS;
 				break;
 		}
@@ -231,14 +231,14 @@ class SplitPanel: LayoutControl
 		Canvas c = e.canvas;
 		Rect cr = e.clipRectangle;
 		int mid = this._splitPos + (SPLITTER_SIZE / 2);
-		scope Pen dp = new Pen(SystemColors.color3DdarkShadow, 2, PenStyle.DOT);
-		scope Pen lp = new Pen(SystemColors.colorBtnFace, 2, PenStyle.DOT);
+		scope Pen dp = new Pen(SystemColors.color3DdarkShadow, 2, PenStyle.dot);
+		scope Pen lp = new Pen(SystemColors.colorBtnFace, 2, PenStyle.dot);
 
 		switch(this._splitOrientation)
 		{
-			case SplitOrientation.VERTICAL:
+			case SplitOrientation.vertical:
 			{
-				c.drawEdge(Rect(this._splitPos, cr.top, SPLITTER_SIZE, cr.bottom), EdgeType.RAISED, EdgeMode.LEFT | EdgeMode.RIGHT);
+				c.drawEdge(Rect(this._splitPos, cr.top, SPLITTER_SIZE, cr.bottom), EdgeType.raised, EdgeMode.left | EdgeMode.right);
 
 				for(int p = (this.height / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
@@ -248,9 +248,9 @@ class SplitPanel: LayoutControl
 			}
 			break;
 
-			default: // SplitOrientation.HORIZONTAL
+			default: // SplitOrientation.horizontal
 			{
-				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, SPLITTER_SIZE), EdgeType.RAISED, EdgeMode.TOP | EdgeMode.BOTTOM);
+				c.drawEdge(Rect(cr.left, this._splitPos, cr.right, SPLITTER_SIZE), EdgeType.raised, EdgeMode.top | EdgeMode.bottom);
 
 				for(int p = (this.width / 2) - 15, i = 0; i < 8; i++, p += 5)
 				{
@@ -274,14 +274,14 @@ class SplitPanel: LayoutControl
 			{
 				switch(this._splitOrientation)
 				{
-					case SplitOrientation.VERTICAL:
+					case SplitOrientation.vertical:
 					{
 						if(this.width) // Avoid division by 0
 							this._splitPos = MulDiv(pWndPos.cx, this._splitPos, this.width);
 					}
 					break;
 
-					default: // SplitOrientation.HORIZONTAL
+					default: // SplitOrientation.horizontal
 					{
 						if(this.height) // Avoid division by 0
 							this._splitPos = MulDiv(pWndPos.cy, this._splitPos, this.height);

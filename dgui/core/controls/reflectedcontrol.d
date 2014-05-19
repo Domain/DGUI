@@ -87,7 +87,7 @@ abstract class ReflectedControl: Control
 			{
 				this.originalWndProc(m); //Components like: ComboBoxEx need this one!
 
-				if(ReflectedControl.hasBit(this._cBits, ControlBits.CAN_NOTIFY)) //Avoid fake notification messages caused by component's properties (like text(), checked(), ...)
+				if(ReflectedControl.hasBit(this._cBits, ControlBits.canNotify)) //Avoid fake notification messages caused by component's properties (like text(), checked(), ...)
 				{
 					this.reflectMessageToChild(m);
 				}

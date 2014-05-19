@@ -13,19 +13,19 @@ public import dgui.core.events.eventargs;
 
 enum OwnerDrawMode: ubyte
 {
-	NORMAL = 0,
-	FIXED = 1,
-	VARIABLE = 2,
+	normal = 0,
+	fixed = 1,
+	variable = 2,
 }
 
 enum DrawItemState: uint
 {
-	DEFAULT  = ODS_DEFAULT,
-	CHECKED  = ODS_CHECKED,
-	DISABLED = ODS_DISABLED,
-	FOCUSED  = ODS_FOCUS,
-	GRAYED   = ODS_GRAYED,
-	SELECTED = ODS_SELECTED,
+	default_  = ODS_DEFAULT,
+	checked  = ODS_CHECKED,
+	disabled = ODS_DISABLED,
+	focused  = ODS_FOCUS,
+	grayed   = ODS_GRAYED,
+	selected = ODS_SELECTED,
 }
 
 class MeasureItemEventArgs: EventArgs
@@ -126,7 +126,7 @@ class DrawItemEventArgs: EventArgs
 
 	public void drawFocusRect()
 	{
-		if(this._state & DrawItemState.FOCUSED)
+		if(this._state & DrawItemState.focused)
 		{
 			DrawFocusRect(this._canvas.handle, &this._itemRect.rect);
 		}
@@ -143,7 +143,7 @@ abstract class OwnerDrawControl: SubclassedControl
 	public Event!(Control, MeasureItemEventArgs) measureItem;
 	public Event!(Control, DrawItemEventArgs) drawItem;
 
-	protected OwnerDrawMode _drawMode = OwnerDrawMode.NORMAL;
+	protected OwnerDrawMode _drawMode = OwnerDrawMode.normal;
 
 	@property public OwnerDrawMode drawMode()
 	{

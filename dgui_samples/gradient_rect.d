@@ -16,14 +16,14 @@ class MainForm: Form
 	{
 		this.text = "GDI: Gradient Fill Rect";
 		this.size = Size(400, 200);
-		this.startPosition = FormStartPosition.CENTER_SCREEN;
+		this.startPosition = FormStartPosition.centerScreen;
 	}
 
 	protected override void onPaint(PaintEventArgs e)
 	{
 		Canvas c = e.canvas;
 
-		c.fillRectGradient(Rect(NullPoint, this.size), SystemColors.blue, SystemColors.green, GradientFillRectMode.VERTICAL);
+		c.fillRectGradient(Rect(NullPoint, this.size), SystemColors.blue, SystemColors.green, GradientFillRectMode.vertical);
 		super.onPaint(e);
 	}
 }

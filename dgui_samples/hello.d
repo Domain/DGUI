@@ -16,7 +16,7 @@ class MainForm: Form
 	{
 		this.text = "DGui Form";
 		this.size = Size(500, 400);
-		this.startPosition = FormStartPosition.CENTER_SCREEN; // Set Form Position
+		this.startPosition = FormStartPosition.centerScreen; // Set Form Position
 	}
 }
 

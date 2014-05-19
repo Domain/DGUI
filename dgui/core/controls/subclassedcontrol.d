@@ -39,7 +39,7 @@ abstract class SubclassedControl: ReflectedControl
 		{
 			case WM_ERASEBKGND:
 			{
-				if(SubclassedControl.hasBit(this._cBits, ControlBits.DOUBLE_BUFFERED))
+				if(SubclassedControl.hasBit(this._cBits, ControlBits.doubleBuffered))
 				{
 					Rect r = void;
 					GetUpdateRect(this._handle, &r.rect, false);
@@ -61,7 +61,7 @@ abstract class SubclassedControl: ReflectedControl
 					this.onPaint(e);
 
 					memCanvas.copyTo(orgCanvas, r, r.position);
-					SubclassedControl.setBit(this._cBits, ControlBits.ERASED, true);
+					SubclassedControl.setBit(this._cBits, ControlBits.erased, true);
 					m.Result = 0;
 				}
 				else
@@ -73,9 +73,9 @@ abstract class SubclassedControl: ReflectedControl
 
 			case WM_PAINT:
 			{
-				if(SubclassedControl.hasBit(this._cBits, ControlBits.DOUBLE_BUFFERED) && SubclassedControl.hasBit(this._cBits, ControlBits.ERASED))
+				if(SubclassedControl.hasBit(this._cBits, ControlBits.doubleBuffered) && SubclassedControl.hasBit(this._cBits, ControlBits.erased))
 				{
-					SubclassedControl.setBit(this._cBits, ControlBits.ERASED, false);
+					SubclassedControl.setBit(this._cBits, ControlBits.erased, false);
 					m.Result = 0;
 				}
 				else

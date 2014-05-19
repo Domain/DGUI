@@ -125,7 +125,7 @@ abstract class TextControl: SubclassedControl
 
 	protected override void onReflectedMessage(ref Message m)
 	{
-		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == EN_CHANGE && TextControl.hasBit(this._cBits, ControlBits.CAN_NOTIFY))
+		if(m.Msg == WM_COMMAND && HIWORD(m.wParam) == EN_CHANGE && TextControl.hasBit(this._cBits, ControlBits.canNotify))
 		{
 			this.onTextChanged(EventArgs.empty);
 		}

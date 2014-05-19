@@ -14,18 +14,18 @@ import dgui.core.winapi;
 
 enum MouseWheel: ubyte
 {
-	UP,
-	DOWN,
+	up,
+	down,
 }
 
 enum MouseKeys: uint
 {
-	NONE   = 0, // No mouse buttons specified.
+	none   = 0, // No mouse buttons specified.
 
 	// Standard mouse keys
-	LEFT   = MK_LBUTTON,
-	RIGHT  = MK_RBUTTON,
-	MIDDLE = MK_MBUTTON,
+	left   = MK_LBUTTON,
+	right  = MK_RBUTTON,
+	middle = MK_MBUTTON,
 
 	// Windows 2000+
 	//XBUTTON1 = 0x0800000,

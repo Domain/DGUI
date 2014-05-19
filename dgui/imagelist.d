@@ -17,11 +17,11 @@ import dgui.canvas;
 
 enum ColorDepth: uint
 {
-	DEPTH_4BIT = ILC_COLOR4,
-	DEPTH_8BIT = ILC_COLOR8,
-	DEPTH_16BIT = ILC_COLOR16,
-	DEPTH_24BIT = ILC_COLOR24,
-	DEPTH_32BIT = ILC_COLOR32,
+	depth4bit = ILC_COLOR4,
+	depth8bit = ILC_COLOR8,
+	depth16bit = ILC_COLOR16,
+	depth24bit = ILC_COLOR24,
+	depth32bit = ILC_COLOR32,
 }
 
 /*
@@ -44,7 +44,7 @@ class ImageList: Handle!(HIMAGELIST), IDisposable
 	private static ImageList_DrawProc imageList_Draw;
 	private static ImageList_SetBkColorProc imageList_SetBkColor;
 
-	private ColorDepth _depth = ColorDepth.DEPTH_32BIT;
+	private ColorDepth _depth = ColorDepth.depth32bit;
 	private Size _size;
 	private Collection!(Icon) _images;
 

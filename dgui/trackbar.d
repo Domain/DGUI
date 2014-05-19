@@ -75,13 +75,13 @@ class TrackBar: SubclassedControl
 		ccp.ClassName = WC_DTRACKBAR;
 		this.setStyle(TBS_AUTOTICKS, true);
 
-		assert(this._dock is DockStyle.FILL, "TrackBar: Invalid Dock Style");
+		assert(this._dock is DockStyle.fill, "TrackBar: Invalid Dock Style");
 
-		if(this._dock is DockStyle.TOP || this._dock is DockStyle.BOTTOM || (this._dock is DockStyle.NONE && this._bounds.width >= this._bounds.height))
+		if(this._dock is DockStyle.top || this._dock is DockStyle.bottom || (this._dock is DockStyle.none && this._bounds.width >= this._bounds.height))
 		{
 			this.setStyle(TBS_HORZ, true);
 		}
-		else if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT || (this._dock is DockStyle.NONE && this._bounds.height < this._bounds.width))
+		else if(this._dock is DockStyle.left || this._dock is DockStyle.right || (this._dock is DockStyle.none && this._bounds.height < this._bounds.width))
 		{
 			this.setStyle(TBS_VERT, true);
 		}
@@ -100,11 +100,11 @@ class TrackBar: SubclassedControl
 
 	protected override void wndProc(ref Message m)
 	{
-		if(m.Msg == WM_MOUSEMOVE && (cast(MouseKeys)m.wParam) is MouseKeys.LEFT ||
-		   m.Msg == WM_KEYDOWN && ((cast(Keys)m.wParam) is Keys.LEFT ||
-		   (cast(Keys)m.wParam) is Keys.UP ||
-		   (cast(Keys)m.wParam) is Keys.RIGHT ||
-		   (cast(Keys)m.wParam) is Keys.DOWN))
+		if(m.Msg == WM_MOUSEMOVE && (cast(MouseKeys)m.wParam) is MouseKeys.left ||
+		   m.Msg == WM_KEYDOWN && ((cast(Keys)m.wParam) is Keys.left ||
+		   (cast(Keys)m.wParam) is Keys.up ||
+		   (cast(Keys)m.wParam) is Keys.right ||
+		   (cast(Keys)m.wParam) is Keys.down))
 		{
 			int val = this.value;
 

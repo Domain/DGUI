@@ -20,10 +20,10 @@ import dgui.core.handle;
 
 enum RegistryValueType: uint
 {
-	BINARY = REG_BINARY,
-	DWORD = REG_DWORD,
-	QWORD = REG_QWORD,
-	STRING = REG_SZ,
+	binary = REG_BINARY,
+	dword = REG_DWORD,
+	qword = REG_QWORD,
+	string_ = REG_SZ,
 }
 
 interface IRegistryValue
@@ -53,7 +53,7 @@ final class RegistryValueBinary: RegistryValue!(ubyte[])
 
 	@property public override RegistryValueType valueType()
 	{
-		return RegistryValueType.BINARY;
+		return RegistryValueType.binary;
 	}
 
 	public override string toString()
@@ -88,7 +88,7 @@ final class RegistryValueString: RegistryValue!(string)
 
 	@property public override RegistryValueType valueType()
 	{
-		return RegistryValueType.STRING;
+		return RegistryValueType.string_;
 	}
 
 	public override string toString()
@@ -116,7 +116,7 @@ final class RegistryValueDword: RegistryValue!(uint)
 
 	@property public override RegistryValueType valueType()
 	{
-		return RegistryValueType.DWORD;
+		return RegistryValueType.dword;
 	}
 
 	public override string toString()
@@ -144,7 +144,7 @@ final class RegistryValueQword: RegistryValue!(ulong)
 
 	@property public override RegistryValueType valueType()
 	{
-		return RegistryValueType.QWORD;
+		return RegistryValueType.qword;
 	}
 
 	public override string toString()

@@ -15,7 +15,7 @@ class Button: AbstractButton
 {
 	/**
 	  Returns:
-		A DialogResult enum (OK, IGNORE, CLOSE, YES, NO, CANCEL, ...)
+		A DialogResult enum (ok, ignore, close, yes, no, cancel, ...)
 
 	See_Also:
 		Form.showDialog()
@@ -43,11 +43,11 @@ class Button: AbstractButton
 	{
 		switch(this._drawMode)
 		{
-			case OwnerDrawMode.NORMAL:
+			case OwnerDrawMode.normal:
 				this.setStyle(BS_DEFPUSHBUTTON, true);
 				break;
 
-			case OwnerDrawMode.FIXED, OwnerDrawMode.VARIABLE:
+			case OwnerDrawMode.fixed, OwnerDrawMode.variable:
 				this.setStyle(BS_OWNERDRAW, true);
 				break;
 
@@ -68,11 +68,11 @@ class CheckBox: CheckedButton
 	{
 		switch(this._drawMode)
 		{
-			case OwnerDrawMode.NORMAL:
+			case OwnerDrawMode.normal:
 				this.setStyle(BS_AUTOCHECKBOX, true);
 				break;
 
-			case OwnerDrawMode.FIXED, OwnerDrawMode.VARIABLE:
+			case OwnerDrawMode.fixed, OwnerDrawMode.variable:
 				this.setStyle(BS_OWNERDRAW, true);
 				break;
 
@@ -93,11 +93,11 @@ class RadioButton: CheckedButton
 	{
 		switch(this._drawMode)
 		{
-			case OwnerDrawMode.NORMAL:
+			case OwnerDrawMode.normal:
 				this.setStyle(BS_AUTORADIOBUTTON, true);
 				break;
 
-			case OwnerDrawMode.FIXED, OwnerDrawMode.VARIABLE:
+			case OwnerDrawMode.fixed, OwnerDrawMode.variable:
 				this.setStyle(BS_OWNERDRAW, true);
 				break;
 

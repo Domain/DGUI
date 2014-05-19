@@ -16,19 +16,19 @@ public import dgui.core.controls.ownerdrawcontrol;
   */
 enum CheckState: uint
 {
-	CHECKED = BST_CHECKED, 				///Checked State
-	UNCHECKED = BST_UNCHECKED,			///Unchecked State
-	INDETERMINATE = BST_INDETERMINATE,	///Indeterminate State
+	checked = BST_CHECKED, 				///Checked State
+	unchecked = BST_UNCHECKED,			///Unchecked State
+	indeterminate = BST_INDETERMINATE,	///Indeterminate State
 }
 
 /// Abstract class of a _Button/_CheckBox/_RadioButton
 abstract class AbstractButton: OwnerDrawControl
 {
-	protected DialogResult _dr = DialogResult.NONE;
+	protected DialogResult _dr = DialogResult.none;
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		AbstractButton.setBit(this._cBits, ControlBits.OWN_CLICK_MSG, true); // Let Button to handle Click Event itself
+		AbstractButton.setBit(this._cBits, ControlBits.ownClickMsg, true); // Let Button to handle Click Event itself
 
 		ccp.SuperclassName = WC_BUTTON;
 		this.setStyle(WS_TABSTOP, true);
@@ -46,28 +46,28 @@ abstract class AbstractButton: OwnerDrawControl
 				{
 					 case BN_CLICKED:
 					 {
-						MouseKeys mk = MouseKeys.NONE;
+						MouseKeys mk = MouseKeys.none;
 
 						if(GetAsyncKeyState(MK_LBUTTON))
 						{
-							mk |= MouseKeys.LEFT;
+							mk |= MouseKeys.left;
 						}
 
 						if(GetAsyncKeyState(MK_MBUTTON))
 						{
-							mk |= MouseKeys.MIDDLE;
+							mk |= MouseKeys.middle;
 						}
 
 						if(GetAsyncKeyState(MK_RBUTTON))
 						{
-							mk |= MouseKeys.RIGHT;
+							mk |= MouseKeys.right;
 						}
 
 						Point p = Point(LOWORD(m.lParam), HIWORD(m.lParam));
 						scope MouseEventArgs e = new MouseEventArgs(p, mk);
 						this.onClick(EventArgs.empty);
 
-						if(this._dr !is DialogResult.NONE)
+						if(this._dr !is DialogResult.none)
 						{
 							Control c = this.topLevelControl;
 
@@ -98,7 +98,7 @@ abstract class CheckedButton: AbstractButton
 {
 	public Event!(Control, EventArgs) checkChanged; ///Checked Changed Event of a Checkable _Button
 
-	private CheckState _checkState = CheckState.UNCHECKED;
+	private CheckState _checkState = CheckState.unchecked;
 
 	/**
 	 Returns:
@@ -109,7 +109,7 @@ abstract class CheckedButton: AbstractButton
 	 */
 	@property public bool checked()
 	{
-		return this.checkState is CheckState.CHECKED;
+		return this.checkState is CheckState.checked;
 	}
 
 	/**
@@ -120,7 +120,7 @@ abstract class CheckedButton: AbstractButton
 	  */
 	@property public void checked(bool b)
 	{
-		this.checkState = b ? CheckState.CHECKED : CheckState.UNCHECKED;
+		this.checkState = b ? CheckState.checked : CheckState.unchecked;
 	}
 
 	/**

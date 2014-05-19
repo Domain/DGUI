@@ -19,7 +19,7 @@ class MainForm: Form
 	{
 		this.text = "ToolBar 32 x 32";
 		this.size = Size(400, 200);
-		this.startPosition = FormStartPosition.CENTER_SCREEN;
+		this.startPosition = FormStartPosition.centerScreen;
 
 		this._imgList = new ImageList();
 		this._imgList.size = Size(32, 32); //The ImageList's size set the ToolBar's size.

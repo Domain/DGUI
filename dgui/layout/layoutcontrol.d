@@ -41,7 +41,7 @@ class ResizeManager: Handle!(HDWP), IDisposable
 
 	public void setPosition(Control ctrl, int x, int y)
 	{
-		this.resizeControl(ctrl, x, y, 0, 0, PositionSpecified.POSITION);
+		this.resizeControl(ctrl, x, y, 0, 0, PositionSpecified.position);
 	}
 
 	public void setSize(Control ctrl, Size sz)
@@ -51,25 +51,25 @@ class ResizeManager: Handle!(HDWP), IDisposable
 
 	public void setSize(Control ctrl, int w, int h)
 	{
-		this.resizeControl(ctrl, 0, 0, w, h, PositionSpecified.SIZE);
+		this.resizeControl(ctrl, 0, 0, w, h, PositionSpecified.size);
 	}
 
-	public void resizeControl(Control ctrl, Rect r, PositionSpecified ps = PositionSpecified.ALL)
+	public void resizeControl(Control ctrl, Rect r, PositionSpecified ps = PositionSpecified.all)
 	{
 		this.resizeControl(ctrl, r.x, r.y, r.width, r.height, ps);
 	}
 
-	public void resizeControl(Control ctrl, int x, int y, int w, int h, PositionSpecified ps = PositionSpecified.ALL)
+	public void resizeControl(Control ctrl, int x, int y, int w, int h, PositionSpecified ps = PositionSpecified.all)
 	{
 		uint wpf = SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOMOVE | SWP_NOSIZE;
 
-		if(ps !is PositionSpecified.ALL)
+		if(ps !is PositionSpecified.all)
 		{
-			if(ps is PositionSpecified.POSITION)
+			if(ps is PositionSpecified.position)
 			{
 				wpf &= ~SWP_NOMOVE;
 			}
-			else //if(ps is PositionSpecified.SIZE)
+			else //if(ps is PositionSpecified.size)
 			{
 				wpf &= ~SWP_NOSIZE;
 			}
@@ -113,35 +113,35 @@ abstract class LayoutControl: ContainerControl, ILayoutControl
 					break;
 				}
 
-				if(c.dock !is DockStyle.NONE && c.visible && c.created)
+				if(c.dock !is DockStyle.none && c.visible && c.created)
 				{
 					switch(c.dock)
 					{
-						case DockStyle.LEFT:
+						case DockStyle.left:
 							//c.bounds = Rect(da.left, da.top, c.width, da.height);
 							rm.resizeControl(c, da.left, da.top, c.width, da.height);
 							da.left += c.width;
 							break;
 
-						case DockStyle.TOP:
+						case DockStyle.top:
 							//c.bounds = Rect(da.left, da.top, da.width, c.height);
 							rm.resizeControl(c, da.left, da.top, da.width, c.height);
 							da.top += c.height;
 							break;
 
-						case DockStyle.RIGHT:
+						case DockStyle.right:
 							//c.bounds = Rect(da.right - c.width, da.top, c.width, da.height);
 							rm.resizeControl(c, da.right - c.width, da.top, c.width, da.height);
 							da.right -= c.width;
 							break;
 
-						case DockStyle.BOTTOM:
+						case DockStyle.bottom:
 							//c.bounds = Rect(c, da.left, da.bottom - c.height, da.width, c.height);
 							rm.resizeControl(c, da.left, da.bottom - c.height, da.width, c.height);
 							da.bottom -= c.height;
 							break;
 
-						case DockStyle.FILL:
+						case DockStyle.fill:
 							//c.bounds = da;
 							rm.resizeControl(c, da);
 							da.size = NullSize;
@@ -169,7 +169,7 @@ abstract class LayoutControl: ContainerControl, ILayoutControl
 			{
 				Control c = winCast!(Control)(m.wParam);
 
-				if(c.dock !is DockStyle.NONE && c.visible)
+				if(c.dock !is DockStyle.none && c.visible)
 				{
 					this.updateLayout();
 				}

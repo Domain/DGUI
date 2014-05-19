@@ -137,11 +137,11 @@ class ListBox: OwnerDrawControl
 
 		switch(this._drawMode)
 		{
-			case OwnerDrawMode.FIXED:
+			case OwnerDrawMode.fixed:
 				this.setStyle(LBS_OWNERDRAWFIXED, true);
 				break;
 
-			case OwnerDrawMode.VARIABLE:
+			case OwnerDrawMode.variable:
 				this.setStyle(LBS_OWNERDRAWVARIABLE, true);
 				break;
 

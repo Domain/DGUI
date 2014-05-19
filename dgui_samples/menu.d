@@ -18,7 +18,7 @@ class MainForm: Form
 	{
 		this.text = "DGui Menu Test";
 		this.size = Size(500, 400);
-		this.startPosition = FormStartPosition.CENTER_SCREEN; // Set Form Position
+		this.startPosition = FormStartPosition.centerScreen; // Set Form Position
 
 		this._mainMenu = new MenuBar();
 		MenuItem m1 = this._mainMenu.addItem("Menu 1"); //Menu 1

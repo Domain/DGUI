@@ -14,9 +14,9 @@ public import dgui.imagelist;
 
 enum ToolButtonStyle: ubyte
 {
-	BUTTON = TBSTYLE_BUTTON,
-	SEPARATOR = TBSTYLE_SEP,
-	DROPDOWN = TBSTYLE_DROPDOWN,
+	button = TBSTYLE_BUTTON,
+	separator = TBSTYLE_SEP,
+	dropdown = TBSTYLE_DROPDOWN,
 }
 
 class ToolButton
@@ -169,7 +169,7 @@ class ToolBar: SubclassedControl
 			this._buttons = new Collection!(ToolButton)();
 		}
 
-		ToolButton tb = new ToolButton(this, ToolButtonStyle.DROPDOWN, imgIndex, en);
+		ToolButton tb = new ToolButton(this, ToolButtonStyle.dropdown, imgIndex, en);
 		tb.contextMenu = ctxMenu;
 		this._buttons.add(tb);
 
@@ -188,7 +188,7 @@ class ToolBar: SubclassedControl
 			this._buttons = new Collection!(ToolButton)();
 		}
 
-		ToolButton tb = new ToolButton(this, ToolButtonStyle.BUTTON, imgIndex, en);
+		ToolButton tb = new ToolButton(this, ToolButtonStyle.button, imgIndex, en);
 		this._buttons.add(tb);
 
 		if(this.created)
@@ -206,7 +206,7 @@ class ToolBar: SubclassedControl
 			this._buttons = new Collection!(ToolButton)();
 		}
 
-		ToolButton tb = new ToolButton(this, ToolButtonStyle.SEPARATOR, -1, true);
+		ToolButton tb = new ToolButton(this, ToolButtonStyle.separator, -1, true);
 		this._buttons.add(tb);
 
 		if(this.created)
@@ -248,14 +248,14 @@ class ToolBar: SubclassedControl
 
 		switch(tb.style)
 		{
-			case ToolButtonStyle.BUTTON, ToolButtonStyle.DROPDOWN:
+			case ToolButtonStyle.button, ToolButtonStyle.dropdown:
 				tbtn.iBitmap = tb.imageIndex;
 				tbtn.fsStyle = cast(ubyte)tb.style;
 				tbtn.fsState = cast(ubyte)(tb.enabled ? TBSTATE_ENABLED : 0);
 				tbtn.dwData = winCast!(uint)(tb);
 				break;
 
-			case ToolButtonStyle.SEPARATOR:
+			case ToolButtonStyle.separator:
 				tbtn.fsStyle = cast(ubyte)tb.style;
 				break;
 
@@ -263,7 +263,7 @@ class ToolBar: SubclassedControl
 				assert(false, "Unknown ToolButton Style");
 		}
 
-		if(tb.toolBar._dock is DockStyle.LEFT || tb.toolBar._dock is DockStyle.RIGHT)
+		if(tb.toolBar._dock is DockStyle.left || tb.toolBar._dock is DockStyle.right)
 		{
 			tbtn.fsState |= TBSTATE_WRAP;
 		}
@@ -277,12 +277,12 @@ class ToolBar: SubclassedControl
 		ccp.ClassName = WC_DTOOLBAR;
 		this.setStyle(TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN, true);
 
-		if(this._dock is DockStyle.NONE)
+		if(this._dock is DockStyle.none)
 		{
-			this._dock = DockStyle.TOP;
+			this._dock = DockStyle.top;
 		}
 
-		if(this._dock is DockStyle.LEFT || this._dock is DockStyle.RIGHT)
+		if(this._dock is DockStyle.left || this._dock is DockStyle.right)
 		{
 			this.setStyle(CCS_VERT, true);
 		}
@@ -381,11 +381,11 @@ class ToolBar: SubclassedControl
 
 			switch(this._dock)
 			{
-				case DockStyle.TOP, DockStyle.BOTTOM:
+				case DockStyle.top, DockStyle.bottom:
 					pWindowPos.cy = HIWORD(sz);
 					break;
 
-				case DockStyle.LEFT, DockStyle.RIGHT:
+				case DockStyle.left, DockStyle.right:
 					pWindowPos.cx = LOWORD(sz);
 					break;
 

@@ -12,15 +12,15 @@ import dgui.core.controls.subclassedcontrol;
 
 enum ToolTipIcons
 {
-	NONE	= TTI_NONE,
-	INFO 	= TTI_INFO,
-	WARNING = TTI_WARNING,
-	ERROR   = TTI_ERROR,
+	none	= TTI_NONE,
+	info 	= TTI_INFO,
+	warning = TTI_WARNING,
+	error   = TTI_ERROR,
 }
 
 class ToolTip: SubclassedControl
 {
-	private ToolTipIcons _ttIcon = ToolTipIcons.NONE;
+	private ToolTipIcons _ttIcon = ToolTipIcons.none;
 	private bool _creating = false;
 	private Control _ctrl;
 	private string _title;
@@ -166,7 +166,7 @@ class ToolTip: SubclassedControl
 		    The width varies based on the length of the string currently in the tooltip window. */
 		this.bounds = Rect(CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT);
 
-		ToolTip.setBit(this._cBits, ControlBits.CANNOT_ADD_CHILD | ControlBits.USE_CACHED_TEXT, true);
+		ToolTip.setBit(this._cBits, ControlBits.cannotAddChild | ControlBits.useCachedText, true);
 		super.createControlParams(ccp);
 	}
 
@@ -188,7 +188,7 @@ class ToolTip: SubclassedControl
 
 	protected override void onHandleCreated(EventArgs e)
 	{
-		if(this._ttIcon !is ToolTipIcons.NONE || this._title.length)
+		if(this._ttIcon !is ToolTipIcons.none || this._title.length)
 		{
 			this.sendMessage(TTM_SETTITLEW, this._ttIcon, cast(LPARAM)toUTFz!(wchar*)(this._title));
 		}

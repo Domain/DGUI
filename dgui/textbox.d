@@ -12,14 +12,14 @@ import dgui.core.controls.textcontrol;
 
 enum CharacterCasing
 {
-	NORMAL = 0,
-	UPPERCASE = ES_UPPERCASE,
-	LOWERCASE = ES_LOWERCASE,
+	normal = 0,
+	uppercase = ES_UPPERCASE,
+	lowercase = ES_LOWERCASE,
 }
 
 class TextBox: TextControl
 {
-	private CharacterCasing _chChasing  = CharacterCasing.NORMAL;
+	private CharacterCasing _chChasing  = CharacterCasing.normal;
 	private uint _maxLength = 0;
 
 	@property public final bool multiline()

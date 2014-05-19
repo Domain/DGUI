@@ -13,14 +13,14 @@ import dgui.core.controls.control;
 
 enum LabelDrawMode: ubyte
 {
-	NORMAL = 0,
-	OWNER_DRAW = 1,
+	normal = 0,
+	ownerDraw = 1,
 }
 
 class Label: Control
 {
-	private LabelDrawMode _drawMode = LabelDrawMode.NORMAL;
-	private TextAlignment _textAlign = TextAlignment.MIDDLE | TextAlignment.LEFT;
+	private LabelDrawMode _drawMode = LabelDrawMode.normal;
+	private TextAlignment _textAlign = TextAlignment.middle | TextAlignment.left;
 
 	alias @property Control.text text;
 	private bool _multiLine = false;
@@ -74,7 +74,7 @@ class Label: Control
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		ccp.ClassName = WC_DLABEL;
-		ccp.ClassStyle = ClassStyles.HREDRAW | ClassStyles.VREDRAW;
+		ccp.ClassStyle = ClassStyles.hRedraw | ClassStyles.vRedraw;
 
 		super.createControlParams(ccp);
 	}
@@ -83,12 +83,12 @@ class Label: Control
 	{
 		super.onPaint(e);
 
-		if(this._drawMode is LabelDrawMode.NORMAL)
+		if(this._drawMode is LabelDrawMode.normal)
 		{
 			Canvas c = e.canvas;
 			Rect r = Rect(NullPoint, this.clientSize);
 
-			scope TextFormat tf = new TextFormat(this._multiLine ? TextFormatFlags.WORD_BREAK : TextFormatFlags.SINGLE_LINE);
+			scope TextFormat tf = new TextFormat(this._multiLine ? TextFormatFlags.wordBreak : TextFormatFlags.singleLine);
 			tf.alignment = this._textAlign;
 
 			scope SolidBrush sb = new SolidBrush(this.backColor);

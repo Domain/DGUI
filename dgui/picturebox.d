@@ -13,13 +13,13 @@ import dgui.canvas;
 
 enum SizeMode
 {
-	NORMAL = 0,
-	AUTO_SIZE = 1,
+	normal = 0,
+	autoSize = 1,
 }
 
 class PictureBox: Control
 {
-	private SizeMode _sm = SizeMode.NORMAL;
+	private SizeMode _sm = SizeMode.normal;
 	private Image _img;
 
 	public override void dispose()
@@ -37,7 +37,7 @@ class PictureBox: Control
 
 	@property public override void bounds(Rect r)
 	{
-		if(this._img && this._sm is SizeMode.AUTO_SIZE)
+		if(this._img && this._sm is SizeMode.autoSize)
 		{
 			// Ignora 'r.size' e usa la dimensione dell'immagine
 			Size sz = r.size;
@@ -89,7 +89,7 @@ class PictureBox: Control
 	{
 		ccp.ClassName  = WC_DPICTUREBOX;
 		ccp.DefaultCursor = SystemCursors.arrow;
-		ccp.ClassStyle = ClassStyles.PARENTDC;
+		ccp.ClassStyle = ClassStyles.parentDC;
 
 		super.createControlParams(ccp);
 	}
@@ -102,7 +102,7 @@ class PictureBox: Control
 
 			switch(this._sm)
 			{
-				case SizeMode.AUTO_SIZE:
+				case SizeMode.autoSize:
 					c.drawImage(this._img, Rect(NullPoint, this.size));
 					break;
 

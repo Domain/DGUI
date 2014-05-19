@@ -149,7 +149,7 @@ public HBITMAP iconToBitmapPARGB32(HICON hIcon)
 	rIco.right = szIco.cx;
 	rIco.bottom = szIco.cy;
 
-	if(ver > WindowsVersion.WINDOWS_XP) //Is Vista or 7
+	if(ver > WindowsVersion.windowsXP) //Is Vista or 7
 	{
 		if(!hUxTheme)
 		{

@@ -59,20 +59,20 @@ enum
 
 enum ClassStyles: uint
 {
-	NONE 			= 0x00000000,
-	VREDRAW			= 0x00000001,
-	HREDRAW			= 0x00000002,
-	KEYCVTWINDOW	= 0x00000004,
-	DBLCLKS			= 0x00000008,
-	OWNDC			= 0x00000020,
-	CLASSDC			= 0x00000040,
-	PARENTDC		= 0x00000080,
-	NOKEYCVT		= 0x00000100,
-	NOCLOSE			= 0x00000200,
-	SAVEBITS		= 0x00000800,
-	BYTEALIGNCLIENT	= 0x00001000,
-	BYTEALIGNWINDOW	= 0x00002000,
-	GLOBALCLASS		= 0x00004000,
+	none 			= 0x00000000,
+	vRedraw			= 0x00000001,
+	hRedraw			= 0x00000002,
+	keyCVTWindow	= 0x00000004,
+	doubleClicks			= 0x00000008,
+	ownDC			= 0x00000020,
+	classDC			= 0x00000040,
+	parentDC		= 0x00000080,
+	noKeyCVT		= 0x00000100,
+	noClose			= 0x00000200,
+	saveBits		= 0x00000800,
+	byteAlignClient	= 0x00001000,
+	byteAlignWindow	= 0x00002000,
+	globalClass		= 0x00004000,
 	IME				= 0x00010000,
 }
 
@@ -105,7 +105,7 @@ final class WindowClass
 		if(!getClassInfoEx(newClassName, &newWc)) // IF Class Non Found THEN
 		{
 			newWc = oldWc;
-			newWc.style &= ~ClassStyles.GLOBALCLASS; // Remove Global Class
+			newWc.style &= ~ClassStyles.globalClass; // Remove Global Class
 
 			newWc.lpfnWndProc = newWndProc;
 			newWc.lpszClassName = pNewClassName;

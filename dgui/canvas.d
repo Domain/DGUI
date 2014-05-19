@@ -25,11 +25,11 @@ public import dgui.core.geometry;
   */
 enum FontStyle: ubyte
 {
-	NORMAL = 0,		/// Normal Font Style
-	BOLD = 1,		/// Bold Font Style
-	ITALIC = 2,		/// Italic Font Style
-	UNDERLINE = 4,	/// Underline Font Style
-	STRIKEOUT = 8,	/// Strikeout Font Style
+	normal = 0,		/// Normal Font Style
+	bold = 1,		/// Bold Font Style
+	italic = 2,		/// Italic Font Style
+	underline = 4,	/// Underline Font Style
+	strikeout = 8,	/// Strikeout Font Style
 }
 
 /**
@@ -38,8 +38,8 @@ enum FontStyle: ubyte
 
 enum ImageType
 {
-	BITMAP 		   = 0,	/// Bitmap Image
-	ICON_OR_CURSOR = 1,	/// Icon or Cursor
+	bitmap 		   = 0,	/// Bitmap Image
+	iconOrCursor = 1,	/// Icon or Cursor
 }
 
 /**
@@ -47,8 +47,8 @@ enum ImageType
   */
 enum GradientFillRectMode
 {
-	HORIZONTAL = 0,	/// Horizontal Fill
-	VERTICAL   = 1,	/// Vertical Fill
+	horizontal = 0,	/// Horizontal Fill
+	vertical   = 1,	/// Vertical Fill
 }
 
 /**
@@ -56,62 +56,62 @@ enum GradientFillRectMode
   */
 enum EdgeType: uint
 {
-	RAISED_OUTER = BDR_RAISEDOUTER,	/// Raised Outer Edge
-	RAISED_INNER = BDR_RAISEDINNER, /// Raised Innter Edge
+	raisedOuter = BDR_RAISEDOUTER,	/// Raised Outer Edge
+	raisedInner = BDR_RAISEDINNER, /// Raised Innter Edge
 
-	SUNKEN_OUTER = BDR_SUNKENOUTER,	/// Sunken Outer Edge
-	SUNKEN_INNER = BDR_SUNKENINNER, /// Sunken Inner Edge
+	sunkenOuter = BDR_SUNKENOUTER,	/// Sunken Outer Edge
+	sunkenInner = BDR_SUNKENINNER, /// Sunken Inner Edge
 
-	BUMP = EDGE_BUMP,				/// Bump Edge
-	ETCHED = EDGE_ETCHED,			/// Etched Edge
-	RAISED = EDGE_RAISED,		/// Edge Raised Edge
-	SUNKEN = EDGE_SUNKEN,			/// Sunken Edge
+	bump = EDGE_BUMP,				/// Bump Edge
+	etched = EDGE_ETCHED,			/// Etched Edge
+	raised = EDGE_RAISED,		/// Edge Raised Edge
+	sunken = EDGE_SUNKEN,			/// Sunken Edge
 }
 
 enum FrameType: uint
 {
-	BUTTON		= DFC_BUTTON,
-	CAPTION		= DFC_CAPTION,
-	MENU 		= DFC_MENU,
-	POPUPMENU	= DFC_POPUPMENU,
-	SCROLL		= DFC_SCROLL,
+	button		= DFC_BUTTON,
+	caption		= DFC_CAPTION,
+	menu 		= DFC_MENU,
+	popupMenu	= DFC_POPUPMENU,
+	scroll		= DFC_SCROLL,
 }
 
 enum FrameMode: uint
 {
-	BUTTON_3STATE				= DFCS_BUTTON3STATE,
-	BUTTON_CHECK				= DFCS_BUTTONCHECK,
-	BUTTON_PUSH					= DFCS_BUTTONPUSH,
-	BUTTON_RADIO				= DFCS_BUTTONRADIO,
-	BUTTON_RADIOIMAGE			= DFCS_BUTTONRADIOIMAGE,
-	BUTTON_RADIOMASK			= DFCS_BUTTONRADIOMASK,
+	button3state				= DFCS_BUTTON3STATE,
+	buttonCheck				= DFCS_BUTTONCHECK,
+	buttonPush					= DFCS_BUTTONPUSH,
+	buttonRadio				= DFCS_BUTTONRADIO,
+	buttonRadioImage			= DFCS_BUTTONRADIOIMAGE,
+	buttonRadioMask			= DFCS_BUTTONRADIOMASK,
 
-	CAPTION_CLOSE				= DFCS_CAPTIONCLOSE,
-	CAPTION_HELP				= DFCS_CAPTIONHELP,
-	CAPTION_MAX					= DFCS_CAPTIONMAX,
-	CAPTION_MIN					= DFCS_CAPTIONMIN,
-	CAPTION_RESTORE 			= DFCS_CAPTIONRESTORE,
+	captionClose				= DFCS_CAPTIONCLOSE,
+	captionHelp				= DFCS_CAPTIONHELP,
+	captionMax					= DFCS_CAPTIONMAX,
+	captionMin					= DFCS_CAPTIONMIN,
+	captionRestore 			= DFCS_CAPTIONRESTORE,
 
-	MENU_ARROW					= DFCS_MENUARROW,
-	MENU_ARROWRIGHT 			= DFCS_MENUARROWRIGHT,
-	MENU_BULLET					= DFCS_MENUBULLET,
-	MENU_CHECK					= DFCS_MENUCHECK,
+	menuArrow					= DFCS_MENUARROW,
+	menuArrowRight 			= DFCS_MENUARROWRIGHT,
+	menuBullet					= DFCS_MENUBULLET,
+	menuCheck					= DFCS_MENUCHECK,
 
-	SCROLL_COMBOBOX				= DFCS_SCROLLCOMBOBOX,
-	SCROLL_DOWN					= DFCS_SCROLLDOWN,
-	SCROLL_LEFT					= DFCS_SCROLLLEFT,
-	SCROLL_RIGHT				= DFCS_SCROLLRIGHT,
-	SCROLL_SIZEGRIP				= DFCS_SCROLLSIZEGRIP,
-	SCROLL_SIZEGRIPRIGHT		= DFCS_SCROLLSIZEGRIPRIGHT,
-	SCROLL_UP					= DFCS_SCROLLUP,
+	scrollComboBox				= DFCS_SCROLLCOMBOBOX,
+	scrollDown					= DFCS_SCROLLDOWN,
+	scrollLeft					= DFCS_SCROLLLEFT,
+	scrollRight				= DFCS_SCROLLRIGHT,
+	scrollSizeGrip				= DFCS_SCROLLSIZEGRIP,
+	scrollSizeGripRight		= DFCS_SCROLLSIZEGRIPRIGHT,
+	scrollUp					= DFCS_SCROLLUP,
 
-	CHECKED						= DFCS_CHECKED,
-	FLAT						= DFCS_FLAT,
-	HOT							= DFCS_HOT,
-	INACTIVE					= DFCS_INACTIVE,
-	MONO						= DFCS_MONO,
-	PUSHED						= DFCS_PUSHED,
-	TRANSPARENT					= DFCS_TRANSPARENT,
+	checked						= DFCS_CHECKED,
+	flat						= DFCS_FLAT,
+	hot							= DFCS_HOT,
+	inactive					= DFCS_INACTIVE,
+	mono						= DFCS_MONO,
+	pushed						= DFCS_PUSHED,
+	transparent					= DFCS_TRANSPARENT,
 }
 
 /**
@@ -119,16 +119,16 @@ enum FrameMode: uint
   */
 enum EdgeMode: uint
 {
-	ADJUST	 = BF_ADJUST,		/// Shrink the rectangle in order to exlude the edges that were drawn.
-	DIAGONAL = BF_DIAGONAL,		/// Diagonal Border.
-	FLAT	 = BF_FLAT,			/// Flat Border.
-	LEFT	 = BF_LEFT,			/// Left Border Only.
-	TOP		 = BF_TOP,			/// Top Border Only.
-	RIGHT    = BF_RIGHT,		/// Right Border Only.
-	BOTTOM 	 = BF_BOTTOM,		/// Bottom Border Only.
-	INTERNAL = BF_MIDDLE,		/// Internal Border will be filled.
-	MONO 	 = BF_MONO,			/// One Dimensional Border.
-	RECT 	 = BF_RECT,			/// Fills the entire border of the rectangle.
+	adjust	 = BF_ADJUST,		/// Shrink the rectangle in order to exlude the edges that were drawn.
+	diagonal = BF_DIAGONAL,		/// Diagonal Border.
+	flat	 = BF_FLAT,			/// Flat Border.
+	left	 = BF_LEFT,			/// Left Border Only.
+	top		 = BF_TOP,			/// Top Border Only.
+	right    = BF_RIGHT,		/// Right Border Only.
+	bottom 	 = BF_BOTTOM,		/// Bottom Border Only.
+	internal = BF_MIDDLE,		/// Internal Border will be filled.
+	mono 	 = BF_MONO,			/// One Dimensional Border.
+	rect 	 = BF_RECT,			/// Fills the entire border of the rectangle.
 	//SOFT 	 = BF_SOFT,
 }
 
@@ -137,12 +137,12 @@ enum EdgeMode: uint
   */
 enum HatchStyle: int
 {
-	HORIZONTAL 		   = HS_HORIZONTAL,		/// The brush has horizontal stripes.
-	VERTICAL 		   = HS_VERTICAL,		/// The brush has vertical stripes.
-	DEGREE_45_UPWARD   = HS_BDIAGONAL, 		/// The brush has 45° degree rising stripes.
-	DEGREE_45_DOWNWARD = HS_FDIAGONAL,		/// The brush has 45° degree falling stripes.
-	CROSS			   = HS_CROSS,			/// The brush has crossed stripes.
-	DIAGONAL_CROSS	   = HS_DIAGCROSS,		/// The brush has diagonal crossed stripes.
+	horizontal 		   = HS_HORIZONTAL,		/// The brush has horizontal stripes.
+	vertical 		   = HS_VERTICAL,		/// The brush has vertical stripes.
+	degree45Upward   = HS_BDIAGONAL, 		/// The brush has 45° degree rising stripes.
+	degree45Downward = HS_FDIAGONAL,		/// The brush has 45° degree falling stripes.
+	cross			   = HS_CROSS,			/// The brush has crossed stripes.
+	diagonalCross	   = HS_DIAGCROSS,		/// The brush has diagonal crossed stripes.
 }
 
 
@@ -151,13 +151,13 @@ enum HatchStyle: int
   */
 enum PenStyle: uint
 {
-	SOLID		 = PS_SOLID,		/// Solid Pen (Standard).
-	DASH		 = PS_DASH,			/// Dashed Pen.
-	DOT  		 = PS_DOT,			/// Dotted Pen.
-	DASH_DOT	 = PS_DASHDOT,		/// Dash-Dotted Pen.
-	DASH_DOT_DOT = PS_DASHDOTDOT,	/// Dashed-Dotted-Dotted Pen.
-	NULL		 = PS_NULL,			/// Invisible Pen.
-	INSIDE_FRAME = PS_INSIDEFRAME,	/// Solid Pen (line are drown inside the border of a closed shape).
+	solid		 = PS_SOLID,		/// Solid Pen (Standard).
+	dash		 = PS_DASH,			/// Dashed Pen.
+	dot  		 = PS_DOT,			/// Dotted Pen.
+	dashDot	 = PS_DASHDOT,		/// Dash-Dotted Pen.
+	dashDotDot = PS_DASHDOTDOT,	/// Dashed-Dotted-Dotted Pen.
+	null_		 = PS_NULL,			/// Invisible Pen.
+	insideFrame = PS_INSIDEFRAME,	/// Solid Pen (line are drown inside the border of a closed shape).
 }
 
 /**
@@ -165,11 +165,11 @@ enum PenStyle: uint
   */
 enum TextFormatFlags: uint
 {
-	NO_PREFIX				= DT_NOPREFIX,		/// Turn of processing of prefix characters (like '&', character that it will be not displayed underline).
-	WORD_BREAK			    = DT_WORDBREAK,		/// Break the line if a carriage return is found or the selected rectangle is too small.
-	SINGLE_LINE				= DT_SINGLELINE,	/// The text is draw in one single line.
-	LINE_LIMIT 				= DT_EDITCONTROL,	/// Duplicate the text displaying of a multiline control.
-	NO_CLIP 				= DT_NOCLIP,		/// The text is not clipped.
+	noPrefix				= DT_NOPREFIX,		/// Turn of processing of prefix characters (like '&', character that it will be not displayed underline).
+	wordBreak			    = DT_WORDBREAK,		/// Break the line if a carriage return is found or the selected rectangle is too small.
+	singleLine				= DT_SINGLELINE,	/// The text is draw in one single line.
+	lineLimit 				= DT_EDITCONTROL,	/// Duplicate the text displaying of a multiline control.
+	noClip 				= DT_NOCLIP,		/// The text is not clipped.
 	//DIRECTION_RIGHT_TO_LEFT = DT_RTLREADING,
 }
 
@@ -178,13 +178,13 @@ enum TextFormatFlags: uint
   */
 enum TextAlignment: uint
 {
-	LEFT   = DT_LEFT,		/// Text is left aligned.
-	RIGHT  = DT_RIGHT,		/// Text is right aligned.
-	CENTER = DT_CENTER,		/// Text is centred horizontally.
+	left   = DT_LEFT,		/// Text is left aligned.
+	right  = DT_RIGHT,		/// Text is right aligned.
+	center = DT_CENTER,		/// Text is centred horizontally.
 
-	TOP    = DT_TOP,		/// Text is top aligned.
-	BOTTOM = DT_BOTTOM,		/// Text is bottom aligned.
-	MIDDLE = DT_VCENTER,	/// Text is centred vertically.
+	top    = DT_TOP,		/// Text is top aligned.
+	bottom = DT_BOTTOM,		/// Text is bottom aligned.
+	middle = DT_VCENTER,	/// Text is centred vertically.
 }
 
 /**
@@ -192,9 +192,9 @@ enum TextAlignment: uint
   */
 enum TextTrimming: uint
 {
-	NONE 		  = 0,					/// No Trimming.
-	ELLIPSIS	  = DT_END_ELLIPSIS,	/// If the text is too long, it will be replaced with end ellipsis (like: ellips...).
-	ELLIPSIS_PATH = DT_PATH_ELLIPSIS,   /// If the text is too long, it will be replaces with middle ellipsis (like: texttr...ing).
+	none 		  = 0,					/// No Trimming.
+	ellipsis	  = DT_END_ELLIPSIS,	/// If the text is too long, it will be replaced with end ellipsis (like: ellips...).
+	ellipsisPath = DT_PATH_ELLIPSIS,   /// If the text is too long, it will be replaces with middle ellipsis (like: texttr...ing).
 }
 
 /**
@@ -202,10 +202,10 @@ enum TextTrimming: uint
   */
 enum BitmapCopyMode
 {
-	NORMAL 	= SRCCOPY,		/// Standard Copy.
-	INVERT	= SRCINVERT,	/// Copy Inverted.
-	AND   	= SRCAND,		/// Copy using _AND operator (Source _AND Destination).
-	OR      = SRCPAINT,		/// Copy using _OR operator (Source _OR Destination).
+	normal 	= SRCCOPY,		/// Standard Copy.
+	invert	= SRCINVERT,	/// Copy Inverted.
+	and   	= SRCAND,		/// Copy using _AND operator (Source _AND Destination).
+	or      = SRCPAINT,		/// Copy using _OR operator (Source _OR Destination).
 }
 
 /**
@@ -341,12 +341,12 @@ class Canvas: Handle!(HDC), IDisposable
 
 	private enum CanvasType: ubyte
 	{
-		NORMAL = 0,
-		FROM_CONTROL = 1,
-		IN_MEMORY = 2,
+		normal = 0,
+		fromControl = 1,
+		inMemory = 2,
 	}
 
-	private CanvasType _canvasType = CanvasType.NORMAL;
+	private CanvasType _canvasType = CanvasType.normal;
 	private HBITMAP _hBitmap;
 	private bool _owned;
 
@@ -379,7 +379,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public void copyTo(Canvas c, Rect destRect, Point posSrc)
 	{
-		this.copyTo(c, BitmapCopyMode.NORMAL, destRect, posSrc);
+		this.copyTo(c, BitmapCopyMode.normal, destRect, posSrc);
 	}
 
 	public void copyTo(Canvas c, BitmapCopyMode bcm, Rect destRect)
@@ -394,7 +394,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public void copyTo(Canvas c)
 	{
-		this.copyTo(c, BitmapCopyMode.NORMAL);
+		this.copyTo(c, BitmapCopyMode.normal);
 	}
 
 	public void copyTransparent(Canvas c, Color transpColor)
@@ -427,11 +427,11 @@ class Canvas: Handle!(HDC), IDisposable
 		{
 			switch(this._canvasType)
 			{
-				case CanvasType.FROM_CONTROL:
+				case CanvasType.fromControl:
 					ReleaseDC(WindowFromDC(this._handle), this._handle);
 					break;
 
-				case CanvasType.IN_MEMORY:
+				case CanvasType.inMemory:
 					DeleteObject(this._hBitmap);
 					DeleteDC(this._handle);
 					break;
@@ -570,7 +570,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 		switch(img.type)
 		{
-			case ImageType.BITMAP:
+			case ImageType.bitmap:
 				HDC hdc = CreateCompatibleDC(this._handle);
 				HBITMAP hOldBitmap = SelectObject(hdc, img.handle);
 				BitBlt(this._handle, x, y, sz.width, sz.height, hdc, 0, 0, SRCCOPY);
@@ -578,7 +578,7 @@ class Canvas: Handle!(HDC), IDisposable
 				DeleteDC(hdc);
 				break;
 
-			case ImageType.ICON_OR_CURSOR:
+			case ImageType.iconOrCursor:
 				DrawIconEx(this._handle, x, y, img.handle, sz.width, sz.height, 0, null, DI_NORMAL);
 				break;
 
@@ -593,7 +593,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 		switch(img.type)
 		{
-			case ImageType.BITMAP:
+			case ImageType.bitmap:
 				HDC hdc = CreateCompatibleDC(this._handle);
 				HBITMAP hOldBitmap = SelectObject(hdc, img.handle);
 				StretchBlt(this._handle, r.x, r.y, r.width, r.height, hdc, 0, 0, sz.width, sz.height, SRCCOPY);
@@ -601,7 +601,7 @@ class Canvas: Handle!(HDC), IDisposable
 				DeleteDC(hdc);
 				break;
 
-			case ImageType.ICON_OR_CURSOR:
+			case ImageType.iconOrCursor:
 				DrawIconEx(this._handle, r.x, r.y, img.handle, r.width, r.height, 0, null, DI_NORMAL);
 				break;
 
@@ -644,10 +644,10 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public final void drawText(string text, Rect r, Color foreColor, Font font)
 	{
-		scope TextFormat tf = new TextFormat(TextFormatFlags.NO_PREFIX | TextFormatFlags.WORD_BREAK |
-											 TextFormatFlags.NO_CLIP | TextFormatFlags.LINE_LIMIT);
+		scope TextFormat tf = new TextFormat(TextFormatFlags.noPrefix | TextFormatFlags.wordBreak |
+											 TextFormatFlags.noClip | TextFormatFlags.lineLimit);
 
-		tf.trimming = TextTrimming.NONE;
+		tf.trimming = TextTrimming.none;
 
 		this.drawText(text, r, foreColor, font, tf);
 	}
@@ -769,7 +769,7 @@ class Canvas: Handle!(HDC), IDisposable
 	public final Canvas createInMemory(Bitmap b)
 	{
 		HDC hdc = CreateCompatibleDC(this._handle);
-		Canvas c = new Canvas(hdc, true, CanvasType.IN_MEMORY);
+		Canvas c = new Canvas(hdc, true, CanvasType.inMemory);
 
 		if(!b)
 		{
@@ -809,7 +809,7 @@ class Canvas: Handle!(HDC), IDisposable
 
 	public static Canvas fromHDC(HDC hdc, bool owned = true)
 	{
-		return new Canvas(hdc, owned, CanvasType.FROM_CONTROL);
+		return new Canvas(hdc, owned, CanvasType.fromControl);
 	}
 }
 
@@ -1074,7 +1074,7 @@ class Bitmap: Image
 
 	@property public override ImageType type()
 	{
-		return ImageType.BITMAP;
+		return ImageType.bitmap;
 	}
 
 	public static Bitmap fromHBITMAP(HBITMAP hBitmap, bool owned = true)
@@ -1164,7 +1164,7 @@ class Icon: Image
 
 	@property public override ImageType type()
 	{
-		return ImageType.ICON_OR_CURSOR;
+		return ImageType.iconOrCursor;
 	}
 
 	public Bitmap toBitmap(Size sz)
@@ -1256,7 +1256,7 @@ final class Font: GraphicObject
 		}
 	}
 
-	public this(string name, int h, FontStyle style = FontStyle.NORMAL)
+	public this(string name, int h, FontStyle style = FontStyle.normal)
 	{
 		Font.initLogPixelSY();
 
@@ -1329,22 +1329,22 @@ final class Font: GraphicObject
 		//lf.lfStrikeOut = FALSE; Inizializzata dal compilatore
 		//lf.lfUnderline = FALSE; Inizializzata dal compilatore
 
-		if(style & FontStyle.BOLD)
+		if(style & FontStyle.bold)
 		{
 			lf.lfWeight = FW_BOLD;
 		}
 
-		if(style & FontStyle.ITALIC)
+		if(style & FontStyle.italic)
 		{
 			lf.lfItalic = 1;
 		}
 
-		if(style & FontStyle.STRIKEOUT)
+		if(style & FontStyle.strikeout)
 		{
 			lf.lfStrikeOut = 1;
 		}
 
-		if(style & FontStyle.UNDERLINE)
+		if(style & FontStyle.underline)
 		{
 			lf.lfUnderline = 1;
 		}
@@ -1461,7 +1461,7 @@ final class Pen: GraphicObject
 		super(hPen, owned);
 	}
 
-	public this(Color color, int width = 1, PenStyle style = PenStyle.SOLID)
+	public this(Color color, int width = 1, PenStyle style = PenStyle.solid)
 	{
 		this._color = color;
 		this._width = width;
@@ -2213,9 +2213,9 @@ final class SystemColors
 
 final class TextFormat
 {
-	private TextTrimming _trim = TextTrimming.NONE; // TextTrimming.CHARACTER.
-	private TextFormatFlags _flags = TextFormatFlags.NO_PREFIX | TextFormatFlags.WORD_BREAK;
-	private TextAlignment _align = TextAlignment.LEFT;
+	private TextTrimming _trim = TextTrimming.none; // TextTrimming.CHARACTER.
+	private TextFormatFlags _flags = TextFormatFlags.noPrefix | TextFormatFlags.wordBreak;
+	private TextAlignment _align = TextAlignment.left;
 	private DRAWTEXTPARAMS _params = {DRAWTEXTPARAMS.sizeof, 8, 0, 0};
 
 	public this()

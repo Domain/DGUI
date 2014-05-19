@@ -22,10 +22,10 @@ private struct TcItem
 
 enum TabAlignment
 {
-	TOP    = 0,
-	LEFT   = TCS_VERTICAL,
-	RIGHT  = TCS_VERTICAL | TCS_RIGHT,
-	BOTTOM = TCS_BOTTOM,
+	top    = 0,
+	left   = TCS_VERTICAL,
+	right  = TCS_VERTICAL | TCS_RIGHT,
+	bottom = TCS_BOTTOM,
 }
 
 class TabPage: Panel
@@ -129,7 +129,7 @@ class TabControl: SubclassedControl, ILayoutControl
 	public Event!(Control, EventArgs) tagPageChanged;
 
 	private Collection!(TabPage) _tabPages;
-	private TabAlignment _ta = TabAlignment.TOP;
+	private TabAlignment _ta = TabAlignment.top;
 	private ImageList _imgList;
 	private int _selIndex = 0; //By Default: select the first TagPage (if exists)
 

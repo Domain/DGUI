@@ -23,11 +23,11 @@ class MainForm: Form
 
 		this.text = "DGui Events";
 		this.size = Size(300, 250);
-		this.startPosition = FormStartPosition.CENTER_SCREEN; // Set Form Position
+		this.startPosition = FormStartPosition.centerScreen; // Set Form Position
 
 		this._pict = new PictureBox();
-		this._pict.sizeMode = SizeMode.AUTO_SIZE; // Stretch the image
-		this._pict.dock = DockStyle.FILL; // Fill the whole form area
+		this._pict.sizeMode = SizeMode.autoSize; // Stretch the image
+		this._pict.dock = DockStyle.fill; // Fill the whole form area
 		this._pict.image = this._bmp;
 		this._pict.parent = this;
 

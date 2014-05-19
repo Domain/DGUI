@@ -151,7 +151,7 @@ class StatusBar: SubclassedControl
 
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
-		this._dock = DockStyle.BOTTOM; //Force dock
+		this._dock = DockStyle.bottom; //Force dock
 
 		ccp.SuperclassName = WC_STATUSBAR;
 		ccp.ClassName = WC_DSTATUSBAR;
