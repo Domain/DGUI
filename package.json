@@ -1,0 +1,9 @@
+{
+	"name": "dgui",
+	"description": "A graphic library for Windows.",
+	"copyright": "Copyright © 2011-2013, Trogu Antonio Davide",
+	"license": "BSL-1.0",
+	"authors": ["Trogu Antonio Davide"],
+	"sourcePaths": ["dgui"],
+	"importPaths": ["."]
+}
