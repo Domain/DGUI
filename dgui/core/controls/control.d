@@ -1271,8 +1271,10 @@ abstract class Control: Handle!(HWND), IDisposable
 				{
 					this._ctxMenu.popupMenu(this._handle, Cursor.position);
 				}
-
-				this.originalWndProc(m);
+				else
+				{
+					this.originalWndProc(m);
+				}
 			}
 			break;
 
