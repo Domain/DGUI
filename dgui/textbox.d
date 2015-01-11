@@ -100,7 +100,7 @@ class TextBox: TextControl
 	protected override void createControlParams(ref CreateControlParams ccp)
 	{
 		this.setExStyle(WS_EX_CLIENTEDGE, true);
-		this.setStyle(this._chChasing, true);
+		this.setStyle(ES_AUTOHSCROLL | this._chChasing, true);
 		ccp.superclassName = WC_EDIT;
 		ccp.className = WC_DEDIT;
 
