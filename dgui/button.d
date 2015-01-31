@@ -44,7 +44,7 @@ class Button: AbstractButton
 		switch(this._drawMode)
 		{
 			case OwnerDrawMode.normal:
-				this.setStyle(BS_DEFPUSHBUTTON, true);
+				this.setStyle(BS_PUSHBUTTON, true);
 				break;
 
 			case OwnerDrawMode.fixed, OwnerDrawMode.variable:
