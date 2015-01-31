@@ -359,6 +359,22 @@ class Form: LayoutControl
 			}
 			break;
 
+			case WM_CONTEXTMENU:
+			{
+				// Display default shortcut menu in case of click on window's caption.
+
+				Rect r = void;
+				GetClientRect(handle, &r.rect);
+
+				auto pt = Point(LOWORD(m.lParam), HIWORD(m.lParam));
+				convertPoint(pt, null, this);
+				if(pt.inRect(r))
+					goto default;
+
+				originalWndProc(m);
+			}
+			break;
+
 			default:
 				super.wndProc(m);
 				break;
