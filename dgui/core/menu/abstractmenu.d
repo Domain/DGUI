@@ -366,8 +366,13 @@ class MenuItem: Menu
 			RootMenu root = this.rootMenu;
 
 			int idx = this.index;
-			HBITMAP hBitmap = iconToBitmapPARGB32(root.imageList.images[imgIdx].handle);
-			root.bitmaps.add(hBitmap);
+
+			HBITMAP hBitmap = null;
+			if(imgIdx != -1)
+			{
+				hBitmap = iconToBitmapPARGB32(root.imageList.images[imgIdx].handle);
+				root.bitmaps.add(hBitmap);
+			}
 
 			MENUITEMINFOW minfo;
 
