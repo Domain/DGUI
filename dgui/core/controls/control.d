@@ -793,12 +793,14 @@ abstract class Control: Handle!(HWND), IDisposable
 		}
 	}
 
-	protected static final void setBit(ref ulong rBits, ulong rBit, bool set)
+	protected static final void setBit(T)(ref T rBits, T rBit, bool set)
+	if(is(T B == enum) && is(B == ulong))
 	{
 		set ? (rBits |= rBit) : (rBits &= ~rBit);
 	}
 
-	protected static final bool hasBit(ref ulong rBits, ulong rBit)
+	protected static final bool hasBit(T)(ref T rBits, T rBit)
+	if(is(T B == enum) && is(B == ulong))
 	{
 		return cast(bool)(rBits & rBit);
 	}
