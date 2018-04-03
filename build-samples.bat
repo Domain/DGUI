@@ -12,7 +12,7 @@ echo Building DGui samples...
 setlocal EnableDelayedExpansion
 for /d %%f in (%samples%) do (
 	echo     %%f.d !%%f!
-	dmd -release -de -w -property -of%OUT_DIR%%%f.exe -L/SUBSYSTEM:windows:4 %SAMPLES_DIR%%%f.d !%%f! %RES% %DGUI_LIB% || goto reportError
+	dmd -release -de -w -of%OUT_DIR%%%f.exe -L/SUBSYSTEM:windows:4 %SAMPLES_DIR%%%f.d !%%f! %RES% %DGUI_LIB% || goto reportError
 	del %OUT_DIR%%%f.obj
 )
 

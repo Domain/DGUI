@@ -116,7 +116,7 @@ class ToolButton
 			 tbinfo.dwMask = TBIF_BYINDEX | TBIF_STATE;
 			 this._owner.sendMessage(TB_GETBUTTONINFOW, this.index, cast(LPARAM)&tbinfo); //Ricavo i dati completi.
 
-			 b ? (tbinfo.fsState |= TBSTATE_ENABLED) : (tbinfo.fsState &= ~TBSTATE_ENABLED);
+			 b ? (tbinfo.fsState |= cast(int)TBSTATE_ENABLED) : (tbinfo.fsState &= ~cast(int)TBSTATE_ENABLED);
 			 this._owner.sendMessage(TB_SETBUTTONINFOW, this.index, cast(LPARAM)&tbinfo);
 		}
 	}

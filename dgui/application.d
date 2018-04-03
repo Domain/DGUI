@@ -28,46 +28,46 @@ private enum
 	info = "Exception Information:",
 	xpManifestFile = "dgui.xml.manifest",
 	errMsg = "An application exception has occured.\r\n1) Click \"Ignore\" to continue (The program can be unstable).\r\n2) Click \"Quit\" to exit.\r\n",
-	xpManifest = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` "\r\n"
-					`<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">` "\r\n"
-					  `<assemblyIdentity` "\r\n"
-						`version="1.0.0.0"` "\r\n"
-						`processorArchitecture="X86"` "\r\n"
-						`name="client"` "\r\n"
-						`type="win32"` "\r\n"
-						`/>` "\r\n"
-						`<description></description>` "\r\n"
-						"\r\n"
-						`<!-- Enable Windows XP and higher themes with common controls -->` "\r\n"
-						`<dependency>` "\r\n"
-							`<dependentAssembly>` "\r\n"
-							  `<assemblyIdentity` "\r\n"
-								`type="win32"` "\r\n"
-								`name="Microsoft.Windows.Common-Controls"` "\r\n"
-								`version="6.0.0.0"` "\r\n"
-								`processorArchitecture="X86"` "\r\n"
-								`publicKeyToken="6595b64144ccf1df"` "\r\n"
-								`language="*"` "\r\n"
-						 	    `/>` "\r\n"
-							`</dependentAssembly>` "\r\n"
-						 `</dependency>` "\r\n"
-						  "\r\n"
-						  `<!-- Disable Windows Vista UAC compatibility heuristics -->` "\r\n"
-						  `<trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">` "\r\n"
-							`<security>` "\r\n"
-								`<requestedPrivileges>` "\r\n"
-									`<requestedExecutionLevel level="asInvoker"/>` "\r\n"
-								`</requestedPrivileges>` "\r\n"
-							`</security>` "\r\n"
-						  `</trustInfo> ` "\r\n"
-						  "\r\n"
-						  `<!-- Enable Windows Vista-style font scaling on Vista -->` "\r\n"
-						  `<asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">` "\r\n"
-						  `<asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">` "\r\n"
-						  `<dpiAware>true</dpiAware>` "\r\n"
-						  `</asmv3:windowsSettings>` "\r\n"
-						  `</asmv3:application>` "\r\n"
-					`</assembly>` "\r\n",
+	xpManifest = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
+					<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0"> 
+					  <assemblyIdentity 
+						version="1.0.0.0" 
+						processorArchitecture="X86" 
+						name="client" 
+						type="win32" 
+						/> 
+						<description></description> 
+						
+						<!-- Enable Windows XP and higher themes with common controls --> 
+						<dependency> 
+							<dependentAssembly> 
+							  <assemblyIdentity 
+								type="win32" 
+								name="Microsoft.Windows.Common-Controls" 
+								version="6.0.0.0" 
+								processorArchitecture="X86" 
+								publicKeyToken="6595b64144ccf1df" 
+								language="*" 
+						 	    /> 
+							</dependentAssembly> 
+						 </dependency> 
+						  
+						  <!-- Disable Windows Vista UAC compatibility heuristics --> 
+						  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2"> 
+							<security> 
+								<requestedPrivileges> 
+									<requestedExecutionLevel level="asInvoker"/> 
+								</requestedPrivileges> 
+							</security> 
+						  </trustInfo>  
+						  
+						  <!-- Enable Windows Vista-style font scaling on Vista --> 
+						  <asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3"> 
+						  <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings"> 
+						  <dpiAware>true</dpiAware> 
+						  </asmv3:windowsSettings> 
+						  </asmv3:application> 
+					</assembly> `,
 }
 private alias extern(Windows) BOOL function(HANDLE hActCtx, ULONG_PTR* lpCookie) ActivateActCtxProc;
 private alias extern(Windows) HANDLE function(ACTCTXW* pActCtx) CreateActCtxWProc;

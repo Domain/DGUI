@@ -70,7 +70,7 @@ class FileBrowserDialog: CommonDialog!(OPENFILENAMEW, string)
 
 		if(res)
 		{
-			this._dlgRes = to!(string)(toUTF8(buffer).ptr);
+			this._dlgRes = toUTF8(buffer[]);
 		}
 
 		return res;

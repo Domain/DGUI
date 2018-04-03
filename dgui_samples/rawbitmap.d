@@ -58,9 +58,9 @@ class MainForm: Form
 
 		for(int i = 0; i < bd.bitsCount; i++) // Invert Colors!
 		{
-			bd.bits[i].rgbRed = ~bd.bits[i].rgbRed;
-			bd.bits[i].rgbGreen = ~bd.bits[i].rgbGreen;
-			bd.bits[i].rgbBlue = ~bd.bits[i].rgbBlue;
+			bd.bits[i].rgbRed = cast(ubyte)(~cast(int)(bd.bits[i].rgbRed));
+			bd.bits[i].rgbGreen = cast(ubyte)(~cast(int)(bd.bits[i].rgbGreen));
+			bd.bits[i].rgbBlue = cast(ubyte)(~cast(int)(bd.bits[i].rgbBlue));
 		}
 
 		this._bmp.setData(bd); //Set the original bitmap data

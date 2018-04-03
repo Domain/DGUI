@@ -1055,7 +1055,7 @@ class Bitmap: Image
 
 	public void setData(ref BitmapData bd)
 	{
-		Bitmap.setData(this._handle, bd);
+		setData(this._handle, bd);
 	}
 
 	public static void freeData(ref BitmapData bd)

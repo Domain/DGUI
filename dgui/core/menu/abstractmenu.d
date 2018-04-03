@@ -244,7 +244,7 @@ class MenuItem: Menu
 
 		if(!e)
 		{
-			this._mBits &= ~MenuBits.enabled;
+			this._mBits &= ~cast(int)MenuBits.enabled;
 		}
 	}
 
